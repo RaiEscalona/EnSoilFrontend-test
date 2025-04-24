@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import './Tooltip.css';
 
 export default function Tooltip({ children, content }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -41,7 +42,7 @@ export default function Tooltip({ children, content }) {
   }, [isVisible]);
 
   return (
-    <div className="relative">
+    <div className="tooltip-container">
       <div
         ref={triggerRef}
         onMouseEnter={() => setIsVisible(true)}
@@ -53,7 +54,7 @@ export default function Tooltip({ children, content }) {
       {isVisible && (
         <div
           ref={tooltipRef}
-          className="absolute z-50 bg-white p-3 rounded-lg shadow-lg border border-gray-200 min-w-[200px] whitespace-normal"
+          className="tooltip-content"
           style={{
             top: `${position.top}px`,
             left: `${position.left}px`,

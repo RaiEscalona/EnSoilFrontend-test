@@ -1,0 +1,17 @@
+.drilling-point {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.drilling-point-marker {
+  width: 1rem;
+  height: 1rem;
+  background-color: rgb(239 68 68);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.drilling-point-marker:hover {
+  background-color: rgb(220 38 38);
+} 

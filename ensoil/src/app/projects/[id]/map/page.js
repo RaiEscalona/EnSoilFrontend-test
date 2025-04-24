@@ -2,9 +2,11 @@
 
 import { useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { calculateCoordinates, formatCoordinates } from '@/utils/coordinateUtils';
 import DrillingPoint from '@/components/DrillingPoint';
 import Alert from '@/components/Alert';
+import './map.css'; // Import the new CSS file
 
 export default function ProjectMapPage() {
   const { id } = useParams();
@@ -20,7 +22,6 @@ export default function ProjectMapPage() {
     coordinates: null,
     clickPosition: null
   });
-  const imageRef = useRef(null);
   const mapContainerRef = useRef(null);
 
   const handleImageUpload = async (e) => {
@@ -30,7 +31,6 @@ export default function ProjectMapPage() {
       setPreviewUrl(url);
       setMapImage(file);
 
-      // Cargar la imagen para obtener sus dimensiones
       const img = new Image();
       img.onload = () => {
         setImageInfo({
@@ -40,7 +40,14 @@ export default function ProjectMapPage() {
           topLeft: { north: 0, east: 0 },
           bottomRight: { north: 0, east: 0 }
         });
+        // Clean up the object URL after loading
+        // URL.revokeObjectURL(url); // Consider if needed based on usage
       };
+      img.onerror = () => {
+        console.error("Error loading image preview.");
+        // Optionally revoke URL here too if preview fails
+        // URL.revokeObjectURL(url);
+      }
       img.src = url;
     }
   };
@@ -49,8 +56,13 @@ export default function ProjectMapPage() {
     if (!imageInfo || !mapContainerRef.current) return;
 
     const rect = mapContainerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Use offsetX and offsetY for coordinates relative to the clicked element (the map container)
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
+
+    // Ensure coordinates are within the image bounds if needed
+    // Check if imageInfo.width and imageInfo.height are available
+    // if (x < 0 || x > imageInfo.width || y < 0 || y > imageInfo.height) return;
 
     const coordinates = calculateCoordinates(imageInfo, { x, y });
     setNewPointData({ 
@@ -64,32 +76,45 @@ export default function ProjectMapPage() {
   const handleCreatePoint = async () => {
     if (!newPointData.tag || !newPointData.coordinates) return;
 
-    // Simular API call
     // TODO: Replace with actual API call when backend is ready
     /*
-    const response = await fetch('/api/drillingPoints', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        zoneId: 1,
-        tag: newPointData.tag,
-        coordinates: {
-          type: "Point",
-          coordinates: [newPointData.coordinates.east, newPointData.coordinates.north]
+    try {
+      const response = await fetch('/api/drillingPoints', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        method: "Percusión",
-        dateTime: new Date().toISOString(),
-        comments: "Punto creado desde el mapa"
-      }),
-    });
-    const newPoint = await response.json();
+        body: JSON.stringify({
+          projectId: id, // Make sure to send project ID
+          zoneId: 1, // Or relevant zone ID
+          tag: newPointData.tag,
+          coordinates: {
+            type: "Point",
+            coordinates: [newPointData.coordinates.east, newPointData.coordinates.north]
+          },
+          method: "Percusión", // Or get from user input if needed
+          dateTime: new Date().toISOString(),
+          comments: "Punto creado desde el mapa"
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create point');
+      }
+      const createdPoint = await response.json();
+      // Add backend returned point (with its ID)
+      setDrillingPoints([...drillingPoints, { ...createdPoint, clickPosition: newPointData.clickPosition }]);
+    } catch (error) {
+      console.error("Error creating point:", error);
+      setAlertMessage('Error al crear el punto.');
+      setShowAlert(true);
+      // Potentially handle different error types
+      return; // Stop execution if API call failed
+    }
     */
 
-    // Simulated response
+    // Simulated response (keep for now)
     const newPoint = {
-      id: drillingPoints.length + 1,
+      id: drillingPoints.length + 1, // Replace with backend ID eventually
       tag: newPointData.tag,
       coordinates: newPointData.coordinates,
       clickPosition: newPointData.clickPosition,
@@ -101,18 +126,33 @@ export default function ProjectMapPage() {
     setDrillingPoints([...drillingPoints, newPoint]);
     setShowPointModal(false);
     
-    // Mostrar alerta
     setAlertMessage(`${newPointData.tag} creado correctamente en las coordenadas ${formatCoordinates(newPointData.coordinates)}`);
     setShowAlert(true);
     
     setNewPointData({ tag: '', coordinates: null, clickPosition: null });
   };
 
+  // Cleanup object URL when component unmounts or previewUrl changes
+  // useEffect(() => {
+  //   return () => {
+  //     if (previewUrl && previewUrl.startsWith('blob:')) {
+  //       URL.revokeObjectURL(previewUrl);
+  //     }
+  //   };
+  // }, [previewUrl]);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Mapa del Proyecto</h1>
+    <div className="map-page-container">
+      <div className="map-header">
+        <h1 className="map-title">Mapa del Proyecto</h1>
+        <Link href={`/projects/${id}/analysis`}>
+          {/* Use a button or an anchor styled as a button */}
+          <span className="analysis-link-button" role="button">
+            Ir a Análisis
+          </span>
+        </Link>
+      </div>
       
-      {/* Alert */}
       {showAlert && (
         <Alert 
           message={alertMessage} 
@@ -120,115 +160,116 @@ export default function ProjectMapPage() {
         />
       )}
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="map-card">
+        <div className="file-input-section">
+          <label className="file-input-label">
             Subir Mapa
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-md file:border-0
-              file:text-sm file:font-semibold
-              file:bg-indigo-50 file:text-indigo-700
-              hover:file:bg-indigo-100"
+            className="file-input"
           />
         </div>
 
         {previewUrl && (
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">Vista Previa del Mapa</h2>
+          <div className="map-preview-section">
+            <h2 className="map-preview-title">Vista Previa del Mapa</h2>
             
-            {/* Input de coordenadas límite */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="coordinate-grid">
               <div>
-                <h3 className="text-lg font-medium mb-2">Esquina Superior Izquierda</h3>
-                <div className="space-y-2">
+                <h3 className="coordinate-section-title">Esquina Superior Izquierda</h3>
+                <div className="coordinate-input-group">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Norte</label>
+                    <label className="coordinate-label">Norte</label>
                     <input
                       type="number"
-                      step="0.000001"
-                      value={imageInfo?.topLeft.north || ''}
+                      step="any" // Allow any decimal step
+                      value={imageInfo?.topLeft.north ?? ''} // Use nullish coalescing
                       onChange={(e) => setImageInfo({
                         ...imageInfo,
-                        topLeft: { ...imageInfo.topLeft, north: parseFloat(e.target.value) }
+                        topLeft: { ...imageInfo.topLeft, north: parseFloat(e.target.value) || 0 } // Default to 0 if parse fails
                       })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="coordinate-input"
+                      placeholder="Ej: 6250000.123"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Este</label>
+                    <label className="coordinate-label">Este</label>
                     <input
                       type="number"
-                      step="0.000001"
-                      value={imageInfo?.topLeft.east || ''}
+                      step="any"
+                      value={imageInfo?.topLeft.east ?? ''}
                       onChange={(e) => setImageInfo({
                         ...imageInfo,
-                        topLeft: { ...imageInfo.topLeft, east: parseFloat(e.target.value) }
+                        topLeft: { ...imageInfo.topLeft, east: parseFloat(e.target.value) || 0 }
                       })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="coordinate-input"
+                      placeholder="Ej: 350000.456"
                     />
                   </div>
                 </div>
               </div>
               
               <div>
-                <h3 className="text-lg font-medium mb-2">Esquina Inferior Derecha</h3>
-                <div className="space-y-2">
+                <h3 className="coordinate-section-title">Esquina Inferior Derecha</h3>
+                <div className="coordinate-input-group">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Norte</label>
+                    <label className="coordinate-label">Norte</label>
                     <input
                       type="number"
-                      step="0.000001"
-                      value={imageInfo?.bottomRight.north || ''}
+                      step="any"
+                      value={imageInfo?.bottomRight.north ?? ''}
                       onChange={(e) => setImageInfo({
                         ...imageInfo,
-                        bottomRight: { ...imageInfo.bottomRight, north: parseFloat(e.target.value) }
+                        bottomRight: { ...imageInfo.bottomRight, north: parseFloat(e.target.value) || 0 }
                       })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="coordinate-input"
+                      placeholder="Ej: 6249000.789"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Este</label>
+                    <label className="coordinate-label">Este</label>
                     <input
                       type="number"
-                      step="0.000001"
-                      value={imageInfo?.bottomRight.east || ''}
+                      step="any"
+                      value={imageInfo?.bottomRight.east ?? ''}
                       onChange={(e) => setImageInfo({
                         ...imageInfo,
-                        bottomRight: { ...imageInfo.bottomRight, east: parseFloat(e.target.value) }
+                        bottomRight: { ...imageInfo.bottomRight, east: parseFloat(e.target.value) || 0 }
                       })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="coordinate-input"
+                      placeholder="Ej: 351000.012"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Mapa con puntos */}
-            <div className="flex-1 relative">
+            <div className="map-display-container">
               <div 
                 ref={mapContainerRef}
-                className="relative w-full h-full"
-                onClick={handleMapClick}
+                className="map-image-container"
+                onClick={handleMapClick} // Attach click handler here
+                style={{ cursor: 'crosshair' }} // Indicate clickable area
               >
-                {imageInfo && (
+                {imageInfo?.url && ( // Ensure URL exists before rendering image
                   <img
                     src={imageInfo.url}
                     alt="Mapa del proyecto"
-                    className="w-full h-full object-contain"
+                    className="map-image"
+                    // Add width/height from imageInfo for better layout stability
+                    // width={imageInfo.width} 
+                    // height={imageInfo.height}
                   />
                 )}
-                <div className="absolute inset-0">
+                <div className="drilling-points-overlay">
                   {drillingPoints.map((point) => (
                     <DrillingPoint
                       key={point.id}
                       point={point}
-                      imageInfo={imageInfo}
+                      imageInfo={imageInfo} // Pass imageInfo if needed by DrillingPoint
                       clickPosition={point.clickPosition}
                     />
                   ))}
@@ -239,38 +280,41 @@ export default function ProjectMapPage() {
         )}
       </div>
 
-      {/* Modal para crear nuevo punto */}
       {showPointModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">Crear Nuevo Punto</h2>
-            <div className="space-y-4">
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <h2 className="modal-title">Crear Nuevo Punto</h2>
+            <div className="modal-body">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre del Punto</label>
+                <label className="modal-input-label">Nombre del Punto</label>
                 <input
                   type="text"
                   value={newPointData.tag}
                   onChange={(e) => setNewPointData({ ...newPointData, tag: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="modal-input"
+                  autoFocus // Focus the input when modal opens
                 />
               </div>
               {newPointData.coordinates && (
                 <div>
-                  <p className="text-sm text-gray-600">
+                  <p className="modal-coordinates-text">
                     Coordenadas: {formatCoordinates(newPointData.coordinates)}
                   </p>
                 </div>
               )}
-              <div className="flex justify-end space-x-3">
+              <div className="modal-footer">
                 <button
                   onClick={() => setShowPointModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  className="modal-button modal-button-cancel"
+                  type="button" // Explicitly set type
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleCreatePoint}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                  className="modal-button modal-button-confirm"
+                  disabled={!newPointData.tag} // Disable if tag is empty
+                  type="button" // Explicitly set type
                 >
                   Crear Punto
                 </button>
