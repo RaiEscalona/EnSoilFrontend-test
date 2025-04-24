@@ -1,103 +1,148 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent } from "../ui/card";
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
+
+export default function VistaPrincipal() {
+  const router = useRouter();
+
+  // Función para manejar la carga de archivos
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    console.log("Archivo seleccionado:", file.name);
+  
+    // 🔁 Aquí preparas para enviar al backend
+    const formData = new FormData();
+    formData.append('archivo', file);
+  
+    try {
+      const res = await fetch('/api/subir-archivo', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!res.ok) throw new Error("Error al subir archivo");
+  
+      const data = await res.json();
+      alert(`Archivo "${file.name}" subido correctamente`);
+      console.log(data);
+    } catch (error) {
+      console.error("Fallo en la subida", error);
+      alert("Error al subir el archivo");
+    }
+  };
+  
+
+  const fileData = [
+    { id: 1, name: "Muestra Norte", date: "24/04/2025", creationDate: "23/04/2025" },
+    { id: 2, name: "Muestra Sur", date: "22/04/2025", creationDate: "21/04/2025" },
+    { id: 3, name: "Reporte Abril", date: "20/04/2025", creationDate: "19/04/2025" },
+  ];
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex h-screen bg-white">
+      {/* Sidebar */}
+      <div className="w-[125px] bg-[#383636] flex flex-col items-center">
+        <div className="mt-14 mb-4">
+          <div className="w-[73px] h-[68px] bg-[#c7058a] rounded-[36.5px/34px] flex items-center justify-center">
+            <span className="font-normal text-[32px] text-[#740b5d]">ES</span>
+          </div>
+          <div className="mt-2 text-white text-base text-center">ENSOIL</div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="mt-20 flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center">
+            <div className="w-[63px] h-[63px] flex items-center justify-center">
+              <img className="w-[39px] h-11" alt="Home Icon" src="/icons/home.png" />
+            </div>
+            <span className="text-white text-base mt-1">Home</span>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="w-[55px] h-[55px] flex items-center justify-center">
+              <img className="w-[46px] h-[46px]" alt="Recent Icon" src="/icons/document.png" />
+            </div>
+            <span className="text-white text-base mt-1">Recent</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-4 overflow-auto">
+        <div className="flex gap-8 mt-8">
+
+          {/* Upload new file Button */}
+          <Card className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none cursor-pointer hover:opacity-90">
+            <label className="flex flex-col items-center justify-center h-full p-0 cursor-pointer">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <img className="w-[57px] h-[57px]" alt="Agregar" src="/icons/add.png" />
+              <span className="mt-2 text-sm text-black">Subir nuevo archivo</span>
+            </label>
+          </Card>
+
+          {/* Calculate Budget */}
+          <Card
+                onClick={() => router.push('/calculo')}
+                className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none cursor-pointer hover:opacity-90" >
+            <CardContent className="flex flex-col items-center justify-center h-full p-0">
+              <img className="w-[57px] h-[57px]" alt="Presupuesto" src="/icons/coins.png" />
+              <span className="mt-2 text-sm text-black">Calcular nuevo presupuesto</span>
+            </CardContent>
+          </Card>
+
+        </div>
+
+        <div className="mt-4 flex justify-between">
+          <div className="text-white text-xl">Subir nuevo archivo:</div>
+          <div className="text-white text-xl">Calcular nuevo presupuesto:</div>
+        </div>
+
+        {/* Tabla de archivos */}
+        <div className="mt-8">
+          <div className="bg-[#393737] h-[25px] flex items-center px-4">
+            <div className="text-white text-xs ml-[83px]">Name</div>
+            <div className="text-white text-xs ml-auto">| Last opened by you</div>
+          </div>
+
+          <Table>
+            <TableBody>
+              {fileData.map((file) => (
+                <TableRow
+                  key={file.id}
+                  className={`${
+                    file.id % 2 === 0 ? "bg-[#736f6f]" : "bg-[#5a5858]"
+                  } h-[66px] rounded-[10px] cursor-pointer hover:opacity-80`}
+                  onClick={() => router.push(`/archivo/${file.id}`)}
+                >
+                  <TableCell className="w-[42px] p-0 pl-4">
+                    <div className="w-[42px] h-[41px] flex items-center justify-center">
+                      <img className="w-7 h-[34px]" alt="File Icon" src="/icons/document.png" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-0">
+                    <div>
+                      <div className="text-white text-base">{file.name}</div>
+                      <div className="text-white text-xs">{file.creationDate}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right p-0 pr-8">
+                    <div className="text-white text-base">{file.date}</div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
   );
 }
