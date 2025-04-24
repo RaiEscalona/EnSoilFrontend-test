@@ -15,7 +15,7 @@ export default function VistaPrincipal() {
   
     console.log("Archivo seleccionado:", file.name);
   
-    // 🔁 Aquí preparas para enviar al backend
+    // Acá se valida el archivo para mandar al backend 
     const formData = new FormData();
     formData.append('archivo', file);
   
@@ -44,7 +44,7 @@ export default function VistaPrincipal() {
   ];
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-[#5A5757]">
       {/* Sidebar */}
       <div className="w-[125px] bg-[#383636] flex flex-col items-center">
         <div className="mt-14 mb-4">
@@ -76,8 +76,8 @@ export default function VistaPrincipal() {
         <div className="flex gap-8 mt-8">
 
           {/* Upload new file Button */}
-          <Card className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none cursor-pointer hover:opacity-90">
-            <label className="flex flex-col items-center justify-center h-full p-0 cursor-pointer">
+          <Card className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none flex flex-col items-center justify-center cursor-pointer hover:opacity-90">
+            <label className="flex flex-col items-center justify-center cursor-pointer">
               <input
                 type="file"
                 accept=".xlsx,.xls"
@@ -91,56 +91,58 @@ export default function VistaPrincipal() {
 
           {/* Calculate Budget */}
           <Card
-                onClick={() => router.push('/calculo')}
-                className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none cursor-pointer hover:opacity-90" >
-            <CardContent className="flex flex-col items-center justify-center h-full p-0">
-              <img className="w-[57px] h-[57px]" alt="Presupuesto" src="/icons/coins.png" />
-              <span className="mt-2 text-sm text-black">Calcular nuevo presupuesto</span>
-            </CardContent>
+            onClick={() => router.push('/calculo')}
+            className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none flex flex-col justify-center items-center cursor-pointer hover:opacity-90">
+            <div className="flex flex-col items-center justify-center">
+              <img className="w-[57px] h-[57px] object-contain mt-[4px]" src="/icons/file-invoice-dollar.png" alt="Presupuesto" />
+              <span className="mt-2 text-sm text-black text-center">Calcular nuevo presupuesto</span>
+            </div>
           </Card>
 
         </div>
 
-        <div className="mt-4 flex justify-between">
-          <div className="text-white text-xl">Subir nuevo archivo:</div>
-          <div className="text-white text-xl">Calcular nuevo presupuesto:</div>
-        </div>
-
         {/* Tabla de archivos */}
         <div className="mt-8">
-          <div className="bg-[#393737] h-[25px] flex items-center px-4">
-            <div className="text-white text-xs ml-[83px]">Name</div>
-            <div className="text-white text-xs ml-auto">| Last opened by you</div>
-          </div>
+        <div className="bg-[#2f2d2d] h-[25px] flex items-center px-21 ml-[-16px] mr-[-16px]">
 
-          <Table>
-            <TableBody>
-              {fileData.map((file) => (
-                <TableRow
-                  key={file.id}
-                  className={`${
-                    file.id % 2 === 0 ? "bg-[#736f6f]" : "bg-[#5a5858]"
-                  } h-[66px] rounded-[10px] cursor-pointer hover:opacity-80`}
-                  onClick={() => router.push(`/archivo/${file.id}`)}
-                >
-                  <TableCell className="w-[42px] p-0 pl-4">
-                    <div className="w-[42px] h-[41px] flex items-center justify-center">
+            <div className="text-white text-xs">Name</div>
+            <div className="ml-auto text-white text-xs">| Last opened by you</div>
+        </div>
+
+        <Table>
+          <TableBody>
+            {fileData.map((file) => (
+              <TableRow
+                key={file.id}
+                onClick={() => router.push(`/archivo/${file.id}`)}
+                className="cursor-pointer"
+              >
+                <TableCell colSpan={3} className="p-0">
+                  <div
+                    className={`${
+                      file.id % 2 === 0 ? "bg-[#736f6f]" : "bg-[#5a5858]"
+                    } rounded-xl flex items-center justify-between h-[66px] transition-all hover:opacity-90`}
+                  >
+                    {/* Icon */}
+                    <div className="w-[66px] flex items-center justify-center">
                       <img className="w-7 h-[34px]" alt="File Icon" src="/icons/document.png" />
                     </div>
-                  </TableCell>
-                  <TableCell className="p-0">
-                    <div>
+
+                    {/* Info */}
+                    <div className="flex-1">
                       <div className="text-white text-base">{file.name}</div>
                       <div className="text-white text-xs">{file.creationDate}</div>
                     </div>
-                  </TableCell>
-                  <TableCell className="text-right p-0 pr-8">
-                    <div className="text-white text-base">{file.date}</div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+
+                    {/* Date */}
+                    <div className="text-white text-base pr-23">{file.date}</div>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
         </div>
       </div>
     </div>
