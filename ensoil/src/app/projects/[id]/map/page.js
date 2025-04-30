@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { calculateCoordinates, formatCoordinates } from '@/utils/coordinateUtils';
 import DrillingPoint from '@/components/DrillingPoint';
 import Alert from '@/components/Alert';
+import api from '@/utils/axios';
 import './map.css'; // Import the new CSS file
 
 export default function ProjectMapPage() {
@@ -76,61 +77,66 @@ export default function ProjectMapPage() {
   const handleCreatePoint = async () => {
     if (!newPointData.tag || !newPointData.coordinates) return;
 
-    // TODO: Replace with actual API call when backend is ready
-    /*
     try {
-      const response = await fetch('/api/drillingPoints', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          projectId: id, // Make sure to send project ID
-          zoneId: 1, // Or relevant zone ID
-          tag: newPointData.tag,
-          coordinates: {
-            type: "Point",
-            coordinates: [newPointData.coordinates.east, newPointData.coordinates.north]
-          },
-          method: "Percusión", // Or get from user input if needed
-          dateTime: new Date().toISOString(),
-          comments: "Punto creado desde el mapa"
-        }),
+      console.log('🔄 Creando nuevo punto en el mapa:', {
+        projectId: id,
+        tag: newPointData.tag,
+        coordinates: newPointData.coordinates
       });
-      if (!response.ok) {
-        throw new Error('Failed to create point');
-      }
-      const createdPoint = await response.json();
-      // Add backend returned point (with its ID)
-      setDrillingPoints([...drillingPoints, { ...createdPoint, clickPosition: newPointData.clickPosition }]);
-    } catch (error) {
-      console.error("Error creating point:", error);
-      setAlertMessage('Error al crear el punto.');
-      setShowAlert(true);
-      // Potentially handle different error types
-      return; // Stop execution if API call failed
-    }
-    */
 
-    // Simulated response (keep for now)
-    const newPoint = {
-      id: drillingPoints.length + 1, // Replace with backend ID eventually
-      tag: newPointData.tag,
-      coordinates: newPointData.coordinates,
-      clickPosition: newPointData.clickPosition,
-      method: "Percusión",
-      dateTime: new Date().toISOString(),
-      comments: "Punto creado desde el mapa"
+      const response = await api.post('/api/drillingPoints', {
+        projectId: id,
+        tag: newPointData.tag,
+        coordinates: {
+          type: "Point",
+          coordinates: [newPointData.coordinates.east, newPointData.coordinates.north]
+        },
+        method: "Diamond drilling",
+        dateTime: new Date().toISOString(),
+        comments: "Punto creado desde el mapa"
+      });
+
+      console.log('✅ Punto creado exitosamente:', response.data);
+
+      setDrillingPoints([...drillingPoints, { ...response.data, clickPosition: newPointData.clickPosition }]);
+      setShowPointModal(false);
+      
+      setAlertMessage(`${newPointData.tag} creado correctamente en las coordenadas ${formatCoordinates(newPointData.coordinates)}`);
+      setShowAlert(true);
+      
+      setNewPointData({ tag: '', coordinates: null, clickPosition: null });
+    } catch (error) {
+      console.error('❌ Error creando punto:', error.response?.data || error.message);
+      setAlertMessage(error.response?.data?.error || 'Error al crear el punto.');
+      setShowAlert(true);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDrillingPoints = async () => {
+      try {
+        console.log(`🔄 Cargando puntos de perforación para el proyecto ${id}`);
+        const response = await api.get(`/api/projects/${id}/drillingPoints`);
+        console.log(`✅ Puntos de perforación cargados exitosamente para el proyecto ${id}:`, response.data);
+
+        setDrillingPoints(response.data.map(point => ({
+          ...point,
+          clickPosition: {
+            x: (point.coordinates.coordinates[0] - imageInfo?.topLeft.east) / (imageInfo?.bottomRight.east - imageInfo?.topLeft.east) * imageInfo?.width,
+            y: (point.coordinates.coordinates[1] - imageInfo?.topLeft.north) / (imageInfo?.bottomRight.north - imageInfo?.topLeft.north) * imageInfo?.height
+          }
+        })));
+      } catch (error) {
+        console.error(`❌ Error cargando puntos de perforación para el proyecto ${id}:`, error.response?.data || error.message);
+        setAlertMessage(error.response?.data?.error || 'Error al cargar los puntos de perforación.');
+        setShowAlert(true);
+      }
     };
 
-    setDrillingPoints([...drillingPoints, newPoint]);
-    setShowPointModal(false);
-    
-    setAlertMessage(`${newPointData.tag} creado correctamente en las coordenadas ${formatCoordinates(newPointData.coordinates)}`);
-    setShowAlert(true);
-    
-    setNewPointData({ tag: '', coordinates: null, clickPosition: null });
-  };
+    if (id && imageInfo) {
+      fetchDrillingPoints();
+    }
+  }, [id, imageInfo]);
 
   // Cleanup object URL when component unmounts or previewUrl changes
   // useEffect(() => {
