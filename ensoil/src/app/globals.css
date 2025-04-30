@@ -14,6 +14,18 @@
   --color-quaternary: #CECECE;
   --color-black: #242424;
   --color-white: #FDFDFD;
+  --color-base: #393737;
+
+  --text-h1: 58px;
+  --text-h1--font-weight: 800;
+  --text-h2: 42px;
+  --text-h3-medium: 21px;
+  --text-h3-medium--font-weight: 600;
+  --text-h4: 14px;
+  --text-p: 10px;
+  --text-p-medium: 10px;
+  --text-p-medium--font-weight: 600;
+  --text-s: 6px;
 }
 
 @media (prefers-color-scheme: dark) {
