@@ -5,7 +5,7 @@ import { Home, CirclePlus, History, ArrowLeftToLine } from "lucide-react";
 export default function Sidebar() {
   return (
     <aside className="bg-quaternary w-21 h-screen text-white flex flex-col items-center pt-6">
-      <div className="bg-primary text-white w-12 h-12 rounded-full text-white flex flex-col items-center justify-center text-h3-medium"
+      <div className="bg-primary text-white w-12 h-12 rounded-full text-white flex flex-col items-center justify-center text-h3"
         >ES</div>
         <span className="text-black text-h4 pt-2">ENSOIL</span>
       <nav className="flex flex-col gap-6 p-4 items-center flex-grow">
