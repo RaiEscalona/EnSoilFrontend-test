@@ -15,7 +15,8 @@ export default function Button({label}) {
           hover:bg-white 
           hover:text-black 
           hover:border-primary 
-          transition"
+          transition
+          dark:border-primary"
         >
           {label}
         </button>

@@ -27,8 +27,9 @@ export default function RegisterForm() {
             name="name"
             value={form.name}
             onChange={handleChange}
-            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4"
-            placeholder="Nombre"
+            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          dark:border-base dark:bg-white"
+            placeholder="Ingresa tu nombre"
         />
         </div>
 
@@ -42,8 +43,9 @@ export default function RegisterForm() {
             name="lastName"
             value={form.lastName}
             onChange={handleChange}
-            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4"
-            placeholder="Apellidos"
+            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          dark:border-base dark:bg-white"
+            placeholder="Ingresa tu apellidos"
         />
         </div>
 
@@ -57,12 +59,13 @@ export default function RegisterForm() {
           name="email"
           value={form.email}
           onChange={handleChange}
-          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4"
-          placeholder="Correo"
+          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          dark:border-base dark:bg-white"
+          placeholder="Ingresa tu correo"
         />
       </div>
     
-    <Button label={"Solictar registro"}></Button>
+    <Button label={"Solicitar registro"}></Button>
     </Form>
   );
 }

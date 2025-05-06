@@ -31,8 +31,9 @@ export default function LoginForm() {
           name="email"
           value={form.email}
           onChange={handleChange}
-          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4"
-          placeholder="Correo"
+          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          dark:border-base dark:bg-white"
+          placeholder="Ingresa tu correo"
         />
       </div>
 
@@ -46,8 +47,9 @@ export default function LoginForm() {
           name="password"
           value={form.password}
           onChange={handleChange}
-          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4"
-          placeholder="Contraseña"
+          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          dark:border-base dark:bg-white"
+          placeholder="Ingresa tu contraseña"
         />
       </div>
 
