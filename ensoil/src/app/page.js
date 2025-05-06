@@ -41,6 +41,8 @@ export default function VistaPrincipal() {
     { id: 1, name: "Muestra Norte", date: "24/04/2025", creationDate: "23/04/2025" },
     { id: 2, name: "Muestra Sur", date: "22/04/2025", creationDate: "21/04/2025" },
     { id: 3, name: "Reporte Abril", date: "20/04/2025", creationDate: "19/04/2025" },
+    { id: 4, name: "Muestra Marzo", date: "22/04/2025", creationDate: "21/04/2025" },
+    { id: 5, name: "Reporte Febrero", date: "20/04/2025", creationDate: "19/04/2025" },
   ];
 
   return (
@@ -113,32 +115,29 @@ export default function VistaPrincipal() {
           <TableBody>
             {fileData.map((file) => (
               <TableRow
-                key={file.id}
-                onClick={() => router.push(`/archivo/${file.id}`)}
-                className="cursor-pointer"
-              >
-                <TableCell colSpan={3} className="p-0">
-                  <div
-                    className={`${
-                      file.id % 2 === 0 ? "bg-[#736f6f]" : "bg-[#5a5858]"
-                    } rounded-xl flex items-center justify-between h-[66px] transition-all hover:opacity-90`}
-                  >
-                    {/* Icon */}
-                    <div className="w-[66px] flex items-center justify-center">
-                      <img className="w-7 h-[34px]" alt="File Icon" src="/icons/document.png" />
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1">
-                      <div className="text-white text-base">{file.name}</div>
-                      <div className="text-white text-xs">{file.creationDate}</div>
-                    </div>
-
-                    {/* Date */}
-                    <div className="text-white text-base pr-23">{file.date}</div>
+              key={file.id}
+              onClick={() => router.push(`/archivo/${file.id}`)}
+              className="cursor-pointer"
+            >
+              <TableCell colSpan={3} className="p-0">
+                <div
+                  className={`${
+                    file.id % 2 === 0
+                      ? "bg-[rgba(219,219,219,0.1)] hover:bg-[#626060]"
+                      : "bg-[#5a5858] hover:bg-[#626060]"
+                  } rounded-xl flex items-center justify-between h-[66px] transition-all`}
+                >
+                  <div className="w-[66px] flex items-center justify-center">
+                    <img className="w-7 h-[34px]" alt="File Icon" src="/icons/document.png" />
                   </div>
-                </TableCell>
-              </TableRow>
+                  <div className="flex-1">
+                    <div className="text-white text-base">{file.name}</div>
+                    <div className="text-white text-xs">{file.creationDate}</div>
+                  </div>
+                  <div className="text-white text-base pr-23">{file.date}</div>
+                </div>
+              </TableCell>
+            </TableRow>
             ))}
           </TableBody>
         </Table>
