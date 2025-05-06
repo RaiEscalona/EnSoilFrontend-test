@@ -17,17 +17,16 @@ export default function LoginForm() {
     e.preventDefault();
     console.log('Datos guardados:', form);
     //router.push('/'); para después
-    // Aquí podrías guardar en localStorage o llamar una API
   };
 
   return (
     <Form onSubmit={handleSubmit}>
       <div className="pb-3">
-        <label htmlFor="username" className="block text-h4 text-black">
+        <label htmlFor="email" className="block text-h4 text-black">
           Correo
         </label>
         <input
-          type="text"
+          type="email"
           id="email"
           name="email"
           value={form.email}
@@ -54,7 +53,7 @@ export default function LoginForm() {
 
       <div className="text-h4 text-black py-2">
         ¿No tienes cuenta en EnSoil?
-        <Link href="/registro" className="text-primary text-h4">
+        <Link href="/register" className="text-primary text-h4">
             <span> Solicitar registro</span>
         </Link>
       </div>
