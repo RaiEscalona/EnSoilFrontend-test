@@ -116,7 +116,7 @@ export default function ProjectMapPage() {
     const fetchDrillingPoints = async () => {
       try {
         console.log(`🔄 Cargando puntos de perforación para el proyecto ${id}`);
-        const response = await api.get(`/drillingPoints/project/${id}`);
+        const response = await api.get(`/projects/${id}/drillingPoints`);
         console.log(`✅ Puntos de perforación cargados exitosamente para el proyecto ${id}:`, response.data);
 
         setDrillingPoints(response.data.map(point => ({
