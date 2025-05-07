@@ -34,12 +34,27 @@ export function calculateCoordinates(imageInfo, clickPosition) {
 }
 
 /**
- * Formatea las coordenadas para mostrar en formato legible
- * @param {Object} coordinates - Coordenadas a formatear
- * @param {number} coordinates.north - Latitud norte
- * @param {number} coordinates.east - Longitud este
- * @returns {string} Coordenadas formateadas
+ * Formats coordinates for display
+ * @param {Object|Array} coordinates - The coordinates to format
+ * @returns {string} Formatted coordinates string
  */
 export function formatCoordinates(coordinates) {
-  return `N: ${coordinates.north.toFixed(6)}, E: ${coordinates.east.toFixed(6)}`;
+  // Handle GeoJSON Point format
+  if (coordinates.type === 'Point' && Array.isArray(coordinates.coordinates)) {
+    const [east, north] = coordinates.coordinates;
+    return `N: ${north.toFixed(6)}, E: ${east.toFixed(6)}`;
+  }
+  
+  // Handle simple object format
+  if (coordinates.north !== undefined && coordinates.east !== undefined) {
+    return `N: ${coordinates.north.toFixed(6)}, E: ${coordinates.east.toFixed(6)}`;
+  }
+
+  // Handle array format [east, north]
+  if (Array.isArray(coordinates)) {
+    const [east, north] = coordinates;
+    return `N: ${north.toFixed(6)}, E: ${east.toFixed(6)}`;
+  }
+
+  return 'Coordenadas no disponibles';
 } 

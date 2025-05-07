@@ -33,9 +33,9 @@ export default function ProjectsPage() {
     const fetchProjects = async () => {
       try {
         console.log('🔄 Cargando lista de proyectos');
-        const response = await api.get('/api/projects');
+        const response = await api.get('/projects');
         console.log('✅ Proyectos cargados exitosamente:', response.data);
-        setProjects(response.data);
+        setProjects(response.data.projects);
       } catch (error) {
         console.error('❌ Error cargando proyectos:', error.response?.data || error.message);
       }
@@ -58,7 +58,7 @@ export default function ProjectsPage() {
     try {
       console.log('🔄 Creando nuevo proyecto:', formData);
       
-      const response = await api.post('/api/projects', {
+      const response = await api.post('/projects', {
         name: formData.name,
         description: formData.description,
         startDate: `${formData.startDate}T00:00:00-03:00`,
