@@ -121,7 +121,7 @@ export default function MapUploader({ onMapDataReady }) {
               <h3 className="coordinate-section-title">Esquina Superior Izquierda</h3>
               <div className="coordinate-input-group">
                 <div>
-                  <label className="coordinate-label">Norte</label>
+                  <label className="text-h5">Norte</label>
                   <input
                     type="number"
                     step="any"
@@ -137,7 +137,7 @@ export default function MapUploader({ onMapDataReady }) {
                   />
                 </div>
                 <div>
-                  <label className="coordinate-label">Este</label>
+                  <label className="text-h5">Este</label>
                   <input
                     type="number"
                     step="any"
@@ -159,7 +159,7 @@ export default function MapUploader({ onMapDataReady }) {
               <h3 className="coordinate-section-title">Esquina Inferior Derecha</h3>
               <div className="coordinate-input-group">
                 <div>
-                  <label className="coordinate-label">Norte</label>
+                  <label className="text-h5">Norte</label>
                   <input
                     type="number"
                     step="any"
@@ -175,7 +175,7 @@ export default function MapUploader({ onMapDataReady }) {
                   />
                 </div>
                 <div>
-                  <label className="coordinate-label">Este</label>
+                  <label className="text-h5">Este</label>
                   <input
                     type="number"
                     step="any"

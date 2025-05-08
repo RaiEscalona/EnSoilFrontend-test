@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import api from '@/utils/axios';
 import "./projects.css";
+import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 
 // Simulated projects data
 const initialProjects = [
@@ -81,12 +82,15 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="projects-bg">
+    <WithSidebarLayout>
+    <div className="dark:bg-secondary">
+
       <div className="projects-container">
-        <h1 className="projects-title">Proyectos</h1>
+        <h1 className="text-h1">Proyectos</h1>
+        <br />
         {/* Create Project Form */}
         <div className="create-project-form">
-          <h2 className="projects-subtitle">Crear Nuevo Proyecto</h2>
+          <h2 className="text-h3">Crear Nuevo Proyecto</h2>
           <form onSubmit={handleSubmit} className="form-fields">
             <div>
               <label>Nombre</label>
@@ -140,7 +144,7 @@ export default function ProjectsPage() {
         {/* Projects List */}
         <div className="projects-list">
           <br />
-          <h2 className="projects-subtitle">Proyectos Existentes</h2>
+          <h2 className="text-h2">Proyectos Existentes</h2>
           {projects.map((project) => (
             <div key={project.id} className="project-card">
               <div className="project-card-content">
@@ -163,5 +167,6 @@ export default function ProjectsPage() {
         </div>
       </div>
     </div>
+    </WithSidebarLayout>
   );
 } 
