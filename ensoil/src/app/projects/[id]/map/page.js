@@ -7,6 +7,7 @@ import { calculateCoordinates, formatCoordinates } from '@/utils/coordinateUtils
 import DrillingPoint from '@/components/DrillingPoint';
 import Alert from '@/components/Alert';
 import MapUploader from '@/components/MapUploader';
+import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import api from '@/utils/axios';
 import './map.css';
 
@@ -155,7 +156,8 @@ export default function ProjectMapPage() {
   }
 
   return (
-    <div className="map-main-bg map-page-container">
+    <WithSidebarLayout>
+    <div className="dark:bg-secondary map-page-container">
       <div className="map-header">
         <h1 className="map-title">Mapa del Proyecto</h1>
         <Link href={`/projects/${id}/analysis`}>
@@ -247,5 +249,6 @@ export default function ProjectMapPage() {
         </div>
       )}
     </div>
+    </WithSidebarLayout>
   );
 } 
