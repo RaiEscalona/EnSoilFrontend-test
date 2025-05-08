@@ -1,26 +1,43 @@
+@import "@fontsource/montserrat";
 @import "tailwindcss";
 
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FDFDFD;
+  --foreground: #242424;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-primary: #367B5D;
+  --color-secondary: #7A7A7A;
+  --color-tertiary: #AFAFAF;
+  --color-quaternary: #CECECE;
+  --color-black: #242424;
+  --color-white: #FDFDFD;
+  --color-base: #393737;
+
+  --text-h1: 58px;
+  --text-h1--font-weight: 800;
+  --text-h2: 42px;
+  --text-h2--font-weight: 600;
+  --text-h3: 21px;
+  --text-h3--font-weight: 600;
+  --text-h4: 14px;
+  --text-p: 10px;
+  --text-p-medium: 10px;
+  --text-p-medium--font-weight: 600;
+  --text-s: 6px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #7A7A7A;
+    --foreground: #FDFDFD;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
