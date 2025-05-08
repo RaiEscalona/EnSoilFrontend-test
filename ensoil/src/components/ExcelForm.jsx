@@ -62,7 +62,7 @@ export function UploadForm() {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Card className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none flex flex-col items-center justify-center cursor-pointer hover:opacity-90">
+          <Card className="w-[369px] h-[177px] bg-quaternary rounded-[14px] border-none flex flex-col items-center justify-center cursor-pointer hover:opacity-90">
             <img className="w-[57px] h-[57px]" alt="Agregar" src="/icons/add.png" />
             <span className="mt-2 text-sm text-black">Subir nuevo archivo</span>
           </Card>
