@@ -67,7 +67,7 @@ export function UploadForm() {
             <span className="mt-2 text-sm text-black">Subir nuevo archivo</span>
           </Card>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white text-black rounded-xl shadow-xl">
           <DialogHeader>
             <DialogTitle>Subir archivo de laboratorio</DialogTitle>
             <DialogDescription>
@@ -91,6 +91,7 @@ export function UploadForm() {
   
             <div>
               <Label htmlFor="file">Archivo Excel</Label>
+              <br />
               <Input
                 id="file"
                 type="file"
