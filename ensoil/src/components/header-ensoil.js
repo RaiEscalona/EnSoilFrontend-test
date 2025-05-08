@@ -7,9 +7,9 @@ export default function HeaderEnsoil() {
             <Image
                 src="/Logo-EnSoil-Horizontal.png"
                 alt="Ensoil logo"
-                width={160}
+                width={150}
                 height={0}
-                className="h-auto w-auto"
+                className="h-auto w-50"
             />
         </div>
     </header>

@@ -1,24 +1,34 @@
-export default function Button({label}) {
+import Link from 'next/link';
+import PropTypes from 'prop-types';
+
+Button.propTypes = {
+  title: PropTypes.string.isRequired,
+  route: PropTypes.string,
+  type: PropTypes.oneOf(['link', 'submit']),
+  size: PropTypes.string,
+  fullWidth: PropTypes.bool,
+  onClick: PropTypes.func,
+};
+
+export default function Button ({label, route, type = "link", size, fullWidth = false, onClick}) {
+  const fullWidthClass = fullWidth ? 'w-full' : 'w-auto';
+  const textSize = size ? size : 'text-h5';
+  const style = `bg-primary text-white py-2 px-4 rounded border-1 border-current hover:bg-white hover:text-black hover:border-primary transition dark:border-primary`
+
+
+  if (route) {
     return (
-        <button
-          type="submit"
-          className="
-          w-full 
-          bg-primary 
-          text-h4 
-          text-white 
-          py-2 
-          px-4 
-          rounded 
-          border-1 
-          border-current 
-          hover:bg-white 
-          hover:text-black 
-          hover:border-primary 
-          transition
-          dark:border-primary"
-        >
+      <Link href={route}>
+        <span className={`${fullWidthClass} ${textSize} ${style}`}>
           {label}
-        </button>
+        </span>
+      </Link>
     );
+  }
+
+  return (
+    <button type={type} className={`${fullWidthClass} ${textSize} ${style}`}>
+      {label}
+    </button>
+  );
 }
