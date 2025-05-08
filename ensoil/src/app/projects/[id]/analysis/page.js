@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import * as XLSX from 'xlsx'; // Import xlsx library
 import './analysis.css'; // Import the CSS file
+import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -133,21 +134,24 @@ export default function AnalysisPage() {
   };
 
   return (
+    <WithSidebarLayout>
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Análisis del Proyecto {projectId}</h1>
+      <h1 className="text-h2 font-bold mb-8">Análisis del Proyecto {projectId}</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-semibold mb-4">Generar Tabla de Análisis</h2>
+      <div className="p-6 rounded-lg border mb-5 block" style={{ borderColor: 'var(--color-quaternary)' }}>
+
+        <h2 className="text-h3 mb-4">Generar Tabla de Análisis</h2>
         <div className="flex items-end space-x-4">
           <div className="flex-grow">
-            <label htmlFor="tableType" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="tableType" className="text-h4 block ">
               Tipo de Tabla
             </label>
+            <br />
             <select
               id="tableType"
               value={selectedTableType}
               onChange={(e) => setSelectedTableType(e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="block w-full rounded-md border-secondary shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-h5"
               disabled={isLoading}
             >
               <option value="">Seleccione un tipo</option>
@@ -158,17 +162,18 @@ export default function AnalysisPage() {
               ))}
             </select>
           </div>
+          
           <button
             onClick={handleGenerateTable}
             disabled={!selectedTableType || isLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-h5 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Generando...' : 'Generar Tabla'}
           </button>
           <button
             onClick={handleExportExcel}
             disabled={!tableData || isLoading || selectedTableType !== 'depth_analysis'}
-            className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-h5 text-white bg-primary rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Exportar a Excel
           </button>
@@ -179,11 +184,12 @@ export default function AnalysisPage() {
       {isLoading && <p className="text-center my-4">Cargando datos de la tabla...</p>}
       {error && <p className="text-center my-4 text-red-600">{error}</p>}
       {tableData && selectedTableType === 'depth_analysis' && (
-         <div className="bg-white p-6 rounded-lg shadow-md">
-           <h3 className="text-lg font-semibold mb-4">Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}</h3>
+         <div className="bg-white p-6 rounded-lg shadow-md max-h-[875vh] overflow-auto" >
+           <h3 className=" text-black text-h3 mb-4">Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}</h3>
            {renderDepthAnalysisTable()}
          </div>
       )}
     </div>
+    </WithSidebarLayout>
   );
 } 

@@ -19,6 +19,7 @@
   padding: 0.5rem 0.75rem;
   text-align: center;
   white-space: nowrap; /* Prevent text wrapping */
+  color: #242424;
 }
 
 .analysis-table thead th {
@@ -27,6 +28,11 @@
   position: sticky;
   top: 0; /* Stick header */
   z-index: 10;
+  color: #242424;
+}
+
+:root.dark .analysis-table thead th {
+  background-color: #1e293b; /* slate-800, por ejemplo */
 }
 
 /* Styling for the top-left empty cell */

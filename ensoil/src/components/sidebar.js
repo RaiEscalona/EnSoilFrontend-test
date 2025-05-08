@@ -5,7 +5,7 @@ import DropdownIcon from "./dropdown";
 
 export default function Sidebar() {
   return (
-    <aside className="bg-quaternary w-21 h-screen text-white flex flex-col items-center pt-6 dark:bg-base dark:text-black">
+    <aside className="bg-quaternary w-21 min-h-screen text-white flex flex-col items-center pt-6 dark:bg-base dark:text-black">
       <div className="bg-primary text-white w-12 h-12 rounded-full text-white flex flex-col items-center justify-center text-h4"
         >ES</div>
         <span className="text-black text-h5 pt-2 dark:text-white">ENSOIL</span>
