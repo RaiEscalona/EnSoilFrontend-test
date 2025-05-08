@@ -71,18 +71,18 @@ export default function Sidebar() {
         <span className="text-black text-h5 pt-2 dark:text-white">ENSOIL</span>
       <nav className="flex flex-col gap-6 p-4 items-center flex-grow">
         <DropdownIcon></DropdownIcon>
-        <Link href="/" className="text-black flex flex-col items-center gap-1 hover:text-primary pt-4 dark:text-white"> 
+        <Link href="/excels" className="text-black flex flex-col items-center gap-1 hover:text-primary pt-4 dark:text-white"> 
           <Home 
             size={35} 
             strokeWidth={1}/>
           <span className="text-black text-h5 dark:text-white">Inicio</span>
         </Link>
-        <Link href="/contacto" className="text-black flex flex-col items-center gap-1 hover:text-primary pt-4 dark:text-white">
+        {/* <Link href="/contacto" className="text-black flex flex-col items-center gap-1 hover:text-primary pt-4 dark:text-white">
           <History 
             size={35} 
             strokeWidth={1}/>
           <span className="text-black text-h5 dark:text-white">Recientes</span>
-        </Link>
+        </Link> */}
       </nav>
       <div>
         <Link href="/" className="text-black flex flex-col items-center gap-1 hover:text-primary pb-4 dark:text-white">
