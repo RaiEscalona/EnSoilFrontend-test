@@ -1,2 +1,3 @@
-```npm run dev```
-Se abre en http://localhost:3000.
+```docker compose build```
+```docker compose up```
+Se abre en http://localhost:3001.
