@@ -19,7 +19,7 @@ export default function Button ({label, route, type = "link", size, fullWidth = 
   if (route) {
     return (
       <Link href={route}>
-        <span className={`w-full ${textSize} ${style}`}>
+        <span className={`${fullWidthClass} ${textSize} ${style}`}>
           {label}
         </span>
       </Link>
