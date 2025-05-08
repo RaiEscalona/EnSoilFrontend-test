@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import axios from "axios"
 import {
   Dialog,
   DialogContent,
@@ -33,21 +34,22 @@ export function UploadForm() {
       
   
       const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
+      const endpoint = '/dataLaboratories/process-laboratory-data'
+      const url = `${apiUrl.replace(/\/+$/, '')}${endpoint}`
 
       try {
-        const res = await fetch(`${apiUrl}/dataLaboratories/process-laboratory-data`, {
-          method: "POST",
-          body: formData
+        const res = await axios.post(url, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         })
   
-        if (!res.ok) {
-          const errText = await res.text()
-          throw new Error(errText)
+        if (res.status !== 200) {
+          throw new Error(res.data)
         }
   
-        const data = await res.json()
         alert(`Archivo "${selectedFile.name}" subido correctamente`)
-        console.log(data)
+        console.log(res.data)
   
         // ✅ cerrar el diálogo
         setOpen(false)
@@ -55,7 +57,8 @@ export function UploadForm() {
   
       } catch (err) {
         console.error("Fallo en la subida", err)
-        alert("Error al subir el archivo")
+        const errorMessage = err.response?.data?.message || err.message || "Error al subir el archivo"
+        alert(`Error al subir el archivo: ${errorMessage}`)
       }
     }
   
