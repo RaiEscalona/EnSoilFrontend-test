@@ -3,11 +3,11 @@ import Carousel from "@/components/carousel";
 import Button from "@/components/button";
 
 const slides = [
-  {
-    image: null,
-    title: 'Ingresar a tu cuenta',
-    description: '',
-  },
+  // {
+  //   image: null,
+  //   title: 'Ingresar a tu cuenta',
+  //   description: '',
+  // },
   {
     image: null,
     title: 'Crear una plantilla tipo excel',

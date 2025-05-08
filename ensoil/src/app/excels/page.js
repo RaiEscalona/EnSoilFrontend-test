@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { UploadForm } from "@/components/ExcelForm";
-import Image from "next/image";
+import Sidebar from "@/components/sidebar";
+import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
+//import Image from "next/image";
 import "./excels.css";
 
 export default function ExcelsPage() {
   const router = useRouter();
 
-  // Acá se crea la constante de la ruta para la subida de archivos al backend
   const apiUrl = "http://localhost:3000";
 
   const fileData = [
@@ -23,15 +24,13 @@ export default function ExcelsPage() {
   ];
 
   return (
-    <div className="excels-main-content p-4 overflow-auto">
+    <WithSidebarLayout>
       <div className="flex gap-8 mt-8">
-        {/* Upload new file Button */}
         <UploadForm />
-
-        {/* Calculate Budget */}
         <Card
           onClick={() => router.push('/calculo')}
-          className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none flex flex-col justify-center items-center cursor-pointer hover:opacity-90">
+          className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none flex flex-col justify-center items-center cursor-pointer hover:opacity-90"
+        >
           <div className="flex flex-col items-center justify-center">
             <img className="w-[57px] h-[57px] object-contain mt-[4px]" src="/icons/file-invoice-dollar.png" alt="Presupuesto" />
             <span className="mt-2 text-sm text-black text-center">Calcular nuevo presupuesto</span>
@@ -39,11 +38,10 @@ export default function ExcelsPage() {
         </Card>
       </div>
 
-      {/* Tabla de archivos */}
       <div className="mt-8">
-        <div className="bg-[#2f2d2d] h-[25px] flex items-center px-21 ml-[-16px] mr-[-16px]">
-          <div className="text-white text-xs">Name</div>
-          <div className="ml-auto text-white text-xs">| Last opened by you</div>
+        <div className="bg-[#2f2d2d] h-[25px] flex items-center px-8 ml-[-16px] mr-[-16px]">
+          <div className="text-white text-xs">Nombre</div>
+          <div className="ml-auto text-white text-xs">| Última apertura</div>
         </div>
 
         <Table>
@@ -69,7 +67,7 @@ export default function ExcelsPage() {
                       <div className="text-white text-base">{file.name}</div>
                       <div className="text-white text-xs">{file.creationDate}</div>
                     </div>
-                    <div className="text-white text-base pr-23">{file.date}</div>
+                    <div className="text-white text-base pr-6">{file.date}</div>
                   </div>
                 </TableCell>
               </TableRow>
@@ -77,6 +75,6 @@ export default function ExcelsPage() {
           </TableBody>
         </Table>
       </div>
-    </div>
+    </WithSidebarLayout>
   );
-} 
+}
