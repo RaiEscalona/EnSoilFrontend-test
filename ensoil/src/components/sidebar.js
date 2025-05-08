@@ -18,13 +18,13 @@ export default function Sidebar() {
           <Home 
             size={30} 
             strokeWidth={1}/>
-          <span className="text-black text-h4">Inicio</span>
+          <span className="text-black text-h5">Inicio</span>
         </Link>
         <Link href="/contacto" className="text-black flex flex-col items-center gap-1 hover:text-primary pt-4">
           <History 
             size={30} 
             strokeWidth={1}/>
-          <span className="text-black text-h4">Recientes</span>
+          <span className="text-black text-h5">Recientes</span>
         </Link>
       </nav>
       <div>
