@@ -34,9 +34,9 @@ export default function ProjectsPage() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        //console.log('🔄 Cargando lista de proyectos');
+        console.log('🔄 Cargando lista de proyectos');
         const response = await api.get('/projects');
-        //console.log('✅ Proyectos cargados exitosamente:', response.data);
+        console.log('✅ Proyectos cargados exitosamente:', response.data);
         setProjects(response.data.projects);
       } catch (error) {
         console.error('❌ Error cargando proyectos:', error.response?.data || error.message);
