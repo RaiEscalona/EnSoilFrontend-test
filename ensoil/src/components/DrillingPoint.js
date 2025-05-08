@@ -2,15 +2,15 @@
 
 import Tooltip from './Tooltip';
 import { formatCoordinates } from '@/utils/coordinateUtils';
+import './DrillingPoint.css';
 
 export default function DrillingPoint({ point, imageInfo, clickPosition }) {
   return (
     <div 
-      className="absolute"
+      className="drilling-point"
       style={{
         left: `${clickPosition.x}px`,
         top: `${clickPosition.y}px`,
-        transform: 'translate(-50%, -50%)'
       }}
     >
       <Tooltip
@@ -23,9 +23,7 @@ export default function DrillingPoint({ point, imageInfo, clickPosition }) {
           </div>
         }
       >
-        <div
-          className="w-4 h-4 bg-red-500 rounded-full cursor-pointer hover:bg-red-600 transition-colors"
-        />
+        <div className="drilling-point-marker" />
       </Tooltip>
     </div>
   );

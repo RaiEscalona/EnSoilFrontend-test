@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import './Alert.css';
 
 export default function Alert({ message, onClose }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -17,18 +18,18 @@ export default function Alert({ message, onClose }) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-lg relative flex items-center gap-4 min-w-[300px] max-w-[600px]">
-        <div className="flex-1 pr-8">
-          <span className="block sm:inline">{message}</span>
+    <div className="alert-container">
+      <div className="alert-content">
+        <div className="alert-message">
+          <span>{message}</span>
         </div>
         <button 
           onClick={() => setIsVisible(false)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-green-200 rounded-full transition-colors"
+          className="alert-close-button"
           aria-label="Cerrar alerta"
         >
           <svg 
-            className="fill-current h-5 w-5 text-green-500" 
+            className="alert-close-icon" 
             xmlns="http://www.w3.org/2000/svg" 
             viewBox="0 0 20 20"
           >

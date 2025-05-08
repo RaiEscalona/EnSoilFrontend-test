@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import api from '@/utils/axios';
 
 // Simulated projects data
 const initialProjects = [
@@ -20,13 +21,28 @@ const initialProjects = [
 ];
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState(initialProjects);
+  const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     startDate: '',
     endDate: ''
   });
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        console.log('🔄 Cargando lista de proyectos');
+        const response = await api.get('/projects');
+        console.log('✅ Proyectos cargados exitosamente:', response.data);
+        setProjects(response.data.projects);
+      } catch (error) {
+        console.error('❌ Error cargando proyectos:', error.response?.data || error.message);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -39,34 +55,28 @@ export default function ProjectsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Simulate API call
-    // TODO: Replace with actual API call when backend is ready
-    /*
-    const response = await fetch('/api/projects', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-    const newProject = await response.json();
-    */
-    
-    // Simulated response
-    const newProject = {
-      id: projects.length + 1,
-      ...formData,
-      drillingPointsCount: 0,
-      zones: []
-    };
-    
-    setProjects([...projects, newProject]);
-    setFormData({
-      name: '',
-      description: '',
-      startDate: '',
-      endDate: ''
-    });
+    try {
+      console.log('🔄 Creando nuevo proyecto:', formData);
+      
+      const response = await api.post('/projects', {
+        name: formData.name,
+        description: formData.description,
+        startDate: `${formData.startDate}T00:00:00-03:00`,
+        endDate: `${formData.endDate}T00:00:00-03:00`
+      });
+
+      console.log('✅ Proyecto creado exitosamente:', response.data);
+      
+      setProjects([...projects, response.data]);
+      setFormData({
+        name: '',
+        description: '',
+        startDate: '',
+        endDate: ''
+      });
+    } catch (error) {
+      console.error('❌ Error creando proyecto:', error.response?.data || error.message);
+    }
   };
 
   return (
@@ -145,19 +155,8 @@ export default function ProjectsPage() {
                 <h3 className="text-lg font-semibold">{project.name}</h3>
                 <p className="text-gray-600">{project.description}</p>
                 <p className="text-sm text-gray-500">
-                  {project.startDate} - {project.endDate}
+                  {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
                 </p>
-                <p className="text-sm text-gray-500">
-                  Puntos de perforación: {project.drillingPointsCount}
-                </p>
-                <div className="mt-2">
-                  <span className="text-sm font-medium">Zonas:</span>
-                  {project.zones.map(zone => (
-                    <span key={zone.id} className="ml-2 text-sm text-gray-600">
-                      {zone.name}
-                    </span>
-                  ))}
-                </div>
               </div>
               <Link
                 href={`/projects/${project.id}/map`}

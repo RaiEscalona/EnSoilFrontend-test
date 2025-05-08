@@ -1,0 +1,292 @@
+{
+  "samplingPoints": [
+    "DSS 2021 SPPC-LOTE S/N", 
+    "Emgrisa/POCH 2015 CAL15", 
+    "Emgrisa/POCH 2015 CAL16", 
+    "Cal2", 
+    "DUP", 
+    "EnSoil 2024 S01", 
+    "EnSoil 2024 S02", 
+    "EnSoil 2024 S03", 
+    "EnSoil 2024 S04", 
+    "EnSoil 2024 S05", 
+    "EnSoil 2024 S06", 
+    "EnSoil 2024 S07", 
+    "EnSoil 2024 S08", 
+    "EnSoil 2024 S09", 
+    "WSP/Emgrisa 2019 CC26"
+  ],
+  "depths": [
+    0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 
+    110, 120, 130, 140, 150, 160, 170, 180, 190, 
+    200, 210, 220, 230, 240, 250, 260, 270, 280, 
+    290, 300, 310, 320
+  ],
+  "analysisData": {
+    "0": { 
+      "DSS 2021 SPPC-LOTE S/N": "As, Fe, Pb", 
+      "Emgrisa/POCH 2015 CAL15": "As, Pb", 
+      "Cal2": "As, Pb",
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "10": { 
+      "DSS 2021 SPPC-LOTE S/N": "As, Fe, Pb", 
+      "Emgrisa/POCH 2015 CAL15": "As, Pb", 
+      "Cal2": "As, Pb",
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd", 
+      "WSP/Emgrisa 2019 CC26": "Mn" 
+    },
+    "20": { 
+      "DSS 2021 SPPC-LOTE S/N": "As, Fe, Pb", 
+      "Emgrisa/POCH 2015 CAL15": "As, Pb", 
+      "Cal2": "As, Pb",
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd", 
+      "WSP/Emgrisa 2019 CC26": "Mn" 
+    },
+    "30": { 
+      "DSS 2021 SPPC-LOTE S/N": "As, Fe, Pb", 
+      "Emgrisa/POCH 2015 CAL15": "As, Pb", 
+      "Cal2": "As, Pb",
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "40": { 
+      "DSS 2021 SPPC-LOTE S/N": "As, Fe, Pb", 
+      "Emgrisa/POCH 2015 CAL15": "As, Pb", 
+      "Cal2": "As, Pb",
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "50": { 
+      "DSS 2021 SPPC-LOTE S/N": "As, Fe, Pb", 
+      "Emgrisa/POCH 2015 CAL15": "As, Pb", 
+      "Cal2": "As, Pb",
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "60": { 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "Cal2": "As, Pb",
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "70": { 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "80": { 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "90": { 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "100": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S03": "Cd", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S05": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S07": "As, Cd, Co", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "110": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S06": "Cd", 
+      "EnSoil 2024 S08": "Cd", 
+      "EnSoil 2024 S09": "Cd" 
+    },
+    "120": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S06": "Cd" 
+    },
+    "130": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S06": "Cd" 
+    },
+    "140": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S06": "Cd" 
+    },
+    "150": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "DUP": "As, Cd", 
+      "EnSoil 2024 S01": "Cd", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "EnSoil 2024 S06": "Cd" 
+    },
+    "160": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd" 
+    },
+    "170": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "WSP/Emgrisa 2019 CC26": "Mn" 
+    },
+    "180": { 
+      "DSS 2021 SPPC-LOTE S/N": "F3, TPH", 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd", 
+      "WSP/Emgrisa 2019 CC26": "Mn" 
+    },
+    "190": { 
+      "Emgrisa/POCH 2015 CAL16": "As, Cu, Pb", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd" 
+    },
+    "200": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co, Fe", 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd" 
+    },
+    "210": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co, Fe", 
+      "Emgrisa/POCH 2015 CAL15": "Pb", 
+      "EnSoil 2024 S02": "Cd, Co", 
+      "EnSoil 2024 S04": "Cd" 
+    },
+    "220": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co, Fe", 
+      "Emgrisa/POCH 2015 CAL15": "Pb" 
+    },
+    "230": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co, Fe" 
+    },
+    "240": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co, Fe" 
+    },
+    "250": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co, Fe" 
+    },
+    "260": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co" 
+    },
+    "270": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co" 
+    },
+    "280": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co" 
+    },
+    "290": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co" 
+    },
+    "300": { 
+      "DSS 2021 SPPC-LOTE S/N": "Co" 
+    }
+  }
+} 

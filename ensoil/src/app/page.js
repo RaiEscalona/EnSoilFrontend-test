@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "../ui/card";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { UploadForm } from "@/components/ExcelForm";
+import Image from "next/image";
+import Sidebar from "@/components/sidebar";
 
 export default function VistaPrincipal() {
   const router = useRouter();
