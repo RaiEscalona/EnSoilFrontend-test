@@ -59,8 +59,9 @@ export default function LoginForm() {
             <span> Solicitar registro</span>
         </Link>
       </div>
-    
-      <Button label={"Acceder"} route={"/excels"} fullWidth={true}></Button>
+      <div className="flex-1 flex justify-center items-center p-1">
+        <Button label={"Acceder"} route={"/excels"} fullWidth={true}></Button>
+      </div>
     </Form>
   );
 }
