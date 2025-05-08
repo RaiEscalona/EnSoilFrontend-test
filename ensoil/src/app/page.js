@@ -4,37 +4,13 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "../ui/card";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
+import { UploadForm } from "@/components/ExcelForm";
 
 export default function VistaPrincipal() {
   const router = useRouter();
 
-  // Función para manejar la carga de archivos
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-  
-    console.log("Archivo seleccionado:", file.name);
-  
-    // Acá se valida el archivo para mandar al backend 
-    const formData = new FormData();
-    formData.append('archivo', file);
-  
-    try {
-      const res = await fetch('/api/subir-archivo', {
-        method: 'POST',
-        body: formData,
-      });
-  
-      if (!res.ok) throw new Error("Error al subir archivo");
-  
-      const data = await res.json();
-      alert(`Archivo "${file.name}" subido correctamente`);
-      console.log(data);
-    } catch (error) {
-      console.error("Fallo en la subida", error);
-      alert("Error al subir el archivo");
-    }
-  };
+    // Acá se crea la constante de la ruta para la subida de archivos al backend
+    const apiUrl = "http://localhost:3000";
   
 
   const fileData = [
@@ -78,18 +54,7 @@ export default function VistaPrincipal() {
         <div className="flex gap-8 mt-8">
 
           {/* Upload new file Button */}
-          <Card className="w-[369px] h-[177px] bg-[#b2abab] rounded-[14px] border-none flex flex-col items-center justify-center cursor-pointer hover:opacity-90">
-            <label className="flex flex-col items-center justify-center cursor-pointer">
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <img className="w-[57px] h-[57px]" alt="Agregar" src="/icons/add.png" />
-              <span className="mt-2 text-sm text-black">Subir nuevo archivo</span>
-            </label>
-          </Card>
+          <UploadForm />
 
           {/* Calculate Budget */}
           <Card
