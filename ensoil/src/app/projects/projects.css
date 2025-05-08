@@ -2,92 +2,68 @@
 @import "tailwindcss";
 
 .projects-bg {
-  background: var(--color-base, #5e5b5b);
+  background: var(--color-base);
   min-height: 100vh;
 }
 
-.projects-title, .projects-subtitle {
-  color: var(--foreground, #242424);
+.projects-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  color: var(--foreground);
 }
 
 .projects-title {
-  font-size: var(--text-h1, 2.25rem);
-  font-weight: var(--text-h1--font-weight, 800);
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: var(--color-white);
+  letter-spacing: -0.5px;
 }
 
 .projects-subtitle {
-  font-size: var(--text-h2, 1.5rem);
-  font-weight: var(--text-h2--font-weight, 600);
-}
-
-.project-card {
-  background: var(--background, #fff);
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.project-card-title {
-  font-size: var(--text-h3, 1.125rem);
-  font-weight: var(--text-h3--font-weight, 600);
-  color: var(--color-black, #242424);
-}
-
-.project-card-desc {
-  color: var(--color-secondary, #7A7A7A);
-}
-
-.project-card-dates {
-  font-size: var(--text-p, 0.875rem);
-  color: var(--color-tertiary, #AFAFAF);
-}
-
-.project-map-btn {
-  background: var(--color-primary, #367B5D);
-  color: var(--color-white, #FDFDFD);
-  border-radius: 0.5rem;
-  padding: 0.5rem 1.5rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  transition: background 0.2s;
+  color: #dddddd;
+  margin-bottom: 1.25rem;
 }
 
-.project-map-btn:hover {
-  background: #24513e;
-}
-
-.create-project-form {
-  background: var(--background, #fff);
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+.create-project-form,
+.project-card {
+  background: var(--background);
+  border-radius: 1rem;
   padding: 1.5rem;
-  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-quaternary);
 }
 
 .create-project-form label {
-  color: var(--color-black, #242424);
+  color: var(--foreground);
+  font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .create-project-form input,
 .create-project-form textarea {
   font-family: 'Montserrat', sans-serif;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-quaternary, #CECECE);
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-quaternary);
   border-radius: 0.5rem;
+  background: #656565;
+  color: var(--color-white);
   font-size: 1rem;
   margin-top: 0.25rem;
-  background: var(--background, #fff);
-  color: var(--color-black, #242424);
-  box-sizing: border-box;
   transition: border 0.2s, box-shadow 0.2s;
 }
 
 .create-project-form input:focus,
 .create-project-form textarea:focus {
   outline: none;
-  border: 1.5px solid var(--color-primary, #367B5D);
-  box-shadow: 0 0 0 2px rgba(54,123,93,0.15);
+  border: 1.5px solid var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(54,123,93,0.3);
 }
 
 .create-project-form textarea {
@@ -95,25 +71,8 @@
   resize: vertical;
 }
 
-.projects-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.projects-title {
-  margin-bottom: 2rem;
-}
-
-.create-project-form {
-  margin-bottom: 2rem;
-}
-
 .form-fields > div {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-dates {
@@ -122,12 +81,52 @@
   gap: 1rem;
 }
 
+.project-create-btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.project-map-btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.project-map-btn:hover {
+  background: #2e6b4f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.project-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.project-card-desc {
+  color: var(--color-secondary);
+  margin-top: 0.25rem;
+}
+
+.project-card-dates {
+  font-size: 0.875rem;
+  color: var(--color-tertiary);
+  margin-top: 0.25rem;
+}
+
 .projects-list {
   flex: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  overflow-y: auto;
 }
 
 .project-card-content {
@@ -135,8 +134,3 @@
   justify-content: space-between;
   align-items: flex-start;
 }
-
-.project-create-btn {
-  width: 100%;
-  margin-top: 1rem;
-} 
