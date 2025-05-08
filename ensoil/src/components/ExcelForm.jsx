@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import axios from "axios"
+import axios from "@/utils/axios"
 import {
   Dialog,
   DialogContent,
@@ -31,14 +31,9 @@ export function UploadForm() {
       const formData = new FormData()
       formData.append("labName", selectedLab)
       formData.append("file", selectedFile)
-      
   
-      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
-      const endpoint = '/dataLaboratories/process-laboratory-data'
-      const url = `${apiUrl.replace(/\/+$/, '')}${endpoint}`
-
       try {
-        const res = await axios.post(url, formData, {
+        const res = await axios.post('/dataLaboratories/process-laboratory-data', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -57,8 +52,17 @@ export function UploadForm() {
   
       } catch (err) {
         console.error("Fallo en la subida", err)
-        const errorMessage = err.response?.data?.message || err.message || "Error al subir el archivo"
-        alert(`Error al subir el archivo: ${errorMessage}`)
+        let errorMessage = "Error al subir el archivo"
+        
+        if (err.code === 'ERR_NETWORK') {
+          errorMessage = "Error de conexión: No se pudo conectar con el servidor. Verifica tu conexión o contacta al administrador."
+        } else if (err.response?.data?.message) {
+          errorMessage = err.response.data.message
+        } else if (err.message) {
+          errorMessage = err.message
+        }
+        
+        alert(errorMessage)
       }
     }
   
