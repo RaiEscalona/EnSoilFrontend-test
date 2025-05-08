@@ -34,6 +34,8 @@ export default function ProjectsPage() {
     const fetchProjects = async () => {
       try {
         console.log('🔄 Cargando lista de proyectos');
+        console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
+        console.log(api.defaults.baseURL);
         const response = await api.get('/projects');
         console.log('✅ Proyectos cargados exitosamente:', response.data);
         setProjects(response.data.projects);

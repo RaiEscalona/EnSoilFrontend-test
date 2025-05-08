@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.raimundoserver.lat';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -8,6 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 10000,
+  withCredentials: true,
 });
 
 api.interceptors.request.use(

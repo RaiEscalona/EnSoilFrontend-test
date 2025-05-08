@@ -13,7 +13,7 @@ import "./excels.css";
 export default function ExcelsPage() {
   const router = useRouter();
 
-  const apiUrl = "http://localhost:3000";
+  const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
   const fileData = [
     { id: 1, name: "Muestra Norte", date: "24/04/2025", creationDate: "23/04/2025" },

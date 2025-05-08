@@ -32,7 +32,7 @@ export function UploadForm() {
       formData.append("file", selectedFile)
       
   
-      const apiUrl = "http://localhost:3000"
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'
 
       try {
         const res = await fetch(`${apiUrl}/dataLaboratories/process-laboratory-data`, {
