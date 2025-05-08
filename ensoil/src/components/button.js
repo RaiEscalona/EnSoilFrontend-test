@@ -11,7 +11,7 @@ Button.propTypes = {
 };
 
 export default function Button ({label, route, type = "link", size, fullWidth = false, onClick}) {
-  const fullWidthClass = fullWidth ? 'w-full' : 'w-auto';
+  const fullWidthClass = fullWidth ? 'w-full' : '';
   const textSize = size ? size : 'text-h5';
   const style = `bg-primary text-white py-2 px-4 rounded border-1 border-current hover:bg-white hover:text-black hover:border-primary transition dark:border-primary`
 
@@ -19,7 +19,7 @@ export default function Button ({label, route, type = "link", size, fullWidth = 
   if (route) {
     return (
       <Link href={route}>
-        <span className={`${fullWidthClass} ${textSize} ${style}`}>
+        <span className={`w-full ${textSize} ${style}`}>
           {label}
         </span>
       </Link>

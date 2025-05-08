@@ -60,7 +60,7 @@ export default function LoginForm() {
         </Link>
       </div>
     
-    <Button label={"Ingresar"} type="submit" fullWidth={true}></Button>
+      <Button label={"Acceder"} route={"/excels"} fullWidth={true}></Button>
     </Form>
   );
 }
