@@ -1,0 +1,142 @@
+@import "@fontsource/montserrat";
+@import "tailwindcss";
+
+.projects-bg {
+  background: var(--color-base, #5e5b5b);
+  min-height: 100vh;
+}
+
+.projects-title, .projects-subtitle {
+  color: var(--foreground, #242424);
+}
+
+.projects-title {
+  font-size: var(--text-h1, 2.25rem);
+  font-weight: var(--text-h1--font-weight, 800);
+}
+
+.projects-subtitle {
+  font-size: var(--text-h2, 1.5rem);
+  font-weight: var(--text-h2--font-weight, 600);
+}
+
+.project-card {
+  background: var(--background, #fff);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-card-title {
+  font-size: var(--text-h3, 1.125rem);
+  font-weight: var(--text-h3--font-weight, 600);
+  color: var(--color-black, #242424);
+}
+
+.project-card-desc {
+  color: var(--color-secondary, #7A7A7A);
+}
+
+.project-card-dates {
+  font-size: var(--text-p, 0.875rem);
+  color: var(--color-tertiary, #AFAFAF);
+}
+
+.project-map-btn {
+  background: var(--color-primary, #367B5D);
+  color: var(--color-white, #FDFDFD);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.project-map-btn:hover {
+  background: #24513e;
+}
+
+.create-project-form {
+  background: var(--background, #fff);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.create-project-form label {
+  color: var(--color-black, #242424);
+}
+
+.create-project-form input,
+.create-project-form textarea {
+  font-family: 'Montserrat', sans-serif;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-quaternary, #CECECE);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+  background: var(--background, #fff);
+  color: var(--color-black, #242424);
+  box-sizing: border-box;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.create-project-form input:focus,
+.create-project-form textarea:focus {
+  outline: none;
+  border: 1.5px solid var(--color-primary, #367B5D);
+  box-shadow: 0 0 0 2px rgba(54,123,93,0.15);
+}
+
+.create-project-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.projects-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.projects-title {
+  margin-bottom: 2rem;
+}
+
+.create-project-form {
+  margin-bottom: 2rem;
+}
+
+.form-fields > div {
+  margin-bottom: 1rem;
+}
+
+.form-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.projects-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.project-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.project-create-btn {
+  width: 100%;
+  margin-top: 1rem;
+} 

@@ -267,4 +267,15 @@
 
 .modal-button-confirm:hover {
   background-color: #4338ca; /* hover:bg-indigo-700 */
+}
+
+.map-main-bg {
+  background: var(--color-base, #5e5b5b);
+  min-height: 100vh;
+}
+
+@media (max-width: 600px) {
+  .map-main-bg {
+    padding-left: 0;
+  }
 } 

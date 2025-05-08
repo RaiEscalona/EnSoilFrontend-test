@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import api from '@/utils/axios';
+import "./projects.css";
 
 // Simulated projects data
 const initialProjects = [
@@ -80,93 +81,85 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Proyectos</h1>
-      
-      {/* Create Project Form */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">Crear Nuevo Proyecto</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Nombre</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Descripción</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
+    <div className="projects-bg">
+      <div className="projects-container">
+        <h1 className="projects-title">Proyectos</h1>
+        {/* Create Project Form */}
+        <div className="create-project-form">
+          <h2 className="projects-subtitle">Crear Nuevo Proyecto</h2>
+          <form onSubmit={handleSubmit} className="form-fields">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Fecha de Inicio</label>
+              <label>Nombre</label>
               <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
             </div>
-            
             <div>
-              <label className="block text-sm font-medium text-gray-700">Fecha de Fin</label>
-              <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
+              <label>Descripción</label>
+              <textarea
+                name="description"
+                value={formData.description}
                 onChange={handleInputChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
             </div>
-          </div>
-          
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Crear Proyecto
-          </button>
-        </form>
-      </div>
-      
-      {/* Projects List */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold mb-4">Proyectos Existentes</h2>
-        {projects.map((project) => (
-          <div key={project.id} className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-start">
+            <div className="form-dates">
               <div>
-                <h3 className="text-lg font-semibold">{project.name}</h3>
-                <p className="text-gray-600">{project.description}</p>
-                <p className="text-sm text-gray-500">
-                  {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
-                </p>
+                <label>Fecha de Inicio</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
-              <Link
-                href={`/projects/${project.id}/map`}
-                className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Ver Mapa
-              </Link>
+              <div>
+                <label>Fecha de Fin</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             </div>
-          </div>
-        ))}
+            <button
+              type="submit"
+              className="project-map-btn project-create-btn"
+            >
+              Crear Proyecto
+            </button>
+          </form>
+        </div>
+        {/* Projects List */}
+        <div className="projects-list">
+          <h2 className="projects-subtitle">Proyectos Existentes</h2>
+          {projects.map((project) => (
+            <div key={project.id} className="project-card">
+              <div className="project-card-content">
+                <div>
+                  <h3 className="project-card-title">{project.name}</h3>
+                  <p className="project-card-desc">{project.description}</p>
+                  <p className="project-card-dates">
+                    {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
+                  </p>
+                </div>
+                <Link
+                  href={`/projects/${project.id}/map`}
+                  className="project-map-btn"
+                >
+                  Ver Mapa
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

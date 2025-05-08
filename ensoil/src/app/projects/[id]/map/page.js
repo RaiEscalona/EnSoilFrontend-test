@@ -155,7 +155,7 @@ export default function ProjectMapPage() {
   }
 
   return (
-    <div className="map-page-container">
+    <div className="map-main-bg map-page-container">
       <div className="map-header">
         <h1 className="map-title">Mapa del Proyecto</h1>
         <Link href={`/projects/${id}/analysis`}>
