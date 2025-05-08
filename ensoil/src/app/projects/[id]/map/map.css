@@ -270,7 +270,6 @@
 }
 
 .map-main-bg {
-  background: var(--color-base, #5e5b5b);
   min-height: 100vh;
 }
 
