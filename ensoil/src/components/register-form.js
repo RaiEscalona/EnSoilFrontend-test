@@ -18,7 +18,7 @@ export default function RegisterForm() {
   return (
     <Form onSubmit={handleSubmit}>
         <div className="pb-3">
-        <label htmlFor="name" className="block text-h4 text-black">
+        <label htmlFor="name" className="block text-h5 text-black">
             Nombre
         </label>
         <input
@@ -27,14 +27,14 @@ export default function RegisterForm() {
             name="name"
             value={form.name}
             onChange={handleChange}
-            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h5
           dark:border-base dark:bg-white"
             placeholder="Ingresa tu nombre"
         />
         </div>
 
         <div className="pb-3">
-        <label htmlFor="lastName" className="block text-h4 text-black">
+        <label htmlFor="lastName" className="block text-h5 text-black">
             Apellidos
         </label>
         <input
@@ -43,14 +43,14 @@ export default function RegisterForm() {
             name="lastName"
             value={form.lastName}
             onChange={handleChange}
-            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+            className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h5
           dark:border-base dark:bg-white"
             placeholder="Ingresa tu apellidos"
         />
         </div>
 
       <div className="pb-3">
-        <label htmlFor="email" className="block text-h4 text-black">
+        <label htmlFor="email" className="block text-h5 text-black">
           Correo
         </label>
         <input
@@ -59,13 +59,13 @@ export default function RegisterForm() {
           name="email"
           value={form.email}
           onChange={handleChange}
-          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h5
           dark:border-base dark:bg-white"
           placeholder="Ingresa tu correo"
         />
       </div>
     
-    <Button label={"Solicitar registro"}></Button>
+        <Button label={"Solicitar registro"} type="submit" fullWidth={true}></Button>
     </Form>
   );
 }

@@ -22,7 +22,8 @@
   --text-h2--font-weight: 600;
   --text-h3: 21px;
   --text-h3--font-weight: 600;
-  --text-h4: 14px;
+  --text-h4: 20px;
+  --text-h5: 14px;
   --text-p: 10px;
   --text-p-medium: 10px;
   --text-p-medium--font-weight: 600;
@@ -37,7 +38,6 @@
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: 'Montserrat', sans-serif;
 }

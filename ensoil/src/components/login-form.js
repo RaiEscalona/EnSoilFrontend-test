@@ -22,7 +22,7 @@ export default function LoginForm() {
   return (
     <Form onSubmit={handleSubmit}>
       <div className="pb-3">
-        <label htmlFor="email" className="block text-h4 text-black">
+        <label htmlFor="email" className="block text-h5 text-black">
           Correo
         </label>
         <input
@@ -31,14 +31,14 @@ export default function LoginForm() {
           name="email"
           value={form.email}
           onChange={handleChange}
-          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h5
           dark:border-base dark:bg-white"
           placeholder="Ingresa tu correo"
         />
       </div>
 
       <div className="pb-3">
-        <label htmlFor="password" className="block text-h4 text-black">
+        <label htmlFor="password" className="block text-h5 text-black">
           Contraseña
         </label>
         <input
@@ -47,20 +47,21 @@ export default function LoginForm() {
           name="password"
           value={form.password}
           onChange={handleChange}
-          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h4
+          className="mt-1 block w-full border border-quaternary rounded p-2 focus:outline-none focus:ring focus:border-primary text-tertiary text-h5
           dark:border-base dark:bg-white"
           placeholder="Ingresa tu contraseña"
         />
       </div>
 
-      <div className="text-h4 text-black py-2">
+      <div className="text-h5 text-black py-2">
         ¿No tienes cuenta en EnSoil?
-        <Link href="/register" className="text-primary text-h4">
+        <Link href="/register" className="text-primary text-h5">
             <span> Solicitar registro</span>
         </Link>
       </div>
-    
-    <Button label={"Ingresar"}></Button>
+      <div className="flex-1 flex justify-center items-center p-1">
+        <Button label={"Acceder"} route={"/excels"} fullWidth={true}></Button>
+      </div>
     </Form>
   );
 }
