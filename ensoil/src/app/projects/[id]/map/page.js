@@ -10,6 +10,7 @@ import MapUploader from '@/components/MapUploader';
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import api from '@/utils/axios';
 import './map.css';
+import Button from '@/components/button';
 
 export default function ProjectMapPage() {
   const { id } = useParams();
@@ -159,12 +160,8 @@ export default function ProjectMapPage() {
     <WithSidebarLayout>
     <div className="dark:bg-secondary map-page-container">
       <div className="map-header">
-        <h1 className="map-title">Mapa del Proyecto</h1>
-        <Link href={`/projects/${id}/analysis`}>
-          <span className="analysis-link-button" role="button">
-            Ir a Análisis
-          </span>
-        </Link>
+        <div className="text-h2">Mapa del Proyecto</div>
+        <Button label={"Ir a Análisis"} route={`/projects/${id}/analysis`} fullWidth={false}></Button>
       </div>
       
       {showAlert && (

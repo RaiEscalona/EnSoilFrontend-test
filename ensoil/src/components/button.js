@@ -13,15 +13,15 @@ Button.propTypes = {
 export default function Button ({label, route, type = "link", size, fullWidth = false, onClick}) {
   const fullWidthClass = fullWidth ? 'w-full' : '';
   const textSize = size ? size : 'text-h5';
-  const style = `bg-primary text-white py-2 px-4 rounded border-1 border-current hover:bg-white hover:text-black hover:border-primary transition dark:border-primary`
+  const style = `bg-primary text-white py-2 px-4 rounded transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`
 
 
   if (route) {
     return (
       <Link href={route}>
-        <span className={`${fullWidthClass} ${textSize} ${style}`}>
+        <button className={`${fullWidthClass} ${textSize} ${style}`}>
           {label}
-        </span>
+        </button>
       </Link>
     );
   }

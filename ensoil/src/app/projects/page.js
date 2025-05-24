@@ -88,11 +88,11 @@ export default function ProjectsPage() {
     <div className="dark:bg-secondary">
 
       <div className="projects-container">
-        <h1 className="text-h1">Proyectos</h1>
+        <div className="text-h2">Proyectos</div>
         <br />
         {/* Create Project Form */}
         <div className="create-project-form">
-          <h2 className="text-h3">Crear Nuevo Proyecto</h2>
+          <div className="text-h3">Crear Nuevo Proyecto</div>
           <form onSubmit={handleSubmit} className="form-fields">
             <div>
               <label>Nombre</label>
@@ -146,13 +146,13 @@ export default function ProjectsPage() {
         {/* Projects List */}
         <div className="projects-list">
           <br />
-          <h2 className="text-h2">Proyectos Existentes</h2>
+          <div className='text-h3 text-black dark:text-white'>Proyectos Existentes</div>
           {projects.map((project) => (
             <div key={project.id} className="project-card">
               <div className="project-card-content">
                 <div>
-                  <h3 className="project-card-title">{project.name}</h3>
-                  <p className="project-card-desc">{project.description}</p>
+                  <div className="project-card-title text-black dark:text-white">{project.name}</div>
+                  <p className="project-card-desc text-base dark:text-quaternary">{project.description}</p>
                   <p className="project-card-dates">
                     {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
                   </p>
