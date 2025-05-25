@@ -13,7 +13,7 @@ Button.propTypes = {
 export default function Button ({label, route, type = "link", size, fullWidth = false, onClick}) {
   const fullWidthClass = fullWidth ? 'w-full' : '';
   const textSize = size ? size : 'text-h5';
-  const style = `bg-primary text-white py-2 px-4 rounded transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`
+  const style = `bg-primary text-white py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`
 
 
   if (route) {

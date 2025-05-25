@@ -5,6 +5,7 @@ import Link from 'next/link';
 import api from '@/utils/axios';
 import "./projects.css";
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
+import Button from '@/components/button';
 
 // Simulated projects data
 const initialProjects = [
@@ -135,12 +136,7 @@ export default function ProjectsPage() {
                 />
               </div>
             </div>
-            <button
-              type="submit"
-              className="project-map-btn project-create-btn"
-            >
-              Crear Proyecto
-            </button>
+            <Button label="Crear Proyecto" type="submit" size="h4" fullWidth={true}></Button>
           </form>
         </div>
         {/* Projects List */}
@@ -157,12 +153,13 @@ export default function ProjectsPage() {
                     {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
                   </p>
                 </div>
-                <Link
+                <Button label="Ver Mapa" route={`/projects/${project.id}/map`}></Button>
+                {/* <Link
                   href={`/projects/${project.id}/map`}
                   className="project-map-btn"
                 >
                   Ver Mapa
-                </Link>
+                </Link> */}
               </div>
             </div>
           ))}
