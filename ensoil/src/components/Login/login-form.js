@@ -1,5 +1,5 @@
 'use client';
-const PATH = "http://localhost:3000";
+
 import Link from "next/link";
 import Form from "next/form";
 import { useState } from 'react';
@@ -7,9 +7,11 @@ import Button from "../button";
 import { auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from 'next/navigation';
+import api from '@/utils/axios';
 
 export default function LoginForm() {
   const router = useRouter();
+  const [data, setData] = useState('');
   const [form, setForm] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
@@ -27,23 +29,28 @@ export default function LoginForm() {
 
       const user = userCredential.user;
       const token = await user.getIdToken();
-      console.log("token:", token);
+      console.log(`🔄 Cargando datos del user ${user}`);
 
-      const response = await fetch(`${PATH}/users/verify`, {
-        method: 'GET',
+      const body = {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         }
-      });
+      };
 
-      const data = await response.json();
-      console.log("Respuesta del backend:", data);
-      if (data.success) {
+      // const response = await fetch(`${PATH}/users/verify`, {
+      //   method: 'GET',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${token}`
+      //   }
+      // });
+
+      const response = await api.get("/users/verify", body);
+      console.log('✅ Datos del user cargados:', response.data);
+      if (response.data.success) {
         router.push('/excels');
       }
-
-
     } catch (error) {
       console.error("Error en login:", error.message);
     }
