@@ -11,7 +11,6 @@ import api from '@/utils/axios';
 
 export default function LoginForm() {
   const router = useRouter();
-  const [data, setData] = useState('');
   const [form, setForm] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
@@ -37,14 +36,6 @@ export default function LoginForm() {
           Authorization: `Bearer ${token}`
         }
       };
-
-      // const response = await fetch(`${PATH}/users/verify`, {
-      //   method: 'GET',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${token}`
-      //   }
-      // });
 
       const response = await api.get("/users/verify", body);
       console.log('✅ Datos del user cargados:', response.data);

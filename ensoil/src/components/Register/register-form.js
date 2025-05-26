@@ -1,11 +1,12 @@
 'use client';
-const PATH = "http://localhost:3000";
+
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Form from "next/form";
 import { useState } from 'react';
 import Button from "../button";
 import { auth } from "@/firebase";
 import { useRouter } from 'next/navigation';
+import api from '@/utils/axios';
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -27,18 +28,20 @@ export default function RegisterForm() {
       const uid = userCredential.user.uid;
       const token = await userCredential.user.getIdToken();
 
-      const response = await fetch(`${PATH}/users`, {
-        method: 'POST',
+      console.log(`🔄 Creando al usuario ${email}`);
+      const response = await api.post('/users', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ name, lastName, uid, email })
+        name: name,
+        lastName: lastName,
+        uid: uid,
+        email: email
       });
 
-      const data = await response.json();
-      console.log("Respuesta del backend:", data);
-      if (data.success) {
+      console.log('✅ Datos del user cargados:', response.data);
+      if (response.data.success) {
         router.push('/login');
       }
 
