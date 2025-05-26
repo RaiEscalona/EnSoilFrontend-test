@@ -29,6 +29,10 @@ export default function ProjectMapPage() {
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
+    console.log("Drilling Point:", drillingPoints);
+  }, [drillingPoints]);
+
+  useEffect(() => {
     const fetchProjectData = async () => {
       try {
         console.log(`🔄 Cargando datos del proyecto ${id}`);
@@ -161,7 +165,7 @@ export default function ProjectMapPage() {
     <div className="dark:bg-secondary map-page-container">
       <div className="map-header">
         <div className="text-h2">Mapa del Proyecto</div>
-        <Button label={"Ir a Análisis"} route={`/projects/${id}/analysis`} fullWidth={false}></Button>
+        <Button label={"Ir a Análisis"} route={`/projects/${id}/analysis`} size="h4" fullWidth={false}></Button>
       </div>
       
       {showAlert && (
@@ -191,6 +195,8 @@ export default function ProjectMapPage() {
                 {drillingPoints.map((point) => (
                   <DrillingPoint
                     key={point.id}
+                    projectId={id}
+                    id={point.id}
                     point={point}
                     imageInfo={imageInfo}
                     clickPosition={point.clickPosition}
@@ -205,7 +211,7 @@ export default function ProjectMapPage() {
       {showPointModal && (
         <div className="modal-backdrop">
           <div className="modal-content">
-            <h2 className="modal-title">Crear Nuevo Punto</h2>
+            <h2 className="modal-title text-black">Crear Nuevo Punto</h2>
             <div className="modal-body">
               <div>
                 <label className="modal-input-label">Nombre del Punto</label>
@@ -219,7 +225,7 @@ export default function ProjectMapPage() {
               </div>
               {newPointData.coordinates && (
                 <div>
-                  <p className="modal-coordinates-text">
+                  <p className="text-h5 text-black">
                     Coordenadas: {formatCoordinates(newPointData.coordinates)}
                   </p>
                 </div>
