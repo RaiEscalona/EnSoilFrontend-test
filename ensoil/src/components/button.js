@@ -1,5 +1,8 @@
-import Link from 'next/link';
+'use client';
+
+import { LoaderCircle } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/navigation';
 
 Button.propTypes = {
   title: PropTypes.string.isRequired,
@@ -8,21 +11,36 @@ Button.propTypes = {
   size: PropTypes.string,
   fullWidth: PropTypes.bool,
   onClick: PropTypes.func,
+  loading: PropTypes.bool,
 };
 
-export default function Button ({label, route, type = "link", size, fullWidth = false, onClick}) {
+export default function Button ({label, route, type = "link", size, fullWidth = false, onClick, loading=false}) {  
+  const router = useRouter();
+
   const fullWidthClass = fullWidth ? 'w-full' : '';
   const textSize = size ? size : 'text-h5';
-  const style = `bg-primary text-white py-2 px-4 rounded border-1 border-current hover:bg-white hover:text-black hover:border-primary transition dark:border-primary`
+  const style = `bg-primary text-white py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`;
+  const loadingStyle = `bg-primary text-white py-2 px-4 rounded-lg`;
 
+  const handleClick = () => {
+    router.push(route);
+  };
 
   if (route) {
     return (
-      <Link href={route}>
-        <span className={`${fullWidthClass} ${textSize} ${style}`}>
-          {label}
-        </span>
-      </Link>
+      <button onClick={handleClick} className={`${fullWidthClass} ${textSize} ${style}`}>
+        {label}
+      </button>
+    );
+  }
+
+  if (loading) {
+    return (
+      <button className={`${fullWidthClass} ${textSize} ${loadingStyle}`} disabled>
+        <div className='flex-1 flex justify-center items-center gap-2'>
+          <LoaderCircle className='animate-spin'/>{label}
+        </div>
+      </button>
     );
   }
 
