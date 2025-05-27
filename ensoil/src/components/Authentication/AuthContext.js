@@ -2,6 +2,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase.js";
+import { useRouter } from 'next/navigation';
 
 const context = createContext();
 

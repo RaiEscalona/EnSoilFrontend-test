@@ -1,4 +1,5 @@
-// components/Sidebar.tsx
+'use client'
+
 import Link from "next/link";
 import { Home, FolderPlus, ArrowLeftToLine } from "lucide-react";
 import { UserAuth } from "./Authentication/AuthContext";
@@ -26,11 +27,11 @@ export default function Sidebar() {
         </Link>
       </nav>
       <div>
-        <Link onClick={logout} href="/" className="text-black flex flex-col items-center gap-1 hover:text-primary pb-4 dark:text-white">
+        <button onClick={logout} className="text-black flex flex-col items-center gap-1 hover:text-primary pb-4 dark:text-white">
           <ArrowLeftToLine 
             size={35} 
             strokeWidth={1}/>
-        </Link>
+        </button>
       </div>
     </aside>
   );
