@@ -3,14 +3,15 @@
 import Tooltip from './Tooltip';
 import { formatCoordinates } from '@/utils/coordinateUtils';
 import './DrillingPoint.css';
-import Link from 'next/link';
-import { Dot } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function DrillingPoint({ projectId, id, point, clickPosition, size = 20, border = 2 }) {
   const route = `/projects/${projectId}/map/drillingPoint/${id}`;
+  const router = useRouter();
 
   const handleClick = (e) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation();
+    router.push(route);
   };
 
   return (
@@ -25,11 +26,7 @@ export default function DrillingPoint({ projectId, id, point, clickPosition, siz
         cursor: 'pointer',
         zIndex: 2,
       }}
-      onClick={handleClick}
     >
-      <Link href={route} className='text-red-800' onClick={handleClick} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', zIndex: 1, pointerEvents: 'auto' }}>
-        <span style={{ display: 'block', width: '100%', height: '100%' }} />
-      </Link>
       <Tooltip
         content={
           <div>
@@ -41,6 +38,7 @@ export default function DrillingPoint({ projectId, id, point, clickPosition, siz
         }
       >
         <div
+          onClick={handleClick}
           style={{
             width: `${size}px`,
             height: `${size}px`,

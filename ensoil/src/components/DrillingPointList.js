@@ -3,15 +3,14 @@ import './DrillingPointList.css';
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Search } from 'lucide-react';
 
-export default function DrillingPointList({ projectId, drillingPoints }) {
+export default function DrillingPointList({ projectId, drillingPoints, selectedPoints, setSelectedPoints }) {
   const [eyeState, setEyeState] = useState(1);
-  const [selectedPoints, setSelectedPoints] = useState([]);
 
   useEffect(() => {
     if (eyeState === 1 && drillingPoints && drillingPoints.length > 0) {
       setSelectedPoints(drillingPoints.map(p => p.id));
     }
-  }, [drillingPoints, eyeState]);
+  }, [drillingPoints, eyeState, setSelectedPoints]);
 
   const handleEyeClick = () => {
     const nextState = (eyeState % 3) + 1;

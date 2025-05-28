@@ -51,6 +51,7 @@ export default function ProjectMapPage() {
   const [modalMinScale, setModalMinScale] = useState(1);
   const [modalMouseDownPos, setModalMouseDownPos] = useState(null);
   const [isMouseOverMainMap, setIsMouseOverMainMap] = useState(false);
+  const [selectedPoints, setSelectedPoints] = useState([]);
 
   useEffect(() => {
     console.log("Drilling Point:", drillingPoints);
@@ -434,6 +435,13 @@ export default function ProjectMapPage() {
     };
   }, [isMouseOverMainMap]);
 
+  // Cuando se cargan los puntos, selecciona todos por defecto
+  useEffect(() => {
+    if (drillingPoints && drillingPoints.length > 0) {
+      setSelectedPoints(drillingPoints.map(p => p.id));
+    }
+  }, [drillingPoints]);
+
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
   }
@@ -527,6 +535,7 @@ export default function ProjectMapPage() {
                   style={{ objectFit: 'cover', width: '100%', height: '100%', pointerEvents: 'none' }}
                 />
                 {drillingPoints
+                  .filter(p => selectedPoints.includes(p.id))
                   .filter(p => p.clickPosition.x >= 0 && p.clickPosition.x <= imageInfo.width && p.clickPosition.y >= 0 && p.clickPosition.y <= imageInfo.height)
                   .map((point) => {
                     const size = 20 / mainMapScale;
@@ -587,7 +596,7 @@ export default function ProjectMapPage() {
       {/* Nueva sección: Lista de puntos de perforación */}
       <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '32px auto 0 auto' }}>
         <div className="text-h3" style={{ marginBottom: 16 }}>Lista de Puntos de Perforación</div>
-        <DrillingPointList projectId={id} drillingPoints={drillingPoints} />
+        <DrillingPointList projectId={id} drillingPoints={drillingPoints} selectedPoints={selectedPoints} setSelectedPoints={setSelectedPoints} />
       </div>
 
       {showPointModal && (
