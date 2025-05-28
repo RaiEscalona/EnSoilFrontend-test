@@ -1,33 +1,28 @@
 'use client';
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { UploadForm } from "@/components/ExcelForm";
-import Sidebar from "@/components/sidebar";
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import { File } from "lucide-react";
-//import Image from "next/image";
-// import "./excels.css";
 
 export default function ExcelsPage() {
   const router = useRouter();
 
-  const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+  // Estado inicial vacío, sin muestras simuladas
+  const [fileData, setFileData] = useState([]);
 
-  const fileData = [
-    { id: 1, name: "Muestra Norte", date: "24/04/2025", creationDate: "23/04/2025" },
-    { id: 2, name: "Muestra Sur", date: "22/04/2025", creationDate: "21/04/2025" },
-    { id: 3, name: "Reporte Abril", date: "20/04/2025", creationDate: "19/04/2025" },
-    { id: 4, name: "Muestra Marzo", date: "22/04/2025", creationDate: "21/04/2025" },
-    { id: 5, name: "Reporte Febrero", date: "20/04/2025", creationDate: "19/04/2025" },
-  ];
+  // Recibe un objeto file generado al subir un archivo
+  const handleNewUpload = (file) => {
+    setFileData([file, ...fileData]);
+  };
 
   return (
     <WithSidebarLayout>
       <div className="flex gap-8 mt-8">
-        <UploadForm />
+        <UploadForm onUpload={handleNewUpload} />
         <Card
           onClick={() => router.push('/calculo')}
           className="w-[369px] h-[177px] bg-quaternary rounded-[14px] border-none flex flex-col justify-center items-center cursor-pointer hover:opacity-90"
@@ -50,7 +45,7 @@ export default function ExcelsPage() {
             {fileData.map((file) => (
               <TableRow
                 key={file.id}
-                onClick={() => router.push(`/archivo/${file.id}`)}
+                onClick={() => router.push(`/analysis/${file.id}`)}
                 className="cursor-pointer text-black dark:text-white"
               >
                 <TableCell colSpan={3} className="p-0">
@@ -62,9 +57,7 @@ export default function ExcelsPage() {
                     } rounded-xl flex items-center justify-between h-[66px] transition-all`}
                   >
                     <div className="w-[66px] flex items-center justify-center">
-                      <File 
-                        size={30} 
-                        strokeWidth={1}/>
+                      <File size={30} strokeWidth={1} />
                     </div>
                     <div className="flex-1">
                       <div className="text-black dark:text-white text-h5">{file.name}</div>
