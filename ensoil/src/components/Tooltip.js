@@ -1,68 +1,52 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import './Tooltip.css';
 
 export default function Tooltip({ children, content }) {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const tooltipRef = useRef(null);
   const triggerRef = useRef(null);
 
-  const calculatePosition = () => {
-    if (!tooltipRef.current || !triggerRef.current) return { top: 0, left: 0 };
-
-    const tooltipRect = tooltipRef.current.getBoundingClientRect();
-    const triggerRect = triggerRef.current.getBoundingClientRect();
-
-    // El punto tiene 16px de ancho (w-4), así que sumamos 8px (radio) + 10px de separación
-    const left = triggerRect.width / 2 + 18;
-    
-    // Centramos verticalmente el tooltip con el punto
-    const top = -(tooltipRect.height / 2) + (triggerRect.height / 2);
-
-    return { top, left };
-  };
-
   useEffect(() => {
-    if (isVisible) {
-      const updatePosition = () => {
-        setPosition(calculatePosition());
-      };
-
-      updatePosition();
-      window.addEventListener('resize', updatePosition);
-      window.addEventListener('scroll', updatePosition);
-
-      return () => {
-        window.removeEventListener('resize', updatePosition);
-        window.removeEventListener('scroll', updatePosition);
-      };
+    if (isVisible && triggerRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      // Posicionar el tooltip a la derecha y centrado verticalmente respecto al trigger
+      const top = triggerRect.top + window.scrollY + triggerRect.height / 2;
+      const left = triggerRect.right + 12 + window.scrollX; // 12px separación
+      setPosition({ top, left });
     }
   }, [isVisible]);
 
+  // Portal para el tooltip
+  const tooltipNode = isVisible && content ? ReactDOM.createPortal(
+    <div
+      className="tooltip-content"
+      style={{
+        position: 'absolute',
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        transform: 'translateY(-50%)',
+        zIndex: 9999,
+      }}
+    >
+      {content}
+    </div>,
+    document.body
+  ) : null;
+
   return (
-    <div className="tooltip-container">
-      <div
+    <>
+      <span
         ref={triggerRef}
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
+        style={{ display: 'inline-block' }}
       >
         {children}
-      </div>
-      
-      {isVisible && (
-        <div
-          ref={tooltipRef}
-          className="tooltip-content"
-          style={{
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-          }}
-        >
-          {content}
-        </div>
-      )}
-    </div>
+      </span>
+      {tooltipNode}
+    </>
   );
 } 

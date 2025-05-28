@@ -13,6 +13,7 @@ import './map.css';
 import Button from '@/components/button';
 import Image from 'next/image';
 import ZoomControls from '@/components/ZoomControls';
+import DrillingPointList from '@/components/DrillingPointList';
 
 export default function ProjectMapPage() {
   const { id } = useParams();
@@ -49,6 +50,7 @@ export default function ProjectMapPage() {
   // Estado para zoom y pan en el modal
   const [modalMinScale, setModalMinScale] = useState(1);
   const [modalMouseDownPos, setModalMouseDownPos] = useState(null);
+  const [isMouseOverMainMap, setIsMouseOverMainMap] = useState(false);
 
   useEffect(() => {
     console.log("Drilling Point:", drillingPoints);
@@ -410,6 +412,28 @@ export default function ProjectMapPage() {
     return east >= minEast && east <= maxEast && north >= minNorth && north <= maxNorth;
   };
 
+  useEffect(() => {
+    if (showPointModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showPointModal]);
+
+  useEffect(() => {
+    if (isMouseOverMainMap) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMouseOverMainMap]);
+
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
   }
@@ -468,7 +492,8 @@ export default function ProjectMapPage() {
               onMouseDown={handleMainPanStart}
               onMouseMove={handleMainPanMove}
               onMouseUp={handleMainPanEnd}
-              onMouseLeave={handleMainPanEnd}
+              onMouseLeave={() => { handleMainPanEnd(); setIsMouseOverMainMap(false); }}
+              onMouseEnter={() => setIsMouseOverMainMap(true)}
               style={{
                 width: '100%',
                 height: '100%',
@@ -559,12 +584,18 @@ export default function ProjectMapPage() {
         )}
       </div>
 
+      {/* Nueva sección: Lista de puntos de perforación */}
+      <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '32px auto 0 auto' }}>
+        <div className="text-h3" style={{ marginBottom: 16 }}>Lista de Puntos de Perforación</div>
+        <DrillingPointList projectId={id} drillingPoints={drillingPoints} />
+      </div>
+
       {showPointModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '90vw', width: '1200px' }}>
+          <div className="modal-content" style={{ maxWidth: '700px', width: '90vw' }}>
             <h2 className="modal-title text-black">Crear Nuevo Punto</h2>
-            <div className="modal-body" style={{ display: 'flex', gap: '2rem' }}>
-              <div className="flex-1" style={{ position: 'relative', height: '500px', overflow: 'hidden', background: '#f8f8f8', borderRadius: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+            <div className="modal-body" style={{ display: 'flex', gap: '1rem', padding: '0.75rem' }}>
+              <div className="flex-1" style={{ position: 'relative', height: '350px', overflow: 'hidden', background: '#f8f8f8', borderRadius: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                 <div 
                   ref={modalMapRef}
                   className="map-image-container"
@@ -624,7 +655,7 @@ export default function ProjectMapPage() {
                   </div>
                 </div>
                 {/* Botones de zoom para el modal debajo del mapa (únicos) */}
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 6 }}>
                   <ZoomControls
                     onZoomIn={(e) => {
                       if (e) e.stopPropagation();
@@ -642,7 +673,7 @@ export default function ProjectMapPage() {
                 </div>
               </div>
               <div className="flex-1">
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div>
                     <label className="modal-input-label">Nombre del Punto</label>
                     <input
@@ -677,7 +708,7 @@ export default function ProjectMapPage() {
                   </div>
                   <div className="modal-footer">
                     {!isPointInBounds() && (
-                      <div style={{ color: 'red', marginBottom: '8px', fontSize: '0.95em' }}>
+                      <div style={{ color: 'red', marginBottom: '6px', fontSize: '0.9em' }}>
                         Las coordenadas están fuera de los límites del mapa.
                       </div>
                     )}
