@@ -14,6 +14,8 @@ import Button from '@/components/button';
 import Image from 'next/image';
 import ZoomControls from '@/components/ZoomControls';
 import DrillingPointList from '@/components/DrillingPointList';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
 
 export default function ProjectMapPage() {
   const { id } = useParams();
@@ -442,6 +444,65 @@ export default function ProjectMapPage() {
     }
   }, [drillingPoints]);
 
+  function exportSelectedPointsToCSV(project, points) {
+    let csv = '';
+    // Datos del proyecto
+    csv += 'ID Proyecto,"URL Imagen"\n';
+    csv += `${project.id},"${project.url}"\n\n`;
+    // Encabezado de la tabla de puntos
+    if (points.length > 0) {
+      const headers = Object.keys(points[0]);
+      csv += headers.join(',') + '\n';
+      points.forEach(point => {
+        csv += headers.map(h => JSON.stringify(point[h] ?? '')).join(',') + '\n';
+      });
+    }
+    return csv;
+  }
+
+  function exportSelectedPointsToExcel(project, points) {
+    // Hoja 1: Datos del proyecto
+    const projectSheet = [
+      ['ID Proyecto', 'URL Imagen'],
+      [project.id, project.url],
+    ];
+    // Hoja 2: Puntos seleccionados
+    let pointSheet = [];
+    if (points.length > 0) {
+      // Filtrar y transformar los datos
+      const headers = Object.keys(points[0])
+        .filter(h => h !== 'comments' && h !== 'dateTime' && h !== 'coordinates' && h !== 'project' && h !== 'clickPosition')
+        .concat(['east', 'north']);
+      pointSheet.push(headers);
+      points.forEach(point => {
+        const row = headers.map(h => {
+          if (h === 'east') {
+            return point.coordinates?.coordinates?.[0] ?? '';
+          } else if (h === 'north') {
+            return point.coordinates?.coordinates?.[1] ?? '';
+          } else {
+            return point[h] ?? '';
+          }
+        });
+        pointSheet.push(row);
+      });
+    } else {
+      pointSheet.push(['No hay puntos seleccionados']);
+    }
+    // Crear libro y hojas
+    const wb = XLSX.utils.book_new();
+    const wsProject = XLSX.utils.aoa_to_sheet(projectSheet);
+    const wsPoints = XLSX.utils.aoa_to_sheet(pointSheet);
+    // Ajuste de ancho de columna (opcional)
+    wsPoints['!cols'] = pointSheet[0].map(() => ({ wch: 20 }));
+    XLSX.utils.book_append_sheet(wb, wsProject, 'Proyecto');
+    XLSX.utils.book_append_sheet(wb, wsPoints, 'Puntos');
+    // Generar y descargar
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    saveAs(blob, `proyecto_${project.id}_puntos.xlsx`);
+  }
+
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
   }
@@ -595,7 +656,20 @@ export default function ProjectMapPage() {
 
       {/* Nueva sección: Lista de puntos de perforación */}
       <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '32px auto 0 auto' }}>
-        <div className="text-h3" style={{ marginBottom: 16 }}>Lista de Puntos de Perforación</div>
+        <div className="text-h3" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+          Lista de Puntos de Perforación
+          <button
+            className="export-btn"
+            style={{ marginLeft: 16, background: 'var(--secondary, #1a5d1a)', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 500, fontFamily: 'var(--font-h5)', cursor: 'pointer', fontSize: '1em' }}
+            onClick={() => {
+              if (!imageInfo) return;
+              const selected = drillingPoints.filter(p => selectedPoints.includes(p.id));
+              exportSelectedPointsToExcel({ id, url: imageInfo.url }, selected);
+            }}
+          >
+            Exportar puntos
+          </button>
+        </div>
         <DrillingPointList projectId={id} drillingPoints={drillingPoints} selectedPoints={selectedPoints} setSelectedPoints={setSelectedPoints} />
       </div>
 
