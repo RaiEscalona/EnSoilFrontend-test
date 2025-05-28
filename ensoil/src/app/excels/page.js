@@ -8,8 +8,8 @@ import { UploadForm } from "@/components/ExcelForm";
 import Sidebar from "@/components/sidebar";
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import { File } from "lucide-react";
-//import Image from "next/image";
-// import "./excels.css";
+import Image from 'next/image';
+//import "./excels.css";
 
 export default function ExcelsPage() {
   const router = useRouter();
@@ -33,7 +33,13 @@ export default function ExcelsPage() {
           className="w-[369px] h-[177px] bg-quaternary rounded-[14px] border-none flex flex-col justify-center items-center cursor-pointer hover:opacity-90"
         >
           <div className="flex flex-col items-center justify-center">
-            <img className="w-[57px] h-[57px] object-contain mt-[4px]" src="/icons/file-invoice-dollar.png" alt="Presupuesto" />
+            <Image 
+              className="w-[57px] h-[57px] object-contain mt-[4px]" 
+              src="/icons/file-invoice-dollar.png" 
+              alt="Presupuesto"
+              width={57}
+              height={57}
+            />
             <span className="mt-2 text-sm text-black text-center">Calcular nuevo presupuesto</span>
           </div>
         </Card>

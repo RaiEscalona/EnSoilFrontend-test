@@ -2,7 +2,7 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 
 Button.propTypes = {
-  title: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   route: PropTypes.string,
   type: PropTypes.oneOf(['link', 'submit']),
   size: PropTypes.string,
@@ -15,7 +15,6 @@ export default function Button ({label, route, type = "link", size, fullWidth = 
   const textSize = size ? size : 'text-h5';
   const style = `bg-primary text-white py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`
 
-
   if (route) {
     return (
       <Link href={route}>
@@ -27,7 +26,11 @@ export default function Button ({label, route, type = "link", size, fullWidth = 
   }
 
   return (
-    <button type={type} className={`${fullWidthClass} ${textSize} ${style}`}>
+    <button 
+      type={type} 
+      className={`${fullWidthClass} ${textSize} ${style}`}
+      onClick={onClick}
+    >
       {label}
     </button>
   );

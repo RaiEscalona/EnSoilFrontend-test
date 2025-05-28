@@ -5,33 +5,60 @@ import { formatCoordinates } from '@/utils/coordinateUtils';
 import './DrillingPoint.css';
 import Link from 'next/link';
 import { Dot } from 'lucide-react';
+import { useState } from 'react';
 
-export default function DrillingPoint({ projectId, id, point, clickPosition }) {
-  const route = `/projects/${projectId}/map/drillingPoint/${id}`
+export default function DrillingPoint({ projectId, id, point, clickPosition, size = 20, border = 2 }) {
+  const route = `/projects/${projectId}/map/drillingPoint/${id}`;
+  const [hover, setHover] = useState(false);
+
+  const handleClick = (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+  };
+
   return (
-    <div 
+    <div
       className="drilling-point"
       style={{
-        left: `${clickPosition.x}px`,
-        top: `${clickPosition.y}px`,
+        width: `${size}px`,
+        height: `${size}px`,
+        left: 0,
+        top: 0,
+        position: 'absolute',
+        cursor: 'pointer',
+        zIndex: 2,
       }}
+      onClick={handleClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
-      <Tooltip
-        content={
-          <div>
-            <p className="font-h5 text-black">{point.tag}</p>
-            <p className="text-p text-black">
-              {formatCoordinates(point.coordinates)}
-            </p>
-          </div>
-        }
-      >
-        {/* <div className="drilling-point-marker" /> */}
-        <Link href={route} className='text-red-800'>
-          <Dot 
-            size={100}/>
-        </Link>
-      </Tooltip>
+      <div
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          backgroundColor: 'red',
+          borderRadius: '50%',
+          border: `${border}px solid white`,
+          boxShadow: '0 0 0 2px rgba(0,0,0,0.3)',
+          pointerEvents: 'auto',
+        }}
+      />
+      {hover && (
+        <Tooltip
+          content={
+            <div>
+              <p className="font-h5 text-black">{point.tag}</p>
+              <p className="text-p text-black">
+                {formatCoordinates(point.coordinates)}
+              </p>
+            </div>
+          }
+        >
+          <div />
+        </Tooltip>
+      )}
+      <Link href={route} className='text-red-800' onClick={handleClick} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>
+        <span style={{ display: 'block', width: '100%', height: '100%' }} />
+      </Link>
     </div>
   );
 } 

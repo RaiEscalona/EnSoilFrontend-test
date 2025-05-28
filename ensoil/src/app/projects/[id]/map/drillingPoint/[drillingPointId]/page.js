@@ -7,6 +7,7 @@ import api from '@/utils/axios';
 import '../../map.css';
 import Carousel from "@/components/carousel";
 import Button from "@/components/button";
+import Image from 'next/image';
 
 export default function DrillingPointView() {
     const { id, drillingPointId } = useParams();
@@ -53,11 +54,14 @@ export default function DrillingPointView() {
                     </div>
                     {drillingPoint.drillingPointPhotos.length > 0 && (
                         <div className="flex flex-wrap justify-center gap-x-2">
-                            {drillingPoint.drillingPointPhotos.map((id) => (
-                                <img
-                                    src={id.url}
-                                    height={"100%"}
-                                    width={"49%"}
+                            {drillingPoint.drillingPointPhotos.map((photo) => (
+                                <Image
+                                    key={photo.id}
+                                    src={photo.url}
+                                    alt={`Foto del punto de perforación ${drillingPoint.tag}`}
+                                    height={300}
+                                    width={300}
+                                    className="object-cover"
                                 />
                             ))}
                         </div>
