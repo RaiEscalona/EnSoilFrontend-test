@@ -12,6 +12,7 @@ import api from '@/utils/axios';
 import './map.css';
 import Button from '@/components/button';
 import Image from 'next/image';
+import ZoomControls from '@/components/ZoomControls';
 
 export default function ProjectMapPage() {
   const { id } = useParams();
@@ -444,6 +445,9 @@ export default function ProjectMapPage() {
               aspectRatio: imageInfo ? `${imageInfo.width} / ${imageInfo.height}` : '4 / 3',
               margin: '0 auto',
               minHeight: imageInfo ? `${imageInfo.height * (Math.min(imageInfo.width, 1000) / imageInfo.width)}px` : '300px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
             }}
           >
             <div className="flex justify-center mb-4">
@@ -530,6 +534,27 @@ export default function ProjectMapPage() {
                   })}
               </div>
             </div>
+            {/* Botones de zoom SOLO para el mapa principal, ocultos si el modal está abierto */}
+            {!showPointModal && (
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', pointerEvents: 'none' }}>
+                <div style={{ margin: 16, pointerEvents: 'auto', zIndex: 200 }}>
+                  <ZoomControls
+                    onZoomIn={(e) => {
+                      if (e) e.stopPropagation();
+                      const newScale = Math.min(mainMapScale + 0.1, 3);
+                      setMainMapScale(newScale);
+                      setMainMapOffset(clampPan(mainMapOffset, newScale));
+                    }}
+                    onZoomOut={(e) => {
+                      if (e) e.stopPropagation();
+                      const newScale = Math.max(mainMapScale - 0.1, minScale);
+                      setMainMapScale(newScale);
+                      setMainMapOffset(clampPan(mainMapOffset, newScale));
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -539,7 +564,7 @@ export default function ProjectMapPage() {
           <div className="modal-content" style={{ maxWidth: '90vw', width: '1200px' }}>
             <h2 className="modal-title text-black">Crear Nuevo Punto</h2>
             <div className="modal-body" style={{ display: 'flex', gap: '2rem' }}>
-              <div className="flex-1" style={{ position: 'relative', height: '500px', overflow: 'hidden', background: '#f8f8f8', borderRadius: '8px' }}>
+              <div className="flex-1" style={{ position: 'relative', height: '500px', overflow: 'hidden', background: '#f8f8f8', borderRadius: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                 <div 
                   ref={modalMapRef}
                   className="map-image-container"
@@ -597,6 +622,23 @@ export default function ProjectMapPage() {
                       />
                     )}
                   </div>
+                </div>
+                {/* Botones de zoom para el modal debajo del mapa (únicos) */}
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                  <ZoomControls
+                    onZoomIn={(e) => {
+                      if (e) e.stopPropagation();
+                      const newScale = Math.min(mapScale + 0.1, 3);
+                      setMapScale(newScale);
+                      setMapOffset(clampModalPan(mapOffset, newScale));
+                    }}
+                    onZoomOut={(e) => {
+                      if (e) e.stopPropagation();
+                      const newScale = Math.max(mapScale - 0.1, modalMinScale);
+                      setMapScale(newScale);
+                      setMapOffset(clampModalPan(mapOffset, newScale));
+                    }}
+                  />
                 </div>
               </div>
               <div className="flex-1">
