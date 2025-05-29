@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
 
 Button.propTypes = {
-  title: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   route: PropTypes.string,
   type: PropTypes.oneOf(['link', 'submit']),
   size: PropTypes.string,
@@ -19,33 +19,24 @@ export default function Button ({label, route, type = "link", size, fullWidth = 
 
   const fullWidthClass = fullWidth ? 'w-full' : '';
   const textSize = size ? size : 'text-h5';
-  const style = `bg-primary text-white py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`;
-  const loadingStyle = `bg-primary text-white py-2 px-4 rounded-lg`;
-
-  const handleClick = () => {
-    router.push(route);
-  };
+  const style = `bg-primary text-white py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5`
 
   if (route) {
     return (
-      <button onClick={handleClick} className={`${fullWidthClass} ${textSize} ${style}`}>
-        {label}
-      </button>
-    );
-  }
-
-  if (loading) {
-    return (
-      <button className={`${fullWidthClass} ${textSize} ${loadingStyle}`} disabled>
-        <div className='flex-1 flex justify-center items-center gap-2'>
-          <LoaderCircle className='animate-spin'/>{label}
-        </div>
-      </button>
+      <Link href={route}>
+        <button className={`${fullWidthClass} ${textSize} ${style}`}>
+          {label}
+        </button>
+      </Link>
     );
   }
 
   return (
-    <button type={type} className={`${fullWidthClass} ${textSize} ${style}`}>
+    <button 
+      type={type} 
+      className={`${fullWidthClass} ${textSize} ${style}`}
+      onClick={onClick}
+    >
       {label}
     </button>
   );

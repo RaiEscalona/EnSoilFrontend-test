@@ -62,11 +62,22 @@ export default function MapUploader({ onMapDataReady }) {
       formData.append('width', imageInfo.width);
       formData.append('height', imageInfo.height);
       try {
+        console.log('🟢 Subiendo mapa para proyecto:', id);
+        console.log('🟢 FormData:', {
+          name: selectedFile.name,
+          topLeftEast: imageInfo.topLeft.east,
+          topLeftNorth: imageInfo.topLeft.north,
+          bottomRightEast: imageInfo.bottomRight.east,
+          bottomRightNorth: imageInfo.bottomRight.north,
+          width: imageInfo.width,
+          height: imageInfo.height
+        });
         await api.post(`/images/projects/map/${id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         onMapDataReady(imageInfo);
       } catch (err) {
+        console.error('🛑 Error al subir el mapa:', err, err?.response);
         if (err.response && err.response.status === 404) {
           setAlertMessage('El proyecto no existe. Por favor, crea el proyecto antes de subir el mapa.');
         } else {
