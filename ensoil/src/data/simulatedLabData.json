@@ -1,0 +1,40 @@
+{
+  "soil": [
+    { "point": "SR01", "sample": "SR01_1,9-2,4m", "metales": true, "phce": true, "gran": true, "splp": true, "aba": true, "crvi": true },
+    { "point": "SR01", "sample": "SR01_2,4-2,9m", "metales": true, "phce": true },
+    { "point": "SR02", "sample": "SR02", "metales": true, "phce": true },
+    { "point": "SR03", "sample": "SR03_1,2-2,2m", "metales": true, "phce": true },
+    { "point": "SR04", "sample": "SR04_0-0,5m", "metales": true, "phce": true },
+    { "point": "SR04", "sample": "SR04_1,7-1,9m", "metales": true, "phce": true, "crvi": true },
+    { "point": "SR05", "sample": "SR05", "metales": true, "phce": true },
+    { "point": "SR06", "sample": "SR06", "metales": true, "phce": true },
+    { "point": "SR07", "sample": "SR07_0-0,1m", "metales": true, "gran": true, "cot": true },
+    { "point": "SR07", "sample": "SR07_1-2m", "metales": true },
+    { "point": "SR07", "sample": "SR07_2,2-3,2m", "metales": true, "phce": true },
+    { "point": "SR08", "sample": "SR08", "metales": true, "phce": true },
+    { "point": "SR09", "sample": "SR09", "metales": true, "phce": true, "gran": true },
+    { "point": "SR10", "sample": "SR10", "metales": true },
+    { "point": "SR11", "sample": "SR11", "metales": true, "phce": true },
+    { "point": "SR12", "sample": "SR12", "metales": true, "phce": true },
+    { "point": "SR13", "sample": "SR13_1-1,5m", "metales": true, "phce": true },
+    { "point": "SR14", "sample": "SR14", "metales": true },
+    { "point": "SR15", "sample": "SR15", "metales": true },
+    { "point": "SR16", "sample": "SR16", "metales": true },
+    { "point": "SR17", "sample": "SR17", "metales": true, "phce": true, "gran": true },
+    { "point": "SR17", "sample": "SR17 Fino", "metales": true },
+    { "point": "SP01", "sample": "SP01", "metales": true },
+    { "point": "SP02", "sample": "SP02", "metales": true },
+    { "point": "DUP1", "sample": "DUP1", "metales": true },
+    { "point": "BG01", "sample": "BG01", "metales": true, "phce": true },
+    { "point": "BG02", "sample": "BG02", "metales": true, "phce": true },
+    { "point": "BG03", "sample": "BG03", "metales": true, "phce": true },
+    { "point": "SD01", "sample": "SD01", "metales": true, "phce": true, "gran": true },
+    { "point": "SD02", "sample": "SD02", "metales": true, "phce": true, "gran": true },
+    { "point": "SD03", "sample": "SD03", "metales": true, "phce": true, "gran": true }
+  ],
+  "water": [
+    { "sample": "AG01", "code": "38", "metales": true, "phce": true, "pb": true, "iones": true, "coliformes": true, "alcalinidad": true, "amoniaco": true },
+    { "sample": "AG02", "code": "38", "metales": true, "phce": true, "pb": true, "iones": true, "coliformes": true, "alcalinidad": true, "amoniaco": true },
+    { "sample": "AG03", "code": "38", "metales": true, "phce": true, "pb": true, "iones": true, "coliformes": true, "alcalinidad": true, "amoniaco": true }
+  ]
+}
