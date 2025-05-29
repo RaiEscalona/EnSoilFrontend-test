@@ -23,13 +23,10 @@ const RestrictionAuth = ({ children }) => {
 
       try {
         const token = await getIdToken(user);
-        const body = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-        
-        const response = await api.get('/authTest/test', body);
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await api.get('/authTest/test', { headers });
         console.log('❕ Respuesta del backend:', response.data);
         if (response.data.success) {
           setAuth(true);

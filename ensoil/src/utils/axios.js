@@ -37,9 +37,10 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('❌ Response Error:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
+      message: error?.message,
+      response: error?.response?.data,
+      status: error?.response?.status,
+      fullError: error
     });
     return Promise.reject(error);
   }

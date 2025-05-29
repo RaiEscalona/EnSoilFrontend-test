@@ -3,6 +3,7 @@
 import { LoaderCircle } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 Button.propTypes = {
   label: PropTypes.string.isRequired,

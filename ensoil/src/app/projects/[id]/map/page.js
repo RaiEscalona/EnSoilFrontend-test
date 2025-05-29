@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { calculateCoordinates, formatCoordinates } from '@/utils/coordinateUtils';
@@ -54,6 +54,7 @@ export default function ProjectMapPage() {
   const [modalMouseDownPos, setModalMouseDownPos] = useState(null);
   const [isMouseOverMainMap, setIsMouseOverMainMap] = useState(false);
   const [selectedPoints, setSelectedPoints] = useState([]);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     console.log("Drilling Point:", drillingPoints);
@@ -98,7 +99,7 @@ export default function ProjectMapPage() {
   }, [id]);
 
   // Mover fetchDrillingPoints fuera del useEffect para poder llamarlo después de crear un punto
-  const fetchDrillingPoints = async () => {
+  const fetchDrillingPoints = useCallback(async () => {
     if (!imageInfo) return;
     try {
       console.log(`🔄 Cargando puntos de perforación para el proyecto ${id}`);
@@ -119,13 +120,13 @@ export default function ProjectMapPage() {
       setAlertMessage(error.response?.data?.error || 'Error al cargar los puntos de perforación.');
       setShowAlert(true);
     }
-  };
+  }, [imageInfo, id]);
 
   useEffect(() => {
     if (id && imageInfo) {
       fetchDrillingPoints();
     }
-  }, [id, imageInfo]);
+  }, [id, imageInfo, fetchDrillingPoints]);
 
   // Calcular minScale para el modal
   useEffect(() => {
@@ -321,7 +322,7 @@ export default function ProjectMapPage() {
 
   // Calcular minScale cuando la imagen y el contenedor están listos
   useEffect(() => {
-    if (!imageInfo || !mainMapRef.current) return;
+    if (!imageInfo || !mainMapRef.current || !imageLoaded) return;
     const container = mainMapRef.current;
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
@@ -331,7 +332,7 @@ export default function ProjectMapPage() {
     setMinScale(min);
     setMainMapScale(min);
     setMainMapOffset({ x: 0, y: 0 });
-  }, [imageInfo]);
+  }, [imageInfo, imageLoaded]);
 
   // Limitar pan para que la imagen nunca deje ver bordes blancos
   const clampPan = (offset, scale) => {
@@ -594,6 +595,7 @@ export default function ProjectMapPage() {
                   width={imageInfo?.width ?? 800}
                   height={imageInfo?.height ?? 600}
                   style={{ objectFit: 'cover', width: '100%', height: '100%', pointerEvents: 'none' }}
+                  onLoad={() => setImageLoaded(true)}
                 />
                 {drillingPoints
                   .filter(p => selectedPoints.includes(p.id))
