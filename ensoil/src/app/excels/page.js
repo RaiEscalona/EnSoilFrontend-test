@@ -45,7 +45,7 @@ export default function ExcelsPage() {
             {fileData.map((file) => (
               <TableRow
                 key={file.id}
-                onClick={() => router.push(`/analysis/${file.id}`)}
+                onClick={() => router.push(`/analisis/${file.id}`)}
                 className="cursor-pointer text-black dark:text-white"
               >
                 <TableCell colSpan={3} className="p-0">
