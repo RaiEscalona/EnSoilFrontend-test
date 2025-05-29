@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Card } from "@/ui/card"
 import { Button } from "@/ui/button"
 
-export function UploadForm() {
+export function UploadForm({ onUpload }) {
     const [open, setOpen] = useState(false)
     const [selectedLab, setSelectedLab] = useState("ALS")
     const [selectedFile, setSelectedFile] = useState(null)
@@ -38,12 +38,22 @@ export function UploadForm() {
             'Content-Type': 'multipart/form-data'
           }
         })
+
   
         if (res.status !== 200) {
           throw new Error(res.data)
         }
-  
+        console.log("Archivo subido correctamente", res.status)
         alert(`Archivo "${selectedFile.name}" subido correctamente`)
+        const newFile = {
+          id: Date.now(),
+          name: selectedFile.name,
+          creationDate: new Date().toLocaleDateString('es-CL'),
+          date: new Date().toLocaleDateString('es-CL')
+        };
+        if (onUpload) {
+          onUpload(newFile);
+        }
         console.log(res.data)
   
         // ✅ cerrar el diálogo
@@ -114,4 +124,3 @@ export function UploadForm() {
       </Dialog>
     )
   }
-  
