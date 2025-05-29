@@ -90,7 +90,10 @@ export default function AnalysisPage() {
               <select
                 id="tableType"
                 value={selectedTableType}
-                onChange={(e) => setSelectedTableType(e.target.value)}
+                onChange={(e) => {
+                  setSelectedTableType(e.target.value);
+                  setTableData(null); // Limpiar tabla generada al cambiar selección
+                }}
                 className="block w-full rounded-md border-secondary shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-h5"
                 disabled={isLoading}
               >
