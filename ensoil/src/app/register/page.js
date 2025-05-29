@@ -1,5 +1,5 @@
 import HeaderEnsoil from "@/components/header-ensoil";
-import RegisterForm from "@/components/register-form";
+import RegisterForm from "@/components/Register/register-form";
 
 export default function RegisterPage() {
   return (

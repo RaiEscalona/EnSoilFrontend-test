@@ -1,12 +1,16 @@
 'use client';
+
 import Link from "next/link";
 import Form from "next/form";
-//import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Button from "./button";
+import Button from "../button";
+import { auth } from "@/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from 'next/navigation';
+import api from '@/utils/axios';
 
 export default function LoginForm() {
-    //const router = useRouter();
+  const router = useRouter();
   const [form, setForm] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
@@ -15,9 +19,33 @@ export default function LoginForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Datos guardados:', form);
-    //router.push('/'); para después
+    handleLogin(form)
   };
+
+  const handleLogin = async ({email, password}) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      console.log(`🔄 Cargando datos del user ${user}`);
+
+      const body = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      };
+
+      const response = await api.get("/users/verify", body);
+      console.log('✅ Datos del user cargados:', response.data);
+      if (response.data.success) {
+        router.push('/excels');
+      }
+    } catch (error) {
+      console.error("Error en login:", error.message);
+    }
+};
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -59,9 +87,7 @@ export default function LoginForm() {
             <span> Solicitar registro</span>
         </Link>
       </div>
-      <div className="flex-1 flex justify-center items-center p-1">
-        <Button label={"Acceder"} route={"/excels"} fullWidth={true}></Button>
-      </div>
+      <Button label={"Acceder"} type="submit" fullWidth={true}></Button>
     </Form>
   );
 }
