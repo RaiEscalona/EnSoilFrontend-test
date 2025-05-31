@@ -660,7 +660,7 @@ export default function ProjectMapPage() {
       <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '32px auto 0 auto' }}>
         <div className="text-h3" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
           Lista de Puntos de Perforación
-          <button
+          {/* <button
             className="export-btn"
             style={{ marginLeft: 16, background: 'var(--secondary, #1a5d1a)', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 500, fontFamily: 'var(--font-h5)', cursor: 'pointer', fontSize: '1em' }}
             onClick={() => {
@@ -670,7 +670,12 @@ export default function ProjectMapPage() {
             }}
           >
             Exportar puntos
-          </button>
+          </button> */}
+          <Button label={'Exportar puntos'} onClick={() => {
+              if (!imageInfo) return;
+              const selected = drillingPoints.filter(p => selectedPoints.includes(p.id));
+              exportSelectedPointsToExcel({ id, url: imageInfo.url }, selected);
+            }}/>
         </div>
         <DrillingPointList projectId={id} drillingPoints={drillingPoints} selectedPoints={selectedPoints} setSelectedPoints={setSelectedPoints} />
       </div>
