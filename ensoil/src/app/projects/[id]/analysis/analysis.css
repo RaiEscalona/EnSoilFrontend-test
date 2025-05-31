@@ -54,7 +54,8 @@
 }
 
 .analysis-table td.highlight {
-  background-color: #fce7f3; /* pink-100 */
+  /* background-color: #fce7f3; pink-100 */
+  background-color: oklch(97% 0.001 106.424);
 }
 
 /* Optional: Alternate row colors for readability */
@@ -62,5 +63,6 @@
   background-color: #f8fafc; /* slate-50 */
 }
 .analysis-table tbody tr:nth-child(even) td.highlight {
-  background-color: #fbcfe8; /* pink-200 adjusted for even rows */
+  /* background-color: #fbcfe8; pink-200 adjusted for even rows */
+  background-color: oklch(92.3% 0.003 48.717);
 } 
