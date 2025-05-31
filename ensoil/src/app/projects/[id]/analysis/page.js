@@ -7,6 +7,7 @@ import './analysis.css';
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import DepthAnalysisTable from './depth-analysis';
 import LabAnalysisTable from './lab-analysis';
+import Button from '@/components/button';
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -94,7 +95,7 @@ export default function AnalysisPage() {
                   setSelectedTableType(e.target.value);
                   setTableData(null); // Limpiar tabla generada al cambiar selección
                 }}
-                className="block w-full rounded-md border-secondary shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-h5"
+                className="block w-full bg-quaternary dark:bg-base p-2 rounded-md border-secondary shadow-sm sm:text-h5"
                 disabled={isLoading}
               >
                 <option value="">Seleccione un tipo</option>
@@ -106,20 +107,22 @@ export default function AnalysisPage() {
               </select>
             </div>
 
-            <button
+            {/* <button
               onClick={handleGenerateTable}
               disabled={!selectedTableType || isLoading}
               className="px-4 py-2 text-h5 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Generando...' : 'Generar Tabla'}
-            </button>
-            <button
+            </button> */}
+            <Button label={isLoading ? 'Generando...' : 'Generar Tabla'} onClick={handleGenerateTable} disable={!selectedTableType || isLoading}/>
+            {/* <button
               onClick={handleExportExcel}
               disabled={!tableData || isLoading || selectedTableType !== 'depth_analysis'}
               className="px-4 py-2 text-h5 text-white bg-primary rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Exportar a Excel
-            </button>
+            </button> */}
+            <Button label={'Exportar a Excel'} onClick={handleExportExcel} disable={!tableData || isLoading || selectedTableType !== 'depth_analysis'}/>
           </div>
         </div>
 
