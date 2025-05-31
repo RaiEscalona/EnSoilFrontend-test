@@ -11,6 +11,7 @@
   font-size: 0.8rem; /* Smaller font for table */
   min-width: 1400px; /* Ensure table is wide enough based on columns */
   border-spacing: 0;
+  background-color: var(--color-white);
 }
 
 .analysis-table th,

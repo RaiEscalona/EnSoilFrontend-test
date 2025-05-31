@@ -130,7 +130,7 @@ export default function AnalysisPage() {
         {isLoading && <p className="text-center my-4">Cargando datos de la tabla...</p>}
         {error && <p className="text-center my-4 text-red-600">{error}</p>}
         {tableData && (
-          <div className="bg-white p-6 rounded-lg shadow-md max-h-[75vh] overflow-auto">
+          <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md max-h-[75vh] overflow-auto">
             <h3 className="text-black text-h3 mb-4">
               Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}
             </h3>
