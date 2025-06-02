@@ -35,7 +35,7 @@ export default function DrillingPointList({ projectId, drillingPoints, selectedP
   }
 
   return (
-    <div className="drilling-point-list">
+    <div className="drilling-point-list bg-quaternary dark:bg-tertiary dark:text-black">
       <div className="drilling-point-list-header">
         <button onClick={handleEyeClick} className="eye-button">
           {eyeState === 1 && <Eye size={24} />}
@@ -44,7 +44,7 @@ export default function DrillingPointList({ projectId, drillingPoints, selectedP
         </button>
         <span className="eye-state-text">
           {eyeState === 1 && 'Todo seleccionado'}
-          {eyeState === 2 && 'Todo deseleccionado'}
+          {eyeState === 2 && 'Sin seleccionar'}
           {eyeState === 3 && 'Selección libre'}
         </span>
       </div>
