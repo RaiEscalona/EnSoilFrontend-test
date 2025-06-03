@@ -1,22 +1,29 @@
 import HeaderEnsoil from "@/components/header-ensoil";
 import Carousel from "@/components/carousel";
 import Button from "@/components/button";
+import { Dot, FolderPlus } from "lucide-react";
 
 const slides = [
-  // {
-  //   image: null,
-  //   title: 'Ingresar a tu cuenta',
-  //   description: '',
-  // },
   {
-    image: null,
-    title: 'Crear una plantilla tipo excel',
-    description: '',
+    title: 'Visualizar los proyectos con el mapa',
+    description: 
+      <div>
+        Presionando <FolderPlus className="inline"/> podrás acceder a todos los proyectos
+      </div>
   },
   {
-    image: null,
-    title: 'Visualizar un mapa',
-    description: '',
+    title: 'Revisar puntos de muestreo',
+    description:
+      <div>
+        Puedes crear y exportar puntos de muestreo desde el mapa, al presionar un punto en particular te llevará a su información detallada
+      </div>
+  },
+  {
+    title: 'Revisar análisis del terreno',
+    description:
+      <div>
+        Desde cualquier proyecto se puede acceder a sus tablas de análisis, con datos como la profundidad, metales y laboratorio
+      </div>
   },
 ];
 

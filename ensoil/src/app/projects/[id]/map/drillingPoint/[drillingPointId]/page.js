@@ -46,7 +46,7 @@ export default function DrillingPointView() {
                     <Button label={"Volver al mapa"} route={`/projects/${id}/map`} size="h4" fullWidth={false}></Button>
                 </div>
                 <div className="map-card flex flex-col">
-                    <div className="text-h4">Coordenadas: {drillingPoint.coordinates.coordinates[0]} – {drillingPoint.coordinates.coordinates[1]}</div>
+                    <div className="text-h4">Coordenadas Norte: {drillingPoint.coordinates.coordinates[0]} – Coordenadas Este: {drillingPoint.coordinates.coordinates[1]}</div>
                     <div className="text-h4">Método {drillingPoint.method}</div>
                     <div className="text-h4">Comentarios del punto:</div>
                     <div className="px-2">

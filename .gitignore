@@ -4,3 +4,6 @@
 /node_modules
 .DS_Store
 *.pem
+ensoil/public/Analisis.png
+ensoil/public/Mapa.png
+ensoil/public/Tablas.png

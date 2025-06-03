@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import api from '@/utils/axios';
 import './MapUploader.css';
+import Button from './button';
 
 export default function MapUploader({ onMapDataReady }) {
   const { id } = useParams();
@@ -53,6 +54,7 @@ export default function MapUploader({ onMapDataReady }) {
     if (imageInfo && imageInfo.topLeft.north && imageInfo.topLeft.east && 
         imageInfo.bottomRight.north && imageInfo.bottomRight.east && selectedFile) {
       const formData = new FormData();
+      formData.append('projectId', id);
       formData.append('map', selectedFile);
       formData.append('name', selectedFile.name);
       formData.append('topLeftEast', imageInfo.topLeft.east);
@@ -72,7 +74,7 @@ export default function MapUploader({ onMapDataReady }) {
           width: imageInfo.width,
           height: imageInfo.height
         });
-        await api.post(`/images/projects/map/${id}`, formData, {
+        await api.post(`/images/projects/map/createProjectMap`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         onMapDataReady(imageInfo);
@@ -98,13 +100,14 @@ export default function MapUploader({ onMapDataReady }) {
       )}
       <div className="file-input-section">
         {!selectedFile ? (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            className="file-input-button"
-          >
-            Elegir Archivo
-          </button>
+          // <button
+          //   type="button"
+          //   onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          //   className="file-input-button"
+          // >
+          //   Elegir Archivo
+          // </button>
+          <Button label={'Elegir Archivo'} onClick={() => fileInputRef.current && fileInputRef.current.click()}/>
         ) : (
           <div className="selected-file">
             <span className="file-name">{selectedFile.name}</span>

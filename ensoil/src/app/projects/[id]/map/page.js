@@ -660,25 +660,19 @@ export default function ProjectMapPage() {
       <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '32px auto 0 auto' }}>
         <div className="text-h3" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
           Lista de Puntos de Perforación
-          <button
-            className="export-btn"
-            style={{ marginLeft: 16, background: 'var(--secondary, #1a5d1a)', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', fontWeight: 500, fontFamily: 'var(--font-h5)', cursor: 'pointer', fontSize: '1em' }}
-            onClick={() => {
+          <Button label={'Exportar puntos'} onClick={() => {
               if (!imageInfo) return;
               const selected = drillingPoints.filter(p => selectedPoints.includes(p.id));
               exportSelectedPointsToExcel({ id, url: imageInfo.url }, selected);
-            }}
-          >
-            Exportar puntos
-          </button>
+            }}/>
         </div>
         <DrillingPointList projectId={id} drillingPoints={drillingPoints} selectedPoints={selectedPoints} setSelectedPoints={setSelectedPoints} />
       </div>
 
       {showPointModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: '700px', width: '90vw' }}>
-            <h2 className="modal-title text-black">Crear Nuevo Punto</h2>
+          <div className="modal-content bg-white dark:bg-quaternary" style={{ maxWidth: '700px', width: '90vw' }}>
+            <h2 className="text-h3 text-black">Crear Nuevo Punto</h2>
             <div className="modal-body" style={{ display: 'flex', gap: '1rem', padding: '0.75rem' }}>
               <div className="flex-1" style={{ position: 'relative', height: '350px', overflow: 'hidden', background: '#f8f8f8', borderRadius: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                 <div 
@@ -760,34 +754,35 @@ export default function ProjectMapPage() {
               <div className="flex-1">
                 <div className="space-y-2">
                   <div>
-                    <label className="modal-input-label">Nombre del Punto</label>
+                    <label className="modal-input-label text-h4 text-black">Nombre del Punto</label>
                     <input
                       type="text"
                       value={newPointData.tag}
                       onChange={(e) => setNewPointData({ ...newPointData, tag: e.target.value })}
-                      className="modal-input"
+                      className="modal-input dark:bg-white text-black px-2"
+                      placeholder='Ingrese un nombre'
                       autoFocus
                     />
                   </div>
                   <div>
-                    <label className="modal-input-label">Coordenada Este</label>
+                    <label className="modal-input-label text-h4 text-black">Coordenada Este</label>
                     <input
                       type="number"
                       step="any"
                       value={newPointData.coordinates.east}
                       onChange={(e) => handleCoordinateChange('east', e.target.value)}
-                      className="modal-input"
+                      className="modal-input dark:bg-white text-black px-2"
                       placeholder="Ingrese la coordenada este"
                     />
                   </div>
                   <div>
-                    <label className="modal-input-label">Coordenada Norte</label>
+                    <label className="modal-input-label text-h4 text-black">Coordenada Norte</label>
                     <input
                       type="number"
                       step="any"
                       value={newPointData.coordinates.north}
                       onChange={(e) => handleCoordinateChange('north', e.target.value)}
-                      className="modal-input"
+                      className="modal-input dark:bg-white text-black px-2"
                       placeholder="Ingrese la coordenada norte"
                     />
                   </div>
@@ -797,26 +792,15 @@ export default function ProjectMapPage() {
                         Las coordenadas están fuera de los límites del mapa.
                       </div>
                     )}
-                    <button
-                      onClick={() => {
+                    
+                    <Button label={'Cancelar'} onClick={() => {
                         setShowPointModal(false);
                         setNewPointData({ tag: '', coordinates: { east: '', north: '' } });
                         setPreviewPoint(null);
                         setMapScale(1);
-                      }}
-                      className="modal-button modal-button-cancel"
-                      type="button"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      onClick={handleCreatePoint}
-                      className="modal-button modal-button-confirm"
-                      disabled={!newPointData.tag || !newPointData.coordinates.east || !newPointData.coordinates.north || !isPointInBounds()}
-                      type="button"
-                    >
-                      Crear Punto
-                    </button>
+                      }}/>
+                      
+                    <Button label={'Crear punto'} onClick={handleCreatePoint} disable={!newPointData.tag || !newPointData.coordinates.east || !newPointData.coordinates.north || !isPointInBounds()}/>
                   </div>
                 </div>
               </div>

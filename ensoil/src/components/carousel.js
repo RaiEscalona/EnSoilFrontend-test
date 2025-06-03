@@ -10,21 +10,21 @@ export default function Carousel({slides}) {
   const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <div className="bg-primary relative w-full max-w-250 h-70 overflow-hidden rounded-md">
+    <div className="bg-primary relative w-full max-w-250 h-70 rounded-md">
       {slides.map((slide, index) => (
         <div
           key={index}
           className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
             index === current ? 'opacity-100' : 'opacity-0'
           }`}>
-          <Image
+          {/* <Image
             src={slide.image}
             alt={slide.title}
             width={800}
             height={400}
             className="w-full h-64 object-cover"
-          />
-          <div className="absolute inset-0 bg-opacity-40 flex flex-col justify-center items-center text-white px-4 text-down">
+          /> */}
+          <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center px-4 max-w-[80%] mx-auto gap-1">
             <span className="text-h2">{slide.title}</span>
             <span className="text-h3">{slide.description}</span>
           </div>
