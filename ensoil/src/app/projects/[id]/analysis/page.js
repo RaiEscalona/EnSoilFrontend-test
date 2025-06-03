@@ -8,6 +8,7 @@ import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import DepthAnalysisTable from './depth-analysis';
 import LabAnalysisTable from './lab-analysis';
 import Button from '@/components/button';
+import api from '@/utils/axios';
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -29,13 +30,43 @@ export default function AnalysisPage() {
     setTableData(null);
     setError(null);
 
-    console.log(`Generando tabla: ${selectedTableType} para proyecto ${projectId}`);
-    await new Promise(resolve => setTimeout(resolve, 500));
-
     try {
       if (selectedTableType === 'depth_analysis') {
-        const dataModule = await import('@/data/simulatedDepthData.json');
-        setTableData(dataModule.default);
+        const response = await api.get(`/projects/${projectId}/depthAnalysis`);
+        const data = response.data;
+
+        if (!data || data.length === 0) {
+          setError('No hay información suficiente para generar la tabla de análisis de profundidad.');
+          return;
+        }
+
+        // Transform API data into table format
+        // Get all unique depths from the first point's analysis and sort them numerically
+        const depths = Object.keys(data[0].analysis)
+          .map(Number)
+          .sort((a, b) => a - b);
+
+        // Get all sampling points (drilling point tags)
+        const samplingPoints = data.map(point => point.drillingPoint.tag);
+        
+        // Create the analysis data structure
+        const analysisData = {};
+        depths.forEach(depth => {
+          analysisData[depth] = {};
+          samplingPoints.forEach((point, index) => {
+            const pointData = data[index];
+            // Get elements exceeding the norm for this depth and point
+            const elements = pointData.analysis[depth] || [];
+            // Join elements with commas, or empty string if no elements
+            analysisData[depth][point] = elements.length > 0 ? elements.join(', ') : '';
+          });
+        });
+
+        setTableData({
+          depths,
+          samplingPoints,
+          analysisData
+        });
       } else if (selectedTableType === 'lab_analysis') {
         // Simulación de datos para análisis de laboratorio
         setTableData({}); // Puedes reemplazarlo con una carga real
