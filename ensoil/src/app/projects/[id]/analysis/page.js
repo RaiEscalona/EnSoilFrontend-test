@@ -7,6 +7,8 @@ import './analysis.css';
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import DepthAnalysisTable from './depth-analysis';
 import LabAnalysisTable from './lab-analysis';
+import Button from '@/components/button';
+import api from '@/utils/axios';
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -28,13 +30,43 @@ export default function AnalysisPage() {
     setTableData(null);
     setError(null);
 
-    console.log(`Generando tabla: ${selectedTableType} para proyecto ${projectId}`);
-    await new Promise(resolve => setTimeout(resolve, 500));
-
     try {
       if (selectedTableType === 'depth_analysis') {
-        const dataModule = await import('@/data/simulatedDepthData.json');
-        setTableData(dataModule.default);
+        const response = await api.get(`/projects/${projectId}/depthAnalysis`);
+        const data = response.data;
+
+        if (!data || data.length === 0) {
+          setError('No hay información suficiente para generar la tabla de análisis de profundidad.');
+          return;
+        }
+
+        // Transform API data into table format
+        // Get all unique depths from the first point's analysis and sort them numerically
+        const depths = Object.keys(data[0].analysis)
+          .map(Number)
+          .sort((a, b) => a - b);
+
+        // Get all sampling points (drilling point tags)
+        const samplingPoints = data.map(point => point.drillingPoint.tag);
+        
+        // Create the analysis data structure
+        const analysisData = {};
+        depths.forEach(depth => {
+          analysisData[depth] = {};
+          samplingPoints.forEach((point, index) => {
+            const pointData = data[index];
+            // Get elements exceeding the norm for this depth and point
+            const elements = pointData.analysis[depth] || [];
+            // Join elements with commas, or empty string if no elements
+            analysisData[depth][point] = elements.length > 0 ? elements.join(', ') : '';
+          });
+        });
+
+        setTableData({
+          depths,
+          samplingPoints,
+          analysisData
+        });
       } else if (selectedTableType === 'lab_analysis') {
         // Simulación de datos para análisis de laboratorio
         setTableData({}); // Puedes reemplazarlo con una carga real
@@ -94,7 +126,7 @@ export default function AnalysisPage() {
                   setSelectedTableType(e.target.value);
                   setTableData(null); // Limpiar tabla generada al cambiar selección
                 }}
-                className="block w-full rounded-md border-secondary shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-h5"
+                className="block w-full bg-quaternary dark:bg-base p-2 rounded-md border-secondary shadow-sm sm:text-h5"
                 disabled={isLoading}
               >
                 <option value="">Seleccione un tipo</option>
@@ -106,20 +138,22 @@ export default function AnalysisPage() {
               </select>
             </div>
 
-            <button
+            {/* <button
               onClick={handleGenerateTable}
               disabled={!selectedTableType || isLoading}
               className="px-4 py-2 text-h5 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Generando...' : 'Generar Tabla'}
-            </button>
-            <button
+            </button> */}
+            <Button label={isLoading ? 'Generando...' : 'Generar Tabla'} onClick={handleGenerateTable} disable={!selectedTableType || isLoading}/>
+            {/* <button
               onClick={handleExportExcel}
               disabled={!tableData || isLoading || selectedTableType !== 'depth_analysis'}
               className="px-4 py-2 text-h5 text-white bg-primary rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Exportar a Excel
-            </button>
+            </button> */}
+            <Button label={'Exportar a Excel'} onClick={handleExportExcel} disable={!tableData || isLoading || selectedTableType !== 'depth_analysis'}/>
           </div>
         </div>
 
@@ -127,7 +161,7 @@ export default function AnalysisPage() {
         {isLoading && <p className="text-center my-4">Cargando datos de la tabla...</p>}
         {error && <p className="text-center my-4 text-red-600">{error}</p>}
         {tableData && (
-          <div className="bg-white p-6 rounded-lg shadow-md max-h-[75vh] overflow-auto">
+          <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md max-h-[75vh] overflow-auto">
             <h3 className="text-black text-h3 mb-4">
               Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}
             </h3>
