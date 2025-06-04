@@ -2,29 +2,54 @@
 
 import Tooltip from './Tooltip';
 import { formatCoordinates } from '@/utils/coordinateUtils';
+import './DrillingPoint.css';
+import { useRouter } from 'next/navigation';
 
-export default function DrillingPoint({ point, imageInfo, clickPosition }) {
+export default function DrillingPoint({ projectId, id, point, clickPosition, size = 20, border = 2 }) {
+  const route = `/projects/${projectId}/map/drillingPoint/${id}`;
+  const router = useRouter();
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    router.push(route);
+  };
+
   return (
-    <div 
-      className="absolute"
+    <div
+      className="drilling-point"
       style={{
-        left: `${clickPosition.x}px`,
-        top: `${clickPosition.y}px`,
-        transform: 'translate(-50%, -50%)'
+        width: `${size}px`,
+        height: `${size}px`,
+        left: 0,
+        top: 0,
+        position: 'absolute',
+        cursor: 'pointer',
+        zIndex: 2,
       }}
     >
       <Tooltip
         content={
           <div>
-            <p className="font-medium">{point.tag}</p>
-            <p className="text-sm text-gray-600">
+            <p className="font-h5 text-black">{point.tag}</p>
+            <p className="text-p text-black">
               {formatCoordinates(point.coordinates)}
             </p>
           </div>
         }
       >
         <div
-          className="w-4 h-4 bg-red-500 rounded-full cursor-pointer hover:bg-red-600 transition-colors"
+          onClick={handleClick}
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: 'red',
+            borderRadius: '50%',
+            border: `${border}px solid white`,
+            boxShadow: '0 0 0 2px rgba(0,0,0,0.3)',
+            pointerEvents: 'auto',
+            position: 'relative',
+            zIndex: 2,
+          }}
         />
       </Tooltip>
     </div>

@@ -1,0 +1,277 @@
+{
+  "info": [
+    {
+      "drillingPointTag": "S01",
+      "sampleLogs": [
+        {
+          "sampleLogTag": "S01_0-0,5",
+          "analytes": []
+        }
+      ]
+    },
+    {
+      "drillingPointTag": "S02",
+      "sampleLogs": [
+        {
+          "sampleLogTag": "S02_0-1",
+          "analytes": [
+            {
+              "analyte": "Al",
+              "result": 19797
+            },
+            {
+              "analyte": "B",
+              "result": 194
+            },
+            {
+              "analyte": "Ba",
+              "result": 180
+            },
+            {
+              "analyte": "Be",
+              "result": 3
+            },
+            {
+              "analyte": "Cd",
+              "result": 10.2
+            },
+            {
+              "analyte": "Co",
+              "result": 25.4
+            },
+            {
+              "analyte": "Cr",
+              "result": 24
+            },
+            {
+              "analyte": "Cu",
+              "result": 165.1
+            },
+            {
+              "analyte": "Mn",
+              "result": 1118
+            },
+            {
+              "analyte": "Mo",
+              "result": 3
+            },
+            {
+              "analyte": "Pb",
+              "result": 76.7
+            },
+            {
+              "analyte": "Sb",
+              "result": 1.5
+            },
+            {
+              "analyte": "Se",
+              "result": 2
+            },
+            {
+              "analyte": "Sr",
+              "result": 63
+            },
+            {
+              "analyte": "Tl",
+              "result": 2
+            },
+            {
+              "analyte": "V",
+              "result": 113
+            },
+            {
+              "analyte": "Zn",
+              "result": 463
+            }
+          ]
+        },
+        {
+          "sampleLogTag": "S02_1-2",
+          "analytes": [
+            {
+              "analyte": "Al",
+              "result": 16843
+            },
+            {
+              "analyte": "B",
+              "result": 186
+            },
+            {
+              "analyte": "Ba",
+              "result": 299
+            },
+            {
+              "analyte": "Be",
+              "result": 3
+            },
+            {
+              "analyte": "Cd",
+              "result": 10
+            },
+            {
+              "analyte": "Co",
+              "result": 23.2
+            },
+            {
+              "analyte": "Cr",
+              "result": 20
+            },
+            {
+              "analyte": "Cu",
+              "result": 267.5
+            },
+            {
+              "analyte": "Mn",
+              "result": 939
+            },
+            {
+              "analyte": "Mo",
+              "result": 3
+            },
+            {
+              "analyte": "Pb",
+              "result": 65.7
+            },
+            {
+              "analyte": "Sb",
+              "result": 1.5
+            },
+            {
+              "analyte": "Se",
+              "result": 2
+            },
+            {
+              "analyte": "Sr",
+              "result": 78
+            },
+            {
+              "analyte": "Tl",
+              "result": 2
+            },
+            {
+              "analyte": "V",
+              "result": 113
+            },
+            {
+              "analyte": "Zn",
+              "result": 477
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "drillingPointTag": "S03",
+      "sampleLogs": [
+        {
+          "sampleLogTag": "S03_0-1",
+          "analytes": [
+            {
+              "analyte": "Al",
+              "result": 11142
+            },
+            {
+              "analyte": "B",
+              "result": 119
+            },
+            {
+              "analyte": "Ba",
+              "result": 83
+            },
+            {
+              "analyte": "Be",
+              "result": 3
+            },
+            {
+              "analyte": "Cd",
+              "result": 7.6
+            },
+            {
+              "analyte": "Co",
+              "result": 15.6
+            },
+            {
+              "analyte": "Cr",
+              "result": 19
+            },
+            {
+              "analyte": "Cu",
+              "result": 58.1
+            },
+            {
+              "analyte": "Mn",
+              "result": 482
+            },
+            {
+              "analyte": "Mo",
+              "result": 4
+            },
+            {
+              "analyte": "Pb",
+              "result": 13
+            },
+            {
+              "analyte": "Sb",
+              "result": 1.5
+            },
+            {
+              "analyte": "Se",
+              "result": 2
+            },
+            {
+              "analyte": "Sr",
+              "result": 47
+            },
+            {
+              "analyte": "Tl",
+              "result": 2
+            },
+            {
+              "analyte": "V",
+              "result": 79
+            },
+            {
+              "analyte": "Zn",
+              "result": 79
+            }
+          ]
+        }
+      ]
+    }],
+  "analytes": [
+    "Ag",
+    "Al",
+    "As",
+    "B",
+    "Ba",
+    "Be",
+    "Bi",
+    "Ca",
+    "Cd",
+    "Co",
+    "Cr",
+    "Cu",
+    "Fe",
+    "Hg",
+    "K",
+    "Li",
+    "Mg",
+    "Mn",
+    "Mo",
+    "Na",
+    "Ni",
+    "P",
+    "Pb",
+    "Rb",
+    "Sb",
+    "Se",
+    "Sn",
+    "Sr",
+    "Te",
+    "Ti",
+    "Tl",
+    "U",
+    "V",
+    "Zn"
+  ]
+}
