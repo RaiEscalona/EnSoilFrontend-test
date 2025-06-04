@@ -126,7 +126,7 @@ export function UploadForm({ onUpload }) {
             onValueChange={setSelectedLab}
             className="flex flex-row justify-center items-center gap-4"
           >
-            {["ALS", "SGS", "AGQ"].map((lab) => (
+            {["ALS", "SGS", "Hidrolab", "AGS"].map((lab) => (
               <div key={lab} className="flex items-center space-x-2">
                 <RadioGroupItem value={lab} id={`lab-${lab}`} />
                 <Label htmlFor={`lab-${lab}`}>{lab}</Label>
