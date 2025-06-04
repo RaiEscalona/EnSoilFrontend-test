@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { lazy, useState } from 'react';
 import { useParams } from 'next/navigation';
 import * as XLSX from 'xlsx'; 
 import './analysis.css'; 
@@ -9,6 +9,7 @@ import DepthAnalysisTable from './depth-analysis';
 import LabAnalysisTable from './lab-analysis';
 import Button from '@/components/button';
 import api from '@/utils/axios';
+import GroundMetalsTable from './ground-metals-analysis';
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -20,6 +21,7 @@ export default function AnalysisPage() {
   const tableTypes = [
     { value: 'depth_analysis', label: 'Análisis de Profundidad' },
     { value: 'lab_analysis', label: 'Análisis de Laboratorio'},
+    { value: 'ground_metals_analysis', label: 'Análisis de Metales en el suelo'}, 
     // Add more table types here in the future
   ];
 
@@ -70,6 +72,25 @@ export default function AnalysisPage() {
       } else if (selectedTableType === 'lab_analysis') {
         // Simulación de datos para análisis de laboratorio
         setTableData({}); // Puedes reemplazarlo con una carga real
+      } else if (selectedTableType === 'ground_metals_analysis') {
+        console.log(`🔄 Cargando datos de la tabla metales suelo del proyecto ${projectId}`);
+        const response = await api.get(`/projects/${projectId}/groundMetals`);
+        console.log(`✅ Datos de la tabla metales suelo del proyecto ${projectId} cargado:`, response.data);
+        const data = response.data;
+
+        if (!data || data.length === 0) {
+          setError('No hay información suficiente para generar la tabla de análisis de metales en el suelo.');
+          return;
+        }
+
+        const info = data.info;
+        const analytes = data.analytes;
+        setTableData({
+          info, analytes
+        })
+
+        // const dataModule = await import('@/data/simulatedGroundMetalData.json');
+        // setTableData(dataModule.default);
       } else {
         throw new Error(`Tipo de tabla no soportado: ${selectedTableType}`);
       }
@@ -137,22 +158,7 @@ export default function AnalysisPage() {
                 ))}
               </select>
             </div>
-
-            {/* <button
-              onClick={handleGenerateTable}
-              disabled={!selectedTableType || isLoading}
-              className="px-4 py-2 text-h5 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Generando...' : 'Generar Tabla'}
-            </button> */}
             <Button label={isLoading ? 'Generando...' : 'Generar Tabla'} onClick={handleGenerateTable} disable={!selectedTableType || isLoading}/>
-            {/* <button
-              onClick={handleExportExcel}
-              disabled={!tableData || isLoading || selectedTableType !== 'depth_analysis'}
-              className="px-4 py-2 text-h5 text-white bg-primary rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Exportar a Excel
-            </button> */}
             <Button label={'Exportar a Excel'} onClick={handleExportExcel} disable={!tableData || isLoading || selectedTableType !== 'depth_analysis'}/>
           </div>
         </div>
@@ -167,6 +173,7 @@ export default function AnalysisPage() {
             </h3>
             {selectedTableType === 'depth_analysis' && <DepthAnalysisTable data={tableData} />}
             {selectedTableType === 'lab_analysis' && <LabAnalysisTable />}
+            {selectedTableType === 'ground_metals_analysis' && <GroundMetalsTable data={tableData}/>}
           </div>
         )}
       </div>
