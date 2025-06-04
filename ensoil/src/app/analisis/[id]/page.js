@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,6 +17,9 @@ const metodoAnalisis = ['ICP-MS', 'pH', 'Conductividad Electrica', 'Carbono Orga
 const tipoMatriz = ['Relave', 'Agua Superficial', 'LDLQ', 'Minmax', 'Polvo', 'Sedimento', 'Suelo', 'Suelo background'];
 
 export default function AnalisisResultadosPage() {
+  const params = useParams();
+  const projectId = params.id; // dinámico desde URL
+
   const [metodo, setMetodo] = useState('');
   const [matriz, setMatriz] = useState('');
   const [comentario, setComentario] = useState('');
@@ -25,8 +29,6 @@ export default function AnalisisResultadosPage() {
   const [selectedMuestras, setSelectedMuestras] = useState([]);
   const [parametrosUnicos, setParametrosUnicos] = useState([]);
   const [muestrasUnicas, setMuestrasUnicas] = useState([]);
-
-  const projectId = 1; // Hardcodeado por ahora
 
   useEffect(() => {
     const fetchExcelData = async () => {
@@ -50,7 +52,6 @@ export default function AnalisisResultadosPage() {
           setAllData(transformedData);
           setChartData(transformedData);
 
-          // Cargar opciones únicas:
           const uniqueAnalitos = [...new Set(transformedData.map(d => d.analito))];
           const uniqueMuestras = [...new Set(transformedData.map(d => d.muestra))];
           setParametrosUnicos(uniqueAnalitos);
@@ -73,6 +74,18 @@ export default function AnalisisResultadosPage() {
     return matchAnalito && matchMuestra;
   });
 
+  // PIVOT DATA para gráfico (X dinámico)
+  const pivotData = [...new Set(filteredData.map(d => d.analito))].map(analito => {
+    const row = { analito };
+    muestrasUnicas
+      .filter(m => selectedMuestras.length === 0 || selectedMuestras.includes(m))
+      .forEach(muestra => {
+        const match = filteredData.find(d => d.analito === analito && d.muestra === muestra);
+        row[muestra] = match ? match.valor : null;
+      });
+    return row;
+  });
+
   return (
     <WithSidebarLayout>
       <main className="h-screen flex flex-col p-6">
@@ -89,74 +102,70 @@ export default function AnalisisResultadosPage() {
           </Select>
 
           {/* Analitos MULTI */}
-          <div className="flex flex-col space-y-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  {selectedAnalitos.length > 0
-                    ? selectedAnalitos.join(", ")
-                    : "Selecciona analitos"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)] ">
-                <ScrollArea className="h-[200px]">
-                  {parametrosUnicos.map((analito, i) => (
-                    <div key={i} className="flex items-center space-x-2 mb-1">
-                      <Checkbox
-                        id={`analito-${i}`}
-                        checked={selectedAnalitos.includes(analito)}
-                        onCheckedChange={(checked) => {
-                          setSelectedAnalitos(prev =>
-                            checked
-                              ? [...prev, analito]
-                              : prev.filter(a => a !== analito)
-                          );
-                        }}
-                      />
-                      <label htmlFor={`analito-${i}`} className="text-sm cursor-pointer">
-                        {analito}
-                      </label>
-                    </div>
-                  ))}
-                </ScrollArea>
-              </PopoverContent>
-            </Popover>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-start">
+                {selectedAnalitos.length > 0
+                  ? selectedAnalitos.join(", ")
+                  : "Selecciona analitos"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-black border border-[color:var(--foreground)]">
+              <ScrollArea className="h-[200px]">
+                {parametrosUnicos.map((analito, i) => (
+                  <div key={i} className="flex items-center space-x-2 mb-1">
+                    <Checkbox
+                      id={`analito-${i}`}
+                      checked={selectedAnalitos.includes(analito)}
+                      onCheckedChange={(checked) => {
+                        setSelectedAnalitos(prev =>
+                          checked
+                            ? [...prev, analito]
+                            : prev.filter(a => a !== analito)
+                        );
+                      }}
+                    />
+                    <label htmlFor={`analito-${i}`} className="text-sm cursor-pointer">
+                      {analito}
+                    </label>
+                  </div>
+                ))}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
 
           {/* Punto de muestreo MULTI */}
-          <div className="flex flex-col gap-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  {selectedMuestras.length > 0
-                    ? selectedMuestras.join(", ")
-                    : "Selecciona punto(s) de muestreo"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[325px] bg-[color:var(--background)] border border-[color:var(--foreground)] ">
-                <ScrollArea className="h-[200px]">
-                  {muestrasUnicas.map((muestra, i) => (
-                    <div key={i} className="flex items-center space-x-2 mb-1">
-                      <Checkbox
-                        id={`muestra-${i}`}
-                        checked={selectedMuestras.includes(muestra)}
-                        onCheckedChange={(checked) => {
-                          setSelectedMuestras(prev =>
-                            checked
-                              ? [...prev, muestra]
-                              : prev.filter(m => m !== muestra)
-                          );
-                        }}
-                      />
-                      <label htmlFor={`muestra-${i}`} className="text-sm cursor-pointer">
-                        {muestra}
-                      </label>
-                    </div>
-                  ))}
-                </ScrollArea>
-              </PopoverContent>
-            </Popover>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-start">
+                {selectedMuestras.length > 0
+                  ? selectedMuestras.join(", ")
+                  : "Selecciona punto(s) de muestreo"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-black border border-[color:var(--foreground)]">
+              <ScrollArea className="h-[200px]">
+                {muestrasUnicas.map((muestra, i) => (
+                  <div key={i} className="flex items-center space-x-2 mb-1">
+                    <Checkbox
+                      id={`muestra-${i}`}
+                      checked={selectedMuestras.includes(muestra)}
+                      onCheckedChange={(checked) => {
+                        setSelectedMuestras(prev =>
+                          checked
+                            ? [...prev, muestra]
+                            : prev.filter(m => m !== muestra)
+                        );
+                      }}
+                    />
+                    <label htmlFor={`muestra-${i}`} className="text-sm cursor-pointer">
+                      {muestra}
+                    </label>
+                  </div>
+                ))}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
 
           <Select onValueChange={setMatriz} value={matriz} className="w-full">
             <SelectTrigger className="min-w-[200px] w-full bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)]">
@@ -199,11 +208,22 @@ export default function AnalisisResultadosPage() {
               <Card className="bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)] h-full">
                 <CardContent className="p-4 h-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={filteredData}>
+                    <LineChart data={pivotData}>
                       <XAxis dataKey="analito" stroke="#ccc" />
                       <YAxis stroke="#ccc" />
                       <Tooltip />
-                      <Line type="monotone" dataKey="valor" stroke="#00cc99" strokeWidth={2} />
+                      {muestrasUnicas
+                        .filter(m => selectedMuestras.length === 0 || selectedMuestras.includes(m))
+                        .map((muestra, i) => (
+                          <Line
+                            key={muestra}
+                            type="monotone"
+                            dataKey={muestra}
+                            stroke={`hsl(${i * 50}, 35%, 50%)`} // colores suaves
+                            strokeWidth={2}
+                            dot={{ r: 3 }}
+                          />
+                        ))}
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
