@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -8,15 +8,43 @@ import { UploadForm } from "@/components/ExcelForm";
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import { File } from "lucide-react";
 import Image from 'next/image';
-//import "./excels.css";
+import axios from "@/utils/axios"; // NECESARIO para el GET!
 
 export default function ExcelsPage() {
   const router = useRouter();
-
-  // Estado inicial vacío, sin muestras simuladas
   const [fileData, setFileData] = useState([]);
+  
+  // Hardcodeado por ahora — después lo puedes cambiar por Select
+  const projectId = 1;
 
-  // Recibe un objeto file generado al subir un archivo
+  // GET de Excel subidos al abrir la página
+  useEffect(() => {
+  const fetchProjects = async () => {
+    try {
+      console.log("🚀 GET /projects");
+      const res = await axios.get('/projects');
+      console.log("✅ Response:", res.data);
+
+      if (Array.isArray(res.data.projects)) {
+        const transformedData = res.data.projects.map(project => ({
+          id: project.id,
+          name: project.name,
+          creationDate: new Date(project.createdAt).toLocaleDateString('es-CL'),
+          date: new Date(project.updatedAt).toLocaleDateString('es-CL'),
+        }));
+
+        setFileData(transformedData);
+      } else {
+        console.error("⚠️ No se encontró data válida en projects");
+      }
+    } catch (error) {
+      console.error("❌ Error al obtener proyectos:", error);
+    }
+  };
+
+  fetchProjects();
+}, []);
+  // Cuando subes un nuevo archivo, se puede agregar a la lista
   const handleNewUpload = (file) => {
     setFileData([file, ...fileData]);
   };
@@ -53,7 +81,7 @@ export default function ExcelsPage() {
             {fileData.map((file) => (
               <TableRow
                 key={file.id}
-                onClick={() => router.push(`/analisis/${file.id}`)}
+                onClick={() => router.push(`/analisis/${file.id}`)} // o /projects/${file.id} si prefieres
                 className="cursor-pointer text-black dark:text-white"
               >
                 <TableCell colSpan={3} className="p-0">
@@ -69,7 +97,6 @@ export default function ExcelsPage() {
                     </div>
                     <div className="flex-1">
                       <div className="text-black dark:text-white text-h5">{file.name}</div>
-                      <div className="text-black dark:text-white text-p">{file.creationDate}</div>
                     </div>
                     <div className="text-black dark:text-white text-h5 pr-6">{file.date}</div>
                   </div>
