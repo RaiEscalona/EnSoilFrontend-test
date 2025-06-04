@@ -79,7 +79,7 @@ export default function AnalysisPage() {
         const data = response.data;
 
         if (!data || data.length === 0) {
-          setError('No hay información suficiente para generar la tabla de análisis de profundidad.');
+          setError('No hay información suficiente para generar la tabla de análisis de metales en el suelo.');
           return;
         }
 
