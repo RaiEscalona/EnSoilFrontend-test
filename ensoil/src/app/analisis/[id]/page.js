@@ -315,6 +315,7 @@ useEffect(() => {
                       >
                         {row.valor}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
