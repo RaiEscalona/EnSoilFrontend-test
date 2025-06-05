@@ -20,7 +20,7 @@ export default function AnalisisResultadosPage() {
   const projectId = params.id; // dinámico desde URL
 
   const [normas, setNormas] = useState([]);
-  const [normaSeleccionada, setNormaSeleccionada] = useState('');
+  const [normaSeleccionada, setNormaSeleccionada] = useState(null);
   const [matriz, setMatriz] = useState('');
   const [comentario, setComentario] = useState('');
   const [chartData, setChartData] = useState([]);
@@ -33,11 +33,12 @@ export default function AnalisisResultadosPage() {
   useEffect(() => {
     const fetchNormas = async () => {
       try {
-        console.log("/internacionalNorms/entities");
+        console.log("/internationalNorms/entities");
         const res = await axios.get(`/internationalNorms/entities`);
         console.log("✅ Normas:", res.data);
-        if (res.data && Array.isArray(res.data)) {
-          setNormas(res.data);
+        if (res.data && Array.isArray(res.data.data)) {
+          setNormas(res.data.data);
+          setNormaSeleccionada(null); // Por defecto, ninguna seleccionada
         }
       } catch (error) {
         console.error("❌ Error al obtener normas:", error);
@@ -84,6 +85,83 @@ export default function AnalisisResultadosPage() {
   fetchExcelData();
 }, [projectId]);
 
+useEffect(() => {
+  const fetchResultsWithNorms = async () => {
+    try {
+      console.log(`🚀 GET /dataLaboratories/${projectId}/results-with-norms/${normaSeleccionada.id}`);
+      const res = await axios.get(`/dataLaboratories/${projectId}/results-with-norms/${normaSeleccionada.id}`);
+      console.log("✅ Response con normas:", res.data);
+
+      if (Array.isArray(res.data.data) && res.data.data.length > 0) {
+        const rawData = res.data.data;
+
+        const transformedData = rawData.flatMap(sample => {
+          return (sample.results || []).map(result => ({
+            muestra: sample.sampleName,
+            analito: result.analyteName,
+            valor: result.result,
+            overNorm: result.overNorm
+          }));
+        });
+
+        console.log("✅ Transformed data con normas:", transformedData);
+        setAllData(transformedData);
+        setChartData(transformedData);
+
+        const uniqueAnalitos = [...new Set(transformedData.map(d => d.analito))];
+        const uniqueMuestras = [...new Set(transformedData.map(d => d.muestra))];
+        setParametrosUnicos(uniqueAnalitos);
+        setMuestrasUnicas(uniqueMuestras);
+      } else {
+        console.error("⚠️ No se encontró data válida (con normas)");
+      }
+    } catch (error) {
+      console.error("❌ Error al obtener resultados con normas:", error);
+    }
+  };
+
+  const fetchResultsWithoutNorms = async () => {
+    try {
+      console.log(`🚀 GET /dataLaboratories/${projectId}/results`);
+      const res = await axios.get(`/dataLaboratories/${projectId}/results`);
+      console.log("✅ Response SIN normas:", res.data);
+
+      if (Array.isArray(res.data.data) && res.data.data.length > 0) {
+        const rawData = res.data.data;
+
+        const transformedData = rawData.flatMap(sample => {
+          return (sample.results || []).map(result => ({
+            muestra: sample.sampleName,
+            analito: result.analyteName,
+            valor: result.result
+          }));
+        });
+
+        console.log("✅ Transformed data SIN normas:", transformedData);
+        setAllData(transformedData);
+        setChartData(transformedData);
+
+        const uniqueAnalitos = [...new Set(transformedData.map(d => d.analito))];
+        const uniqueMuestras = [...new Set(transformedData.map(d => d.muestra))];
+        setParametrosUnicos(uniqueAnalitos);
+        setMuestrasUnicas(uniqueMuestras);
+      } else {
+        console.error("⚠️ No se encontró data válida (sin normas)");
+      }
+    } catch (error) {
+      console.error("❌ Error al obtener resultados SIN normas:", error);
+    }
+  };
+
+  // ✅ Decisión:
+  if (normaSeleccionada?.id) {
+    fetchResultsWithNorms();
+  } else {
+    fetchResultsWithoutNorms();
+  }
+
+}, [normaSeleccionada, projectId]);
+
   // FILTRADO
   const filteredData = chartData.filter(d => {
     const matchAnalito = selectedAnalitos.length === 0 || selectedAnalitos.includes(d.analito);
@@ -110,12 +188,30 @@ export default function AnalisisResultadosPage() {
         <h1 className="text-3xl font-bold mb-6 text-center">Análisis de Resultados</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Select onValueChange={setNormaSeleccionada} value={normaSeleccionada} className="w-full">
+          <Select
+            onValueChange={(id) => {
+              if (id === 'none') {
+                setNormaSeleccionada(null);
+              } else {
+                const selected = normas.find(n => n.id.toString() === id);
+                setNormaSeleccionada(selected);
+              }
+            }}
+            value={normaSeleccionada?.id?.toString() ?? 'none'}
+            className="w-full"
+          >
             <SelectTrigger className="min-w-[200px] w-full bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)]">
               <SelectValue placeholder="Norma internacional" />
             </SelectTrigger>
             <SelectContent className="bg-[color:var(--background)]">
-              {normas.map((norma, i) => <SelectItem key={i} value={norma}>{norma}</SelectItem>)}
+              <SelectItem value="none">
+                Sin norma seleccionada
+              </SelectItem>
+              {normas.map((norma) => (
+                <SelectItem key={norma.id} value={norma.id.toString()}>
+                  {norma.entity}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -212,7 +308,13 @@ export default function AnalisisResultadosPage() {
                     <tr key={i} className="border-b border-gray-700">
                       <td className="py-2 px-2">{row.muestra}</td>
                       <td className="py-2 px-2">{row.analito}</td>
-                      <td className="py-2 px-2">{row.valor}</td>
+                      <td
+                        className={`py-2 px-2 ${
+                          row.overNorm ? 'text-red-500 font-bold' : ''
+                        }`}
+                      >
+                        {row.valor}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
