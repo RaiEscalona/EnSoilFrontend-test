@@ -111,9 +111,9 @@ export default function AnalisisResultadosPage() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-black border border-[color:var(--foreground)]">
-              <ScrollArea className="h-[200px]">
+              <ScrollArea className="h-[200px] text-black">
                 {parametrosUnicos.map((analito, i) => (
-                  <div key={i} className="flex items-center space-x-2 mb-1">
+                  <div key={i} className="flex items-center space-x-2 mb-1 text-black">
                     <Checkbox
                       id={`analito-${i}`}
                       checked={selectedAnalitos.includes(analito)}
@@ -125,7 +125,7 @@ export default function AnalisisResultadosPage() {
                         );
                       }}
                     />
-                    <label htmlFor={`analito-${i}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`analito-${i}`} className="text-sm cursor-pointer text-black">
                       {analito}
                     </label>
                   </div>
@@ -144,9 +144,9 @@ export default function AnalisisResultadosPage() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-black border border-[color:var(--foreground)]">
-              <ScrollArea className="h-[200px]">
+              <ScrollArea className="h-[200px] text-black">
                 {muestrasUnicas.map((muestra, i) => (
-                  <div key={i} className="flex items-center space-x-2 mb-1">
+                  <div key={i} className="flex items-center space-x-2 mb-1 text-black">
                     <Checkbox
                       id={`muestra-${i}`}
                       checked={selectedMuestras.includes(muestra)}
@@ -158,7 +158,7 @@ export default function AnalisisResultadosPage() {
                         );
                       }}
                     />
-                    <label htmlFor={`muestra-${i}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`muestra-${i}`} className="text-sm cursor-pointer text-black">
                       {muestra}
                     </label>
                   </div>
@@ -180,21 +180,21 @@ export default function AnalisisResultadosPage() {
         {/* CARD GRANDE CON TABLA */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
           <Card className="bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)] h-full">
-            <CardContent className="p-4 h-[755px] overflow-y-auto">
+            <CardContent className="h-[755px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-[color:var(--background)]">
+                <thead className="sticky top-0 bg-[color:var(--background)] z-0">
                   <tr className="text-left border-b border-gray-600">
-                    <th>Muestra</th>
-                    <th>Analito</th>
-                    <th>Valor</th>
+                    <th className="py-3 px-2 font-semibold">Muestra</th>
+                    <th className="py-3 px-2 font-semibold">Analito</th>
+                    <th className="py-3 px-2 font-semibold">Valor</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredData.map((row, i) => (
                     <tr key={i} className="border-b border-gray-700">
-                      <td>{row.muestra}</td>
-                      <td>{row.analito}</td>
-                      <td>{row.valor}</td>
+                      <td className="py-2 px-2">{row.muestra}</td>
+                      <td className="py-2 px-2">{row.analito}</td>
+                      <td className="py-2 px-2">{row.valor}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -211,7 +211,10 @@ export default function AnalisisResultadosPage() {
                     <LineChart data={pivotData}>
                       <XAxis dataKey="analito" stroke="#ccc" />
                       <YAxis stroke="#ccc" />
-                      <Tooltip />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'white', color: 'black' }}
+                        labelStyle={{ color: 'black', fontWeight: 'bold' }}
+                      />
                       {muestrasUnicas
                         .filter(m => selectedMuestras.length === 0 || selectedMuestras.includes(m))
                         .map((muestra, i) => (
