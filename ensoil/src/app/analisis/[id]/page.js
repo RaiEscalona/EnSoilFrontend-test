@@ -13,14 +13,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import axios from '@/utils/axios';
 
-const metodoAnalisis = ['ICP-MS', 'pH', 'Conductividad Electrica', 'Carbono Organico Total', 'Granulometría', 'Azufre Total', 'Sulfato', 'Cromo Hexavalente'];
 const tipoMatriz = ['Relave', 'Agua Superficial', 'LDLQ', 'Minmax', 'Polvo', 'Sedimento', 'Suelo', 'Suelo background'];
 
 export default function AnalisisResultadosPage() {
   const params = useParams();
   const projectId = params.id; // dinámico desde URL
 
-  const [metodo, setMetodo] = useState('');
+  const [normas, setNormas] = useState([]);
+  const [normaSeleccionada, setNormaSeleccionada] = useState('');
   const [matriz, setMatriz] = useState('');
   const [comentario, setComentario] = useState('');
   const [chartData, setChartData] = useState([]);
@@ -31,41 +31,58 @@ export default function AnalisisResultadosPage() {
   const [muestrasUnicas, setMuestrasUnicas] = useState([]);
 
   useEffect(() => {
-    const fetchExcelData = async () => {
+    const fetchNormas = async () => {
       try {
-        console.log(`🚀 GET /dataLaboratories/project/${projectId}`);
-        const res = await axios.get(`/dataLaboratories/project/${projectId}`);
-        console.log("✅ Response:", res.data);
-
-        if (res.data.success && res.data.data) {
-          const rawData = res.data.data;
-
-          const transformedData = Object.keys(rawData).flatMap(sampleTag => {
-            return rawData[sampleTag].map(item => ({
-              muestra: sampleTag,
-              analito: item.analyte,
-              valor: item.result
-            }));
-          });
-
-          console.log("✅ Transformed data:", transformedData);
-          setAllData(transformedData);
-          setChartData(transformedData);
-
-          const uniqueAnalitos = [...new Set(transformedData.map(d => d.analito))];
-          const uniqueMuestras = [...new Set(transformedData.map(d => d.muestra))];
-          setParametrosUnicos(uniqueAnalitos);
-          setMuestrasUnicas(uniqueMuestras);
-        } else {
-          console.error("⚠️ No se encontró data válida");
+        console.log("/internacionalNorms/entities");
+        const res = await axios.get(`/internationalNorms/entities`);
+        console.log("✅ Normas:", res.data);
+        if (res.data && Array.isArray(res.data)) {
+          setNormas(res.data);
         }
       } catch (error) {
-        console.error("❌ Error al obtener Excel:", error);
+        console.error("❌ Error al obtener normas:", error);
       }
     };
+    fetchNormas();
+  }, []);
 
-    fetchExcelData();
-  }, [projectId]);
+  useEffect(() => {
+  const fetchExcelData = async () => {
+    try {
+      console.log(`🚀 GET /dataLaboratories/project/${projectId}`);
+      const res = await axios.get(`/dataLaboratories/${projectId}/results`);
+      console.log("✅ Response:", res.data);
+
+      if (Array.isArray(res.data.data) && res.data.data.length > 0) {
+        const rawData = res.data.data;
+
+        // ✅ Correcto: recorrer el array y flatear los results
+        const transformedData = rawData.flatMap(sample => {
+          return (sample.results || []).map(result => ({
+            muestra: sample.sampleName,
+            analito: result.analyteName,
+            valor: result.result
+          }));
+        });
+
+        console.log("✅ Transformed data:", transformedData);
+        setAllData(transformedData);
+        setChartData(transformedData);
+
+        const uniqueAnalitos = [...new Set(transformedData.map(d => d.analito))];
+        const uniqueMuestras = [...new Set(transformedData.map(d => d.muestra))];
+        setParametrosUnicos(uniqueAnalitos);
+        setMuestrasUnicas(uniqueMuestras);
+      } else {
+        console.error("⚠️ No se encontró data válida");
+      }
+    } catch (error) {
+      console.error("❌ Error al obtener Excel:", error);
+    }
+  };
+
+  fetchExcelData();
+}, [projectId]);
 
   // FILTRADO
   const filteredData = chartData.filter(d => {
@@ -76,15 +93,16 @@ export default function AnalisisResultadosPage() {
 
   // PIVOT DATA para gráfico (X dinámico)
   const pivotData = [...new Set(filteredData.map(d => d.analito))].map(analito => {
-    const row = { analito };
-    muestrasUnicas
-      .filter(m => selectedMuestras.length === 0 || selectedMuestras.includes(m))
-      .forEach(muestra => {
-        const match = filteredData.find(d => d.analito === analito && d.muestra === muestra);
-        row[muestra] = match ? match.valor : null;
-      });
-    return row;
+  const row = { analito };
+  const muestrasFiltradas = muestrasUnicas.filter(m =>
+    selectedMuestras.length === 0 || selectedMuestras.includes(m)
+  );
+  muestrasFiltradas.forEach(muestra => {
+    const match = filteredData.find(d => d.analito === analito && d.muestra === muestra);
+    row[muestra] = match?.valor ?? null;
   });
+  return row;
+});
 
   return (
     <WithSidebarLayout>
@@ -92,12 +110,12 @@ export default function AnalisisResultadosPage() {
         <h1 className="text-3xl font-bold mb-6 text-center">Análisis de Resultados</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Select onValueChange={setMetodo} value={metodo} className="w-full">
+          <Select onValueChange={setNormaSeleccionada} value={normaSeleccionada} className="w-full">
             <SelectTrigger className="min-w-[200px] w-full bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)]">
-              <SelectValue placeholder="Método de análisis" />
+              <SelectValue placeholder="Norma internacional" />
             </SelectTrigger>
             <SelectContent className="bg-[color:var(--background)]">
-              {metodoAnalisis.map((m, i) => <SelectItem key={i} value={m}>{m}</SelectItem>)}
+              {normas.map((norma, i) => <SelectItem key={i} value={norma}>{norma}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -111,9 +129,9 @@ export default function AnalisisResultadosPage() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-black border border-[color:var(--foreground)]">
-              <ScrollArea className="h-[200px]">
+              <ScrollArea className="h-[200px] text-black">
                 {parametrosUnicos.map((analito, i) => (
-                  <div key={i} className="flex items-center space-x-2 mb-1">
+                  <div key={i} className="flex items-center space-x-2 mb-1 text-black">
                     <Checkbox
                       id={`analito-${i}`}
                       checked={selectedAnalitos.includes(analito)}
@@ -125,7 +143,7 @@ export default function AnalisisResultadosPage() {
                         );
                       }}
                     />
-                    <label htmlFor={`analito-${i}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`analito-${i}`} className="text-sm cursor-pointer text-black">
                       {analito}
                     </label>
                   </div>
@@ -144,9 +162,9 @@ export default function AnalisisResultadosPage() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="min-w-[325px] w-full bg-[color:var(--background)] text-black border border-[color:var(--foreground)]">
-              <ScrollArea className="h-[200px]">
+              <ScrollArea className="h-[200px] text-black">
                 {muestrasUnicas.map((muestra, i) => (
-                  <div key={i} className="flex items-center space-x-2 mb-1">
+                  <div key={i} className="flex items-center space-x-2 mb-1 text-black">
                     <Checkbox
                       id={`muestra-${i}`}
                       checked={selectedMuestras.includes(muestra)}
@@ -158,7 +176,7 @@ export default function AnalisisResultadosPage() {
                         );
                       }}
                     />
-                    <label htmlFor={`muestra-${i}`} className="text-sm cursor-pointer">
+                    <label htmlFor={`muestra-${i}`} className="text-sm cursor-pointer text-black">
                       {muestra}
                     </label>
                   </div>
@@ -180,21 +198,21 @@ export default function AnalisisResultadosPage() {
         {/* CARD GRANDE CON TABLA */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
           <Card className="bg-[color:var(--background)] text-[color:var(--foreground)] border border-[color:var(--foreground)] h-full">
-            <CardContent className="p-4 h-[755px] overflow-y-auto">
+            <CardContent className="h-[755px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-[color:var(--background)]">
+                <thead className="sticky top-0 bg-[color:var(--background)] z-0">
                   <tr className="text-left border-b border-gray-600">
-                    <th>Muestra</th>
-                    <th>Analito</th>
-                    <th>Valor</th>
+                    <th className="py-3 px-2 font-semibold">Muestra</th>
+                    <th className="py-3 px-2 font-semibold">Analito</th>
+                    <th className="py-3 px-2 font-semibold">Valor</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredData.map((row, i) => (
                     <tr key={i} className="border-b border-gray-700">
-                      <td>{row.muestra}</td>
-                      <td>{row.analito}</td>
-                      <td>{row.valor}</td>
+                      <td className="py-2 px-2">{row.muestra}</td>
+                      <td className="py-2 px-2">{row.analito}</td>
+                      <td className="py-2 px-2">{row.valor}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -211,7 +229,10 @@ export default function AnalisisResultadosPage() {
                     <LineChart data={pivotData}>
                       <XAxis dataKey="analito" stroke="#ccc" />
                       <YAxis stroke="#ccc" />
-                      <Tooltip />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'white', color: 'black' }}
+                        labelStyle={{ color: 'black', fontWeight: 'bold' }}
+                      />
                       {muestrasUnicas
                         .filter(m => selectedMuestras.length === 0 || selectedMuestras.includes(m))
                         .map((muestra, i) => (
