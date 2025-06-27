@@ -1,1 +1,17 @@
-{}
+{
+  "/api/drillingPoints/route": "app/api/drillingPoints/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/projects/[id]/drillingPoints/route": "app/api/projects/[id]/drillingPoints/route.js",
+  "/api/projects/route": "app/api/projects/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/analisis/[id]/page": "app/analisis/[id]/page.js",
+  "/analisis/page": "app/analisis/page.js",
+  "/excels/page": "app/excels/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/projects/[id]/map/drillingPoint/[drillingPointId]/page": "app/projects/[id]/map/drillingPoint/[drillingPointId]/page.js",
+  "/projects/[id]/analysis/page": "app/projects/[id]/analysis/page.js",
+  "/projects/page": "app/projects/page.js",
+  "/register/page": "app/register/page.js",
+  "/projects/[id]/map/page": "app/projects/[id]/map/page.js"
+}
