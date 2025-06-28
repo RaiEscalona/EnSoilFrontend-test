@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.raimundoserver.lat';
+const BASE_URL = 'https://ensoilapp.site';
+// const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,

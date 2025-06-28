@@ -1,149 +1,136 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import api from '@/utils/axios';
 import "./projects.css";
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
-import Button from '@/components/button';
-
-// Simulated projects data
-const initialProjects = [
-  {
-    id: 1,
-    name: "Proyecto Norte",
-    description: "Estudio geológico 2025",
-    startDate: "2025-05-01",
-    endDate: "2025-10-30",
-    drillingPointsCount: 5,
-    zones: [
-      { id: 1, name: "Zona A" },
-      { id: 2, name: "Zona B" }
-    ]
-  }
-];
+import ButtonComponent from '@/components/utils/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from "@/ui/pagination";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    startDate: '',
-    endDate: ''
-  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        console.log('🔄 Cargando lista de proyectos');
-        console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
-        console.log(api.defaults.baseURL);
         const response = await api.get('/projects');
-        console.log('✅ Proyectos cargados exitosamente:', response.data);
         setProjects(response.data.projects);
       } catch (error) {
         console.error('❌ Error cargando proyectos:', error.response?.data || error.message);
       }
     };
-
     fetchProjects();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // Normaliza texto para búsqueda (sin espacios y minúsculas)
+  const normalize = (str) => str.replace(/\s+/g, "").toLowerCase();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      console.log('🔄 Creando nuevo proyecto:', formData);
-      
-      const response = await api.post('/projects', {
-        name: formData.name,
-        description: formData.description,
-        startDate: `${formData.startDate}T00:00:00-03:00`,
-        endDate: `${formData.endDate}T00:00:00-03:00`
-      });
+  // Filtrado reactivo por nombre
+  const filteredProjects = useMemo(() => {
+    if (!searchTerm.trim()) return projects;
+    return projects.filter(project =>
+      normalize(project.name).includes(normalize(searchTerm))
+    );
+  }, [projects, searchTerm]);
 
-      console.log('✅ Proyecto creado exitosamente:', response.data);
-      
-      setProjects([...projects, response.data]);
-      setFormData({
-        name: '',
-        description: '',
-        startDate: '',
-        endDate: ''
-      });
-    } catch (error) {
-      console.error('❌ Error creando proyecto:', error.response?.data || error.message);
+  // Cálculos de paginación sobre los proyectos filtrados
+  const totalItems = filteredProjects.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = useMemo(() => {
+    return filteredProjects.slice(startIndex, endIndex);
+  }, [filteredProjects, startIndex, endIndex]);
+
+  // Función para generar números de página
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('ellipsis');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('ellipsis');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('ellipsis');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('ellipsis');
+        pages.push(totalPages);
+      }
     }
+    return pages;
   };
 
   return (
     <WithSidebarLayout>
-    <div className="dark:bg-secondary">
-
       <div className="projects-container">
         <div className="text-h2">Proyectos</div>
         <br />
-        {/* Create Project Form */}
-        <div className="create-project-form">
-          <div className="text-h3">Crear Nuevo Proyecto</div>
-          <form onSubmit={handleSubmit} className="form-fields">
-            <div>
-              <label>Nombre</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div>
-              <label>Descripción del Proyecto</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="form-dates">
-              <div>
-                <label>Fecha de Inicio</label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Fecha de Fin</label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-            <Button label="Crear Proyecto" type="submit" size="h4" fullWidth={true}></Button>
-          </form>
+        {/* Controles de paginación y barra de búsqueda */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Mostrar:</span>
+            <select
+              value={itemsPerPage}
+              onChange={e => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="w-20 bg-white border border-gray-300 text-gray-900 rounded px-2 py-1 cursor-pointer"
+            >
+              <option value={5}>5</option>
+              <option value={8}>8</option>
+              <option value={12}>12</option>
+              <option value={20}>20</option>
+            </select>
+            <span className="text-sm text-gray-600">elementos por página</span>
+          </div>
+          <div className="flex-1 flex justify-center">
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="max-w-xs w-full border border-gray-300 rounded px-2 py-1"
+            />
+          </div>
+          <div className="text-sm text-gray-600 text-center sm:text-right">
+            Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems} resultados
+          </div>
         </div>
         {/* Projects List */}
         <div className="projects-list">
-          <br />
-          <div className='text-h3 text-black dark:text-white'>Proyectos Existentes</div>
-          {projects.map((project) => (
+          {paginatedData.map((project) => (
             <div key={project.id} className="project-card">
               <div className="project-card-content">
                 <div>
@@ -153,19 +140,48 @@ export default function ProjectsPage() {
                     {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
                   </p>
                 </div>
-                <Button label="Ver Mapa" route={`/projects/${project.id}/map`}></Button>
-                {/* <Link
-                  href={`/projects/${project.id}/map`}
-                  className="project-map-btn"
-                >
-                  Ver Mapa
-                </Link> */}
+                <ButtonComponent label="Ir al proyecto" route={`/projects/${project.id}/map`}></ButtonComponent>
               </div>
             </div>
           ))}
         </div>
+        {/* Paginación estilizada */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {generatePageNumbers().map((page, index) => (
+                  <PaginationItem key={index}>
+                    {page === 'ellipsis' ? (
+                      <PaginationEllipsis />
+                    ) : (
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className={currentPage === page ? "" : "cursor-pointer"}
+                      >
+                        {page}
+                      </PaginationLink>
+                    )}
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
-    </div>
     </WithSidebarLayout>
   );
 } 

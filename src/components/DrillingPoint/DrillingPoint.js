@@ -1,9 +1,9 @@
 'use client';
 
-import Tooltip from './Tooltip';
 import { formatCoordinates } from '@/utils/coordinateUtils';
 import './DrillingPoint.css';
 import { useRouter } from 'next/navigation';
+import Tooltip from '../ToolTip/Tooltip';
 
 export default function DrillingPoint({ projectId, id, point, clickPosition, size = 20, border = 2 }) {
   const route = `/projects/${projectId}/map/drillingPoint/${id}`;

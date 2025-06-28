@@ -7,7 +7,8 @@ import './analysis.css';
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import DepthAnalysisTable from './depth-analysis';
 import LabAnalysisTable from './lab-analysis';
-import Button from '@/components/button';
+import WaterAnalysisTable from './water-analysis';
+import ButtonComponent from '@/components/utils/button';
 import api from '@/utils/axios';
 import GroundMetalsTable from './ground-metals-analysis';
 
@@ -20,8 +21,9 @@ export default function AnalysisPage() {
 
   const tableTypes = [
     { value: 'depth_analysis', label: 'Análisis de Profundidad' },
-    { value: 'lab_analysis', label: 'Análisis de Laboratorio'},
-    { value: 'ground_metals_analysis', label: 'Análisis de Metales en el suelo'}, 
+    { value: 'lab_analysis', label: 'Análisis de Laboratorio - Suelo'},
+    { value: 'water_analysis', label: 'Análisis de Laboratorio - Agua'},
+    { value: 'ground_metals_analysis', label: 'Análisis de Metales en el suelo'},
     // Add more table types here in the future
   ];
 
@@ -72,6 +74,8 @@ export default function AnalysisPage() {
       } else if (selectedTableType === 'lab_analysis') {
         // Simulación de datos para análisis de laboratorio
         setTableData({}); // Puedes reemplazarlo con una carga real
+      } else if (selectedTableType === 'water_analysis') {
+        setTableData({});
       } else if (selectedTableType === 'ground_metals_analysis') {
         console.log(`🔄 Cargando datos de la tabla metales suelo del proyecto ${projectId}`);
         const response = await api.get(`/projects/${projectId}/groundMetals`);
@@ -131,10 +135,9 @@ export default function AnalysisPage() {
   return (
     <WithSidebarLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-h2 font-bold mb-8">Análisis del Proyecto {projectId}</h1>
-
-        <div className="p-6 rounded-lg border mb-5" style={{ borderColor: 'var(--color-quaternary)' }}>
-          <h2 className="text-h3 mb-4">Generar Tabla de Análisis</h2>
+        <h1 className="text-h2 font-bold mb-6">Análisis del Proyecto {projectId}</h1>
+        <div className="p-4 rounded-lg border mb-5" style={{ borderColor: 'var(--color-quaternary)' }}>
+          <h2 className="text-h3 mb-4 text-center">Generar Tabla de Análisis</h2>
           <div className="flex items-end space-x-4">
             <div className="flex-grow">
               <label htmlFor="tableType" className="text-h4 block mb-[2px]">
@@ -158,8 +161,8 @@ export default function AnalysisPage() {
                 ))}
               </select>
             </div>
-            <Button label={isLoading ? 'Generando...' : 'Generar Tabla'} onClick={handleGenerateTable} disable={!selectedTableType || isLoading}/>
-            <Button label={'Exportar a Excel'} onClick={handleExportExcel} disable={!tableData || isLoading || selectedTableType !== 'depth_analysis'}/>
+            <ButtonComponent label={isLoading ? 'Generando...' : 'Generar Tabla'} onClick={handleGenerateTable} disable={!selectedTableType || isLoading}/>
+            <ButtonComponent label={'Exportar a Excel'} onClick={handleExportExcel} disable={!tableData || isLoading || selectedTableType !== 'depth_analysis'}/>
           </div>
         </div>
 
@@ -167,13 +170,19 @@ export default function AnalysisPage() {
         {isLoading && <p className="text-center my-4">Cargando datos de la tabla...</p>}
         {error && <p className="text-center my-4 text-red-600">{error}</p>}
         {tableData && (
-          <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md max-h-[75vh] overflow-auto">
-            <h3 className="text-black text-h3 mb-4">
-              Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}
-            </h3>
-            {selectedTableType === 'depth_analysis' && <DepthAnalysisTable data={tableData} />}
-            {selectedTableType === 'lab_analysis' && <LabAnalysisTable />}
-            {selectedTableType === 'ground_metals_analysis' && <GroundMetalsTable data={tableData}/>}
+          <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md h-full w- flex flex-col">
+            {/* Selector Suelo/Agua flotante y título */}
+            {selectedTableType === 'lab_analysis' ? (
+              <h3 className="text-black text-h3 mb-4">Tabla: Análisis de Laboratorio</h3>
+            ) : (
+              <h3 className="text-black text-h3 mb-4">
+                Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}
+              </h3>
+            )}
+            {selectedTableType === 'depth_analysis' && <div className="h-full overflow-auto"><DepthAnalysisTable data={tableData} /></div>}
+            {selectedTableType === 'lab_analysis' && <div className="h-full overflow-auto"><LabAnalysisTable showHeaderControls={false} /></div>}
+            {selectedTableType === 'water_analysis' && <div className="h-full overflow-auto"><WaterAnalysisTable /></div>}
+            {selectedTableType === 'ground_metals_analysis' && <div className="h-full overflow-auto"><GroundMetalsTable data={tableData} /></div>}
           </div>
         )}
       </div>

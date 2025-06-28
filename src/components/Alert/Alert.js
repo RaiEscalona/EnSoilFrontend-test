@@ -3,17 +3,22 @@
 import { useEffect, useState } from 'react';
 import './Alert.css';
 
-export default function Alert({ message, onClose }) {
+export default function Alert({ message, onClose, duration = 10000 }) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
       onClose();
-    }, 3000);
+    }, duration);
 
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, duration]);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    onClose();
+  };
 
   if (!isVisible) return null;
 
@@ -24,7 +29,7 @@ export default function Alert({ message, onClose }) {
           <span>{message}</span>
         </div>
         <button 
-          onClick={() => setIsVisible(false)}
+          onClick={handleClose}
           className="alert-close-button"
           aria-label="Cerrar alerta"
         >

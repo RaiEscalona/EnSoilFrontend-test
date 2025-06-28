@@ -15,8 +15,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/ui/card"
-import { Button } from "@/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import ButtonComponent from "../utils/button"
 
 export function UploadForm({ onUpload }) {
   const [open, setOpen] = useState(false)
@@ -31,7 +31,7 @@ export function UploadForm({ onUpload }) {
     axios.get('/projects')
       .then((res) => {
         console.log("✅ GET /projects result:", res.data)
-        setProjects(res.data.projects) // <--- CORRECTO ✅
+        setProjects(res.data.projects) 
       })
       .catch((err) => {
         console.error("Error fetching projects", err)
@@ -53,12 +53,6 @@ export function UploadForm({ onUpload }) {
   const formData = new FormData()
   formData.append("labName", selectedLab)
   formData.append("file", selectedFile)
-
-  // 🚀 LOG FormData
-  console.log("🚀 Subiendo con FormData:");
-  for (let pair of formData.entries()) {
-    console.log(`${pair[0]}:`, pair[1]);
-  }
 
   try {
     const res = await axios.post(`/dataLaboratories/${selectedProjectId}/process-laboratory-data`, formData, {
@@ -83,7 +77,6 @@ export function UploadForm({ onUpload }) {
     }
     console.log(res.data)
 
-    // ✅ cerrar el diálogo
     setOpen(false)
     setSelectedFile(null)
     setSelectedProjectId("")
@@ -119,12 +112,12 @@ export function UploadForm({ onUpload }) {
             Selecciona el laboratorio, el archivo Excel y el proyecto.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-3 py-2 text-h5">
           <Label>Laboratorio</Label>
           <RadioGroup
             value={selectedLab}
             onValueChange={setSelectedLab}
-            className="flex flex-row justify-center items-center gap-4"
+            className="flex flex-row justify-center items-center gap-5"
           >
             {["ALS", "SGS", "Hidrolab", "AGS"].map((lab) => (
               <div key={lab} className="flex items-center space-x-2">
@@ -134,9 +127,8 @@ export function UploadForm({ onUpload }) {
             ))}
           </RadioGroup>
 
-          <div>
+          <div className="grid gap-3">
             <Label htmlFor="file">Archivo Excel</Label>
-            <br />
             <Input
               id="file"
               type="file"
@@ -145,9 +137,8 @@ export function UploadForm({ onUpload }) {
             />
           </div>
 
-          <div>
+          <div className="grid gap-3">
             <Label>Proyecto</Label>
-            <br />
             <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecciona un proyecto" />
@@ -168,7 +159,7 @@ export function UploadForm({ onUpload }) {
 
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Subir</Button>
+          <ButtonComponent label={'Subir'} fullWidth={true} onClick={handleSubmit}/>
         </DialogFooter>
       </DialogContent>
     </Dialog>

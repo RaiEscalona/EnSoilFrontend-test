@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { formatCoordinates } from '@/utils/coordinateUtils';
 import './DrillingPointListItem.css';
 import { CheckSquare, Square } from 'lucide-react';
-import Button from './button';
+import ButtonComponent from '../utils/button';
 
 export default function DrillingPointListItem({ projectId, point, isSelected, onCheckboxChange }) {
   const route = `/projects/${projectId}/map/drillingPoint/${point.id}`;
@@ -16,7 +16,7 @@ export default function DrillingPointListItem({ projectId, point, isSelected, on
       {/* <div className="dpi-link">
         <Link href={route} className="dpi-link-btn">Ver</Link>
       </div> */}
-      <Button label={'Ver'} route={route}/>
+      <ButtonComponent label={'Ver'} route={route}/>
     </div>
   );
 } 
