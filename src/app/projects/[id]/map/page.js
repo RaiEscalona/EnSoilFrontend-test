@@ -1,25 +1,28 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { calculateCoordinates, formatCoordinates } from '@/utils/coordinateUtils';
-import DrillingPoint from '@/components/DrillingPoint';
-import Alert from '@/components/Alert';
-import MapUploader from '@/components/MapUploader';
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import api from '@/utils/axios';
 import './map.css';
-import Button from '@/components/button';
-import Image from 'next/image';
-import ZoomControls from '@/components/ZoomControls';
-import DrillingPointList from '@/components/DrillingPointList';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import CreatePoint from '@/components/CreatePoint/createPoint';
+import ProjectMap from '@/components/ProjectMap/projectMap';
+import Alert from '@/components/Alert/Alert';
+import ButtonComponent from '@/components/utils/button';
+import DrillingPointList from '@/components/DrillingPoint/DrillingPointList';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/ui/pagination';
 
 export default function ProjectMapPage() {
   const { id } = useParams();
-  const [mapImage, setMapImage] = useState(null);
   const [imageInfo, setImageInfo] = useState(null);
   const [drillingPoints, setDrillingPoints] = useState([]);
   const [showPointModal, setShowPointModal] = useState(false);
@@ -34,27 +37,53 @@ export default function ProjectMapPage() {
   });
   const [previewPoint, setPreviewPoint] = useState(null);
   const [mapScale, setMapScale] = useState(1);
-  const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
-  const mapContainerRef = useRef(null);
-  const modalMapRef = useRef(null);
-  const [mouseDownPos, setMouseDownPos] = useState(null);
-  // Estado para zoom y pan en el mapa principal
-  const [mainMapScale, setMainMapScale] = useState(1);
-  const [mainMapOffset, setMainMapOffset] = useState({ x: 0, y: 0 });
-  const [mainIsPanning, setMainIsPanning] = useState(false);
-  const [mainPanStart, setMainPanStart] = useState({ x: 0, y: 0 });
-  const [mainMouseDownPos, setMainMouseDownPos] = useState(null);
-  const mainMapRef = useRef(null);
-  const [minScale, setMinScale] = useState(1);
+  const [projectName, setProjectName] = useState('');
   // Estado para zoom y pan en el modal
-  const [modalMinScale, setModalMinScale] = useState(1);
-  const [modalMouseDownPos, setModalMouseDownPos] = useState(null);
-  const [isMouseOverMainMap, setIsMouseOverMainMap] = useState(false);
   const [selectedPoints, setSelectedPoints] = useState([]);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [viewMode, setViewMode] = useState('points'); // 'points' o 'analysisMethods'
+  const [analysisMethods, setAnalysisMethods] = useState([]);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [analysisCurrentPage, setAnalysisCurrentPage] = useState(1);
+  const [analysisItemsPerPage, setAnalysisItemsPerPage] = useState(10);
+  
+  // Estados para el modal de edición de costo
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingMethod, setEditingMethod] = useState(null);
+  const [editCost, setEditCost] = useState('');
+  const [isUpdatingCost, setIsUpdatingCost] = useState(false);
+  
+  // Estados para el modal de confirmación de eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingMethod, setDeletingMethod] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+
+  // Estados para vincular método de análisis
+  const [showLinkPopover, setShowLinkPopover] = useState(false);
+  const [allAnalysisMethods, setAllAnalysisMethods] = useState([]);
+  const [linkSearch, setLinkSearch] = useState('');
+  const [linkCandidates, setLinkCandidates] = useState([]);
+  const [selectedLinkMethod, setSelectedLinkMethod] = useState(null);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkCost, setLinkCost] = useState('');
+  const [isLinking, setIsLinking] = useState(false);
+
+  // Utilidad para formatear moneda CLP
+  const formatCurrency = (amount) => {
+    if (!amount || isNaN(amount)) return '$0';
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount);
+  };
+
+  // Utilidad para obtener el costo promedio de un método
+  const getAverageCost = (relatedProjects) => {
+    if (!Array.isArray(relatedProjects) || relatedProjects.length === 0) return 0;
+    const validCosts = relatedProjects
+      .map(p => typeof p.cost === 'number' ? p.cost : (typeof p.analysisCost === 'number' ? p.analysisCost : null))
+      .filter(c => typeof c === 'number' && !isNaN(c));
+    if (!validCosts.length) return 0;
+    return validCosts.reduce((a, b) => a + b, 0) / validCosts.length;
+  };
 
   useEffect(() => {
     console.log("Drilling Point:", drillingPoints);
@@ -64,6 +93,14 @@ export default function ProjectMapPage() {
     const fetchProjectData = async () => {
       try {
         console.log(`🔄 Cargando datos del proyecto ${id}`);
+        
+        // Obtener información del proyecto (incluyendo nombre)
+        const projectResponse = await api.get(`/projects`);
+        const project = projectResponse.data.projects.find(p => p.id === parseInt(id));
+        if (project) {
+          setProjectName(project.name);
+        }
+        
         const response = await api.get(`/images/projects/map/${id}`);
         console.log('✅ Datos del proyecto cargados:', response.data);
 
@@ -128,139 +165,6 @@ export default function ProjectMapPage() {
     }
   }, [id, imageInfo, fetchDrillingPoints]);
 
-  // Calcular minScale para el modal
-  useEffect(() => {
-    if (!imageInfo || !modalMapRef.current) return;
-    const container = modalMapRef.current;
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
-    const scaleX = containerWidth / imageInfo.width;
-    const scaleY = containerHeight / imageInfo.height;
-    const min = Math.max(scaleX, scaleY);
-    setModalMinScale(min);
-    setMapScale(min);
-    setMapOffset({ x: 0, y: 0 });
-  }, [imageInfo, showPointModal]);
-
-  // Limitar pan para que la imagen nunca deje ver bordes blancos en el modal
-  const clampModalPan = (offset, scale) => {
-    if (!imageInfo || !modalMapRef.current) return { x: 0, y: 0 };
-    const container = modalMapRef.current;
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
-    const imgWidth = imageInfo.width * scale;
-    const imgHeight = imageInfo.height * scale;
-    let minX = Math.min(0, containerWidth - imgWidth);
-    let minY = Math.min(0, containerHeight - imgHeight);
-    let maxX = 0;
-    let maxY = 0;
-    let x = Math.max(minX, Math.min(offset.x, maxX));
-    let y = Math.max(minY, Math.min(offset.y, maxY));
-    return { x, y };
-  };
-
-  // Pan handlers para el modal
-  const handlePanStart = (e) => {
-    e.preventDefault();
-    setIsPanning(true);
-    setPanStart({
-      x: e.clientX - mapOffset.x,
-      y: e.clientY - mapOffset.y,
-    });
-    setModalMouseDownPos({ x: e.clientX, y: e.clientY });
-  };
-
-  const handlePanMove = (e) => {
-    if (!isPanning) return;
-    const newOffset = {
-      x: e.clientX - panStart.x,
-      y: e.clientY - panStart.y,
-    };
-    setMapOffset(clampModalPan(newOffset, mapScale));
-  };
-
-  const handlePanEnd = (e) => {
-    setIsPanning(false);
-    if (modalMouseDownPos && e) {
-      const dx = e.clientX - modalMouseDownPos.x;
-      const dy = e.clientY - modalMouseDownPos.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < 5) {
-        // Es un click real, seleccionar punto
-        handleMapClick(e);
-      }
-    }
-    setModalMouseDownPos(null);
-  };
-
-  // Zoom centrado en el mouse para el modal
-  const handleZoom = (e) => {
-    e.preventDefault();
-    if (!modalMapRef.current) return;
-    const container = modalMapRef.current;
-    const rect = container.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const prevScale = mapScale;
-    let newScale = mapScale;
-    if (e.deltaY < 0) {
-      newScale = Math.min(mapScale + 0.1, 3);
-    } else {
-      newScale = Math.max(mapScale - 0.1, modalMinScale);
-    }
-    // Ajustar offset para centrar el zoom en el mouse
-    const imgX = (mouseX - mapOffset.x) / prevScale;
-    const imgY = (mouseY - mapOffset.y) / prevScale;
-    let newOffset = {
-      x: mouseX - imgX * newScale,
-      y: mouseY - imgY * newScale,
-    };
-    newOffset = clampModalPan(newOffset, newScale);
-    setMapScale(newScale);
-    setMapOffset(newOffset);
-  };
-
-  // Click para calcular coordenadas considerando pan y zoom en el modal
-  const handleMapClick = (e) => {
-    if (!imageInfo || !modalMapRef.current) return;
-    const rect = modalMapRef.current.getBoundingClientRect();
-    // Ajustar por pan y zoom
-    const x = (e.clientX - rect.left - mapOffset.x) / mapScale;
-    const y = (e.clientY - rect.top - mapOffset.y) / mapScale;
-    // Calcular coordenadas
-    const east = imageInfo.topLeft.east + (x / imageInfo.width) * (imageInfo.bottomRight.east - imageInfo.topLeft.east);
-    const north = imageInfo.topLeft.north + (y / imageInfo.height) * (imageInfo.bottomRight.north - imageInfo.topLeft.north);
-    setNewPointData(prev => ({
-      ...prev,
-      coordinates: {
-        east: east.toFixed(6),
-        north: north.toFixed(6)
-      }
-    }));
-  };
-
-  // Calcular preview point considerando pan y zoom
-  useEffect(() => {
-    if (!imageInfo || !newPointData.coordinates.east || !newPointData.coordinates.north) {
-      setPreviewPoint(null);
-      return;
-    }
-    // Posición relativa en porcentaje
-    const xPct = (parseFloat(newPointData.coordinates.east) - imageInfo.topLeft.east) / (imageInfo.bottomRight.east - imageInfo.topLeft.east);
-    const yPct = (parseFloat(newPointData.coordinates.north) - imageInfo.topLeft.north) / (imageInfo.bottomRight.north - imageInfo.topLeft.north);
-    setPreviewPoint({ xPct, yPct });
-  }, [newPointData.coordinates, imageInfo]);
-
-  const handleCoordinateChange = (axis, value) => {
-    setNewPointData(prev => ({
-      ...prev,
-      coordinates: {
-        ...prev.coordinates,
-        [axis]: value
-      }
-    }));
-  };
-
   const handleCreatePoint = async () => {
     if (!newPointData.tag || !newPointData.coordinates.east || !newPointData.coordinates.north) return;
 
@@ -320,102 +224,6 @@ export default function ProjectMapPage() {
     console.log('🔄 showPointModal cambió a:', showPointModal);
   }, [showPointModal]);
 
-  // Calcular minScale cuando la imagen y el contenedor están listos
-  useEffect(() => {
-    if (!imageInfo || !mainMapRef.current || !imageLoaded) return;
-    const container = mainMapRef.current;
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
-    const scaleX = containerWidth / imageInfo.width;
-    const scaleY = containerHeight / imageInfo.height;
-    const min = Math.max(scaleX, scaleY);
-    setMinScale(min);
-    setMainMapScale(min);
-    setMainMapOffset({ x: 0, y: 0 });
-  }, [imageInfo, imageLoaded]);
-
-  // Limitar pan para que la imagen nunca deje ver bordes blancos
-  const clampPan = (offset, scale) => {
-    if (!imageInfo || !mainMapRef.current) return { x: 0, y: 0 };
-    const container = mainMapRef.current;
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
-    const imgWidth = imageInfo.width * scale;
-    const imgHeight = imageInfo.height * scale;
-    let minX = Math.min(0, containerWidth - imgWidth);
-    let minY = Math.min(0, containerHeight - imgHeight);
-    let maxX = 0;
-    let maxY = 0;
-    let x = Math.max(minX, Math.min(offset.x, maxX));
-    let y = Math.max(minY, Math.min(offset.y, maxY));
-    return { x, y };
-  };
-
-  // Pan handlers para el mapa principal
-  const handleMainPanStart = (e) => {
-    e.preventDefault();
-    setMainIsPanning(true);
-    setMainPanStart({
-      x: e.clientX - mainMapOffset.x,
-      y: e.clientY - mainMapOffset.y,
-    });
-    setMainMouseDownPos({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMainPanMove = (e) => {
-    if (!mainIsPanning) return;
-    const newOffset = {
-      x: e.clientX - mainPanStart.x,
-      y: e.clientY - mainPanStart.y,
-    };
-    setMainMapOffset(clampPan(newOffset, mainMapScale));
-  };
-
-  const handleMainPanEnd = () => {
-    setMainIsPanning(false);
-    setMainMouseDownPos(null);
-  };
-
-  // Zoom centrado en el mouse para el mapa principal
-  const handleMainZoom = (e) => {
-    e.preventDefault();
-    if (!mainMapRef.current) return;
-    const container = mainMapRef.current;
-    const rect = container.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const prevScale = mainMapScale;
-    let newScale = mainMapScale;
-    if (e.deltaY < 0) {
-      newScale = Math.min(mainMapScale + 0.1, 3);
-    } else {
-      newScale = Math.max(mainMapScale - 0.1, minScale);
-    }
-    // Ajustar offset para centrar el zoom en el mouse
-    const imgX = (mouseX - mainMapOffset.x) / prevScale;
-    const imgY = (mouseY - mainMapOffset.y) / prevScale;
-    let newOffset = {
-      x: mouseX - imgX * newScale,
-      y: mouseY - imgY * newScale,
-    };
-    newOffset = clampPan(newOffset, newScale);
-    setMainMapScale(newScale);
-    setMainMapOffset(newOffset);
-  };
-
-  // Validar si las coordenadas están dentro del mapa
-  const isPointInBounds = () => {
-    if (!imageInfo) return false;
-    const east = parseFloat(newPointData.coordinates.east);
-    const north = parseFloat(newPointData.coordinates.north);
-    if (isNaN(east) || isNaN(north)) return false;
-    const minEast = Math.min(imageInfo.topLeft.east, imageInfo.bottomRight.east);
-    const maxEast = Math.max(imageInfo.topLeft.east, imageInfo.bottomRight.east);
-    const minNorth = Math.min(imageInfo.topLeft.north, imageInfo.bottomRight.north);
-    const maxNorth = Math.max(imageInfo.topLeft.north, imageInfo.bottomRight.north);
-    return east >= minEast && east <= maxEast && north >= minNorth && north <= maxNorth;
-  };
-
   useEffect(() => {
     if (showPointModal) {
       document.body.style.overflow = 'hidden';
@@ -426,17 +234,6 @@ export default function ProjectMapPage() {
       document.body.style.overflow = 'auto';
     };
   }, [showPointModal]);
-
-  useEffect(() => {
-    if (isMouseOverMainMap) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [isMouseOverMainMap]);
 
   // Cuando se cargan los puntos, selecciona todos por defecto
   useEffect(() => {
@@ -504,6 +301,172 @@ export default function ProjectMapPage() {
     saveAs(blob, `proyecto_${project.id}_puntos.xlsx`);
   }
 
+  // Fetch analysis methods
+  const fetchAnalysisMethods = useCallback(async () => {
+    setLoadingAnalysis(true);
+    try {
+      const response = await api.get(`/analysisMethods/${id}`);
+      setAnalysisMethods(response.data.data);
+    } catch (error) {
+      setAnalysisMethods([]);
+      setAlertMessage('Error al cargar los métodos de análisis.');
+      setShowAlert(true);
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (viewMode === 'analysisMethods') {
+      fetchAnalysisMethods();
+    }
+  }, [viewMode, fetchAnalysisMethods]);
+
+  // Paginación para métodos de análisis
+  const analysisTotalItems = analysisMethods.length;
+  const analysisTotalPages = Math.ceil(analysisTotalItems / analysisItemsPerPage);
+  const analysisStartIndex = (analysisCurrentPage - 1) * analysisItemsPerPage;
+  const analysisEndIndex = analysisStartIndex + analysisItemsPerPage;
+  const paginatedAnalysisMethods = analysisMethods.slice(analysisStartIndex, analysisEndIndex);
+  const generateAnalysisPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    if (analysisTotalPages <= maxVisiblePages) {
+      for (let i = 1; i <= analysisTotalPages; i++) pages.push(i);
+    } else {
+      if (analysisCurrentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('ellipsis');
+        pages.push(analysisTotalPages);
+      } else if (analysisCurrentPage >= analysisTotalPages - 2) {
+        pages.push(1);
+        pages.push('ellipsis');
+        for (let i = analysisTotalPages - 3; i <= analysisTotalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('ellipsis');
+        for (let i = analysisCurrentPage - 1; i <= analysisCurrentPage + 1; i++) pages.push(i);
+        pages.push('ellipsis');
+        pages.push(analysisTotalPages);
+      }
+    }
+    return pages;
+  };
+
+  // Función para manejar la actualización del costo
+  const handleUpdateCost = async () => {
+    if (!editingMethod || !editCost) return;
+    
+    setIsUpdatingCost(true);
+    try {
+      const response = await api.patch(`/analysisMethods/${editingMethod.id}`, {
+        name: editingMethod.name,
+        matrixType: editingMethod.matrixType,
+        source: editingMethod.source,
+        laboratoryName: editingMethod.labName,
+        projectId: parseInt(id),
+        cost: parseFloat(editCost)
+      });
+
+      // Actualizar la lista de métodos de análisis
+      setAnalysisMethods(prevMethods => 
+        prevMethods.map(method => 
+          method.id === editingMethod.id 
+            ? { ...method, projectCost: parseFloat(editCost) }
+            : method
+        )
+      );
+
+      setShowEditModal(false);
+      setEditingMethod(null);
+      setEditCost('');
+      setAlertMessage('Costo actualizado correctamente');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error actualizando costo:', error);
+      setAlertMessage(error.response?.data?.error || 'Error al actualizar el costo');
+      setShowAlert(true);
+    } finally {
+      setIsUpdatingCost(false);
+    }
+  };
+
+  // Función para cerrar el modal de edición
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingMethod(null);
+    setEditCost('');
+  };
+
+  // Función para abrir el modal de confirmación de eliminación
+  const handleOpenDeleteModal = (method) => {
+    setDeletingMethod(method);
+    setShowDeleteModal(true);
+    setDeleteConfirmation('');
+  };
+
+  // Función para manejar la eliminación del método de análisis
+  const handleDeleteMethod = async () => {
+    if (!deletingMethod || deleteConfirmation !== 'confirmar eliminar') return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await api.delete(`/analysisMethods/${deletingMethod.id}`);
+      
+      // Actualizar la lista de métodos de análisis
+      setAnalysisMethods(prevMethods => 
+        prevMethods.filter(method => method.id !== deletingMethod.id)
+      );
+
+      setShowDeleteModal(false);
+      setDeletingMethod(null);
+      setDeleteConfirmation('');
+      setAlertMessage('Método de análisis eliminado correctamente');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error eliminando método:', error);
+      setAlertMessage(error.response?.data?.error || 'Error al eliminar el método de análisis');
+      setShowAlert(true);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Función para cerrar el modal de eliminación
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeletingMethod(null);
+    setDeleteConfirmation('');
+  };
+
+  // Cargar todos los métodos de análisis y filtrar los no vinculados
+  const fetchAllAnalysisMethods = useCallback(async () => {
+    try {
+      const response = await api.get('/analysisMethods/all');
+      setAllAnalysisMethods(response.data.data);
+    } catch (error) {
+      setAlertMessage('Error al cargar todos los métodos de análisis');
+      setShowAlert(true);
+    }
+  }, []);
+
+  // Filtrar métodos no vinculados al proyecto actual
+  useEffect(() => {
+    if (!allAnalysisMethods.length) {
+      setLinkCandidates([]);
+      return;
+    }
+    const linkedIds = new Set(analysisMethods.map(m => m.id));
+    const filtered = allAnalysisMethods.filter(m => !linkedIds.has(m.id));
+    setLinkCandidates(filtered);
+  }, [allAnalysisMethods, analysisMethods]);
+
+  // Buscar por nombre ignorando mayúsculas y espacios
+  const normalized = s => s.replace(/\s+/g, '').toLowerCase();
+  const filteredLinkCandidates = linkSearch.trim()
+    ? linkCandidates.filter(m => normalized(m.name).includes(normalized(linkSearch)))
+    : linkCandidates;
+
   if (isLoading) {
     return <div className="loading">Cargando...</div>;
   }
@@ -512,302 +475,407 @@ export default function ProjectMapPage() {
     <WithSidebarLayout>
     <div className="dark:bg-secondary map-page-container">
       <div className="map-header">
-        <div className="text-h2">Mapa del Proyecto</div>
-        <Button label={"Ir a Análisis"} route={`/projects/${id}/analysis`} size="h4" fullWidth={false}></Button>
+        <div className="text-h2">{projectName}</div>
+        <ButtonComponent label={"Ir a Análisis"} route={`/projects/${id}/analysis`} size="h4" fullWidth={false}></ButtonComponent>
       </div>
       
       {showAlert && (
-        <Alert 
+        <Alert
           message={alertMessage} 
           onClose={() => setShowAlert(false)} 
         />
       )}
 
-      <div className="map-card">
-        {!imageInfo ? (
-          <MapUploader onMapDataReady={handleMapDataReady} />
-        ) : (
-          <div
-            className="map-display-container"
-            style={{
-              overflow: 'hidden',
-              background: '#fff',
-              borderRadius: '8px',
-              position: 'relative',
-              width: '100%',
-              maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%',
-              aspectRatio: imageInfo ? `${imageInfo.width} / ${imageInfo.height}` : '4 / 3',
-              margin: '0 auto',
-              minHeight: imageInfo ? `${imageInfo.height * (Math.min(imageInfo.width, 1000) / imageInfo.width)}px` : '300px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <div className="flex justify-center mb-4">
-              <Button 
-                label="Crear punto nuevo" 
-                onClick={() => {
-                  console.log('🔄 Botón "Crear punto nuevo" clickeado');
-                  handleOpenCreatePointModal();
-                }}
-                size="h4" 
-                fullWidth={false}
-              />
-            </div>
-            <div
-              ref={mainMapRef}
-              className="map-image-container"
-              onWheel={handleMainZoom}
-              onMouseDown={handleMainPanStart}
-              onMouseMove={handleMainPanMove}
-              onMouseUp={handleMainPanEnd}
-              onMouseLeave={() => { handleMainPanEnd(); setIsMouseOverMainMap(false); }}
-              onMouseEnter={() => setIsMouseOverMainMap(true)}
-              style={{
-                width: '100%',
-                height: '100%',
-                cursor: mainIsPanning ? 'grabbing' : 'grab',
-                userSelect: 'none',
-                position: 'relative',
-                overflow: 'hidden',
-                background: '#fff',
-                borderRadius: '8px',
-              }}
-            >
-              <div
-                style={{
-                  width: `${imageInfo?.width ?? 800}px`,
-                  height: `${imageInfo?.height ?? 600}px`,
-                  position: 'absolute',
-                  left: mainMapOffset.x,
-                  top: mainMapOffset.y,
-                  transform: `scale(${mainMapScale})`,
-                  transformOrigin: 'top left',
-                  transition: mainIsPanning ? 'none' : 'transform 0.1s',
-                }}
-              >
-                <Image
-                  src={imageInfo.url}
-                  alt="Mapa del proyecto"
-                  className="map-image"
-                  fill={false}
-                  width={imageInfo?.width ?? 800}
-                  height={imageInfo?.height ?? 600}
-                  style={{ objectFit: 'cover', width: '100%', height: '100%', pointerEvents: 'none' }}
-                  onLoad={() => setImageLoaded(true)}
-                />
-                {drillingPoints
-                  .filter(p => selectedPoints.includes(p.id))
-                  .filter(p => p.clickPosition.x >= 0 && p.clickPosition.x <= imageInfo.width && p.clickPosition.y >= 0 && p.clickPosition.y <= imageInfo.height)
-                  .map((point) => {
-                    const size = 20 / mainMapScale;
-                    const border = 2 / mainMapScale;
-                    return (
-                      <div
-                        key={point.id}
-                        style={{
-                          position: 'absolute',
-                          left: `${point.clickPosition.x}px`,
-                          top: `${point.clickPosition.y}px`,
-                          transform: `translate(-50%, -50%)`,
-                          width: `${size}px`,
-                          height: `${size}px`,
-                          zIndex: 2,
-                          pointerEvents: 'auto',
-                        }}
-                      >
-                        <DrillingPoint
-                          projectId={id}
-                          id={point.id}
-                          point={point}
-                          imageInfo={imageInfo}
-                          clickPosition={{ x: 0, y: 0 }}
-                          size={size}
-                          border={border}
-                        />
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-            {/* Botones de zoom SOLO para el mapa principal, ocultos si el modal está abierto */}
-            {!showPointModal && (
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', pointerEvents: 'none' }}>
-                <div style={{ margin: 16, pointerEvents: 'auto', zIndex: 200 }}>
-                  <ZoomControls
-                    onZoomIn={(e) => {
-                      if (e) e.stopPropagation();
-                      const newScale = Math.min(mainMapScale + 0.1, 3);
-                      setMainMapScale(newScale);
-                      setMainMapOffset(clampPan(mainMapOffset, newScale));
-                    }}
-                    onZoomOut={(e) => {
-                      if (e) e.stopPropagation();
-                      const newScale = Math.max(mainMapScale - 0.1, minScale);
-                      setMainMapScale(newScale);
-                      setMainMapOffset(clampPan(mainMapOffset, newScale));
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        <ProjectMap 
+          id={id}
+          imageInfo={imageInfo} 
+          handleMapDataReady={handleMapDataReady} 
+          handleOpenCreatePointModal={handleOpenCreatePointModal} 
+          drillingPoints={drillingPoints} 
+          selectedPoints={selectedPoints} 
+          showPointModal={showPointModal} />
+
+      {/* Botones para cambiar la vista debajo del mapa */}
+      <div style={{ display: 'flex', gap: 16, margin: '32px auto 16px auto', maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%' }}>
+        <Button
+          onClick={() => setViewMode('points')}
+          className={`px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
+            viewMode === 'points' 
+              ? 'bg-primary text-white shadow-md' 
+              : 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200'
+          }`}
+        >
+          Ver puntos de perforación
+        </Button>
+        <Button
+          onClick={() => setViewMode('analysisMethods')}
+          className={`px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
+            viewMode === 'analysisMethods' 
+              ? 'bg-primary text-white shadow-md' 
+              : 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200'
+          }`}
+        >
+          Ver métodos de análisis
+        </Button>
       </div>
 
-      {/* Nueva sección: Lista de puntos de perforación */}
-      <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '32px auto 0 auto' }}>
-        <div className="text-h3" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-          Lista de Puntos de Perforación
-          <Button label={'Exportar puntos'} onClick={() => {
-              if (!imageInfo) return;
-              const selected = drillingPoints.filter(p => selectedPoints.includes(p.id));
-              exportSelectedPointsToExcel({ id, url: imageInfo.url }, selected);
-            }}/>
-        </div>
-        <DrillingPointList projectId={id} drillingPoints={drillingPoints} selectedPoints={selectedPoints} setSelectedPoints={setSelectedPoints} />
-      </div>
-
-      {showPointModal && (
-        <div className="modal-backdrop">
-          <div className="modal-content bg-white dark:bg-quaternary" style={{ maxWidth: '700px', width: '90vw' }}>
-            <h2 className="text-h3 text-black">Crear Nuevo Punto</h2>
-            <div className="modal-body" style={{ display: 'flex', gap: '1rem', padding: '0.75rem' }}>
-              <div className="flex-1" style={{ position: 'relative', height: '350px', overflow: 'hidden', background: '#f8f8f8', borderRadius: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                <div 
-                  ref={modalMapRef}
-                  className="map-image-container"
-                  onWheel={handleZoom}
-                  onMouseDown={handlePanStart}
-                  onMouseMove={handlePanMove}
-                  onMouseUp={handlePanEnd}
-                  onMouseLeave={() => { setIsPanning(false); setModalMouseDownPos(null); }}
-                  style={{ 
-                    width: '100%',
-                    height: '100%',
-                    cursor: isPanning ? 'grabbing' : 'grab',
-                    userSelect: 'none',
-                    position: 'relative',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${imageInfo?.width ?? 800}px`,
-                      height: `${imageInfo?.height ?? 600}px`,
-                      position: 'absolute',
-                      left: mapOffset.x,
-                      top: mapOffset.y,
-                      transform: `scale(${mapScale})`,
-                      transformOrigin: 'top left',
-                      transition: isPanning ? 'none' : 'transform 0.1s',
-                    }}
-                  >
-                    <Image
-                      src={imageInfo.url}
-                      alt="Mapa del proyecto"
-                      className="map-image"
-                      fill={false}
-                      width={imageInfo?.width ?? 800}
-                      height={imageInfo?.height ?? 600}
-                      style={{ objectFit: 'cover', width: '100%', height: '100%', pointerEvents: 'none' }}
-                    />
-                    {previewPoint && (
-                      <div
-                        className="preview-point"
-                        style={{
-                          position: 'absolute',
-                          left: `calc(${previewPoint.xPct * 100}% )`,
-                          top: `calc(${previewPoint.yPct * 100}% )`,
-                          transform: 'translate(-50%, -50%)',
-                          width: `${20 / mapScale}px`,
-                          height: `${20 / mapScale}px`,
-                          backgroundColor: 'green',
-                          borderRadius: '50%',
-                          border: `${2 / mapScale}px solid white`,
-                          boxShadow: '0 0 0 2px rgba(0,0,0,0.3)',
-                          pointerEvents: 'none',
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-                {/* Botones de zoom para el modal debajo del mapa (únicos) */}
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 6 }}>
-                  <ZoomControls
-                    onZoomIn={(e) => {
-                      if (e) e.stopPropagation();
-                      const newScale = Math.min(mapScale + 0.1, 3);
-                      setMapScale(newScale);
-                      setMapOffset(clampModalPan(mapOffset, newScale));
-                    }}
-                    onZoomOut={(e) => {
-                      if (e) e.stopPropagation();
-                      const newScale = Math.max(mapScale - 0.1, modalMinScale);
-                      setMapScale(newScale);
-                      setMapOffset(clampModalPan(mapOffset, newScale));
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="space-y-2">
-                  <div>
-                    <label className="modal-input-label text-h4 text-black">Nombre del Punto</label>
-                    <input
-                      type="text"
-                      value={newPointData.tag}
-                      onChange={(e) => setNewPointData({ ...newPointData, tag: e.target.value })}
-                      className="modal-input dark:bg-white text-black px-2"
-                      placeholder='Ingrese un nombre'
-                      autoFocus
-                    />
-                  </div>
-                  <div>
-                    <label className="modal-input-label text-h4 text-black">Coordenada Este</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={newPointData.coordinates.east}
-                      onChange={(e) => handleCoordinateChange('east', e.target.value)}
-                      className="modal-input dark:bg-white text-black px-2"
-                      placeholder="Ingrese la coordenada este"
-                    />
-                  </div>
-                  <div>
-                    <label className="modal-input-label text-h4 text-black">Coordenada Norte</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={newPointData.coordinates.north}
-                      onChange={(e) => handleCoordinateChange('north', e.target.value)}
-                      className="modal-input dark:bg-white text-black px-2"
-                      placeholder="Ingrese la coordenada norte"
-                    />
-                  </div>
-                  <div className="modal-footer">
-                    {!isPointInBounds() && (
-                      <div style={{ color: 'red', marginBottom: '6px', fontSize: '0.9em' }}>
-                        Las coordenadas están fuera de los límites del mapa.
-                      </div>
-                    )}
-                    
-                    <Button label={'Cancelar'} onClick={() => {
-                        setShowPointModal(false);
-                        setNewPointData({ tag: '', coordinates: { east: '', north: '' } });
-                        setPreviewPoint(null);
-                        setMapScale(1);
-                      }}/>
-                      
-                    <Button label={'Crear punto'} onClick={handleCreatePoint} disable={!newPointData.tag || !newPointData.coordinates.east || !newPointData.coordinates.north || !isPointInBounds()}/>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Vista condicional debajo del mapa */}
+      {viewMode === 'points' && (
+        <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '0 auto' }}>
+          <div className="text-h3" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+            Lista de Puntos de Perforación
+            <ButtonComponent label={'Exportar puntos'} onClick={() => {
+                if (!imageInfo) return;
+                const selected = drillingPoints.filter(p => selectedPoints.includes(p.id));
+                exportSelectedPointsToExcel({ id, url: imageInfo.url }, selected);
+              }}/>
           </div>
+          <DrillingPointList projectId={id} drillingPoints={drillingPoints} selectedPoints={selectedPoints} setSelectedPoints={setSelectedPoints} />
         </div>
       )}
+      {viewMode === 'analysisMethods' && (
+        <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '0 auto' }}>
+          <div className="flex justify-between items-center mb-4">
+            <div className="text-h3" style={{ marginBottom: 0, display: 'flex', alignItems: 'center', gap: 16 }}>
+              Métodos de Análisis del Proyecto
+            </div>
+            <Popover open={showLinkPopover} onOpenChange={open => {
+              setShowLinkPopover(open);
+              if (open && allAnalysisMethods.length === 0) fetchAllAnalysisMethods();
+            }}>
+              <PopoverTrigger asChild>
+                <Button className="bg-primary hover:bg-green-800 text-white cursor-pointer transition-all duration-200 hover:scale-105">
+                  Vincular método
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-md">
+                <div className="p-3 border-b">
+                  <Input
+                    placeholder="Buscar método..."
+                    value={linkSearch}
+                    onChange={e => setLinkSearch(e.target.value)}
+                    className="bg-white border-gray-300 text-gray-900"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {filteredLinkCandidates.length === 0 ? (
+                    <div className="p-4 text-gray-500 text-center text-sm">No hay métodos disponibles</div>
+                  ) : (
+                    filteredLinkCandidates.map(method => (
+                      <button
+                        key={method.id}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-900 border-b last:border-b-0"
+                        onClick={() => {
+                          setSelectedLinkMethod(method);
+                          setShowLinkPopover(false);
+                          setShowLinkModal(true);
+                        }}
+                      >
+                        <div className="font-medium">{method.name}</div>
+                        <div className="text-xs text-gray-500">
+                          Costo promedio: {formatCurrency(getAverageCost(method.relatedProjects))}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+          {loadingAnalysis ? (
+            <div>Cargando métodos de análisis...</div>
+          ) : analysisMethods.length === 0 ? (
+            <div className="text-center text-gray-500 text-lg py-12">
+              No hay métodos de análisis vinculados a este proyecto actualmente
+            </div>
+          ) : (
+            <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+              <span className="text-sm text-gray-600">Mostrar:</span>
+              <select value={analysisItemsPerPage} onChange={e => { setAnalysisItemsPerPage(Number(e.target.value)); setAnalysisCurrentPage(1); }} className="cursor-pointer">
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span className="text-sm text-gray-600">elementos por página</span>
+              <span className="text-sm text-gray-600">Mostrando {analysisStartIndex + 1} a {Math.min(analysisEndIndex, analysisTotalItems)} de {analysisTotalItems} resultados</span>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Matriz</TableHead>
+                  <TableHead>Fuente</TableHead>
+                  <TableHead>Laboratorio</TableHead>
+                  <TableHead>Costo Actual (UF)</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedAnalysisMethods.map((method) => (
+                  <TableRow key={method.id}>
+                    <TableCell>{method.name}</TableCell>
+                    <TableCell>{method.matrixType}</TableCell>
+                    <TableCell>{method.source}</TableCell>
+                    <TableCell>{method.labName}</TableCell>
+                    <TableCell>{method.projectCost}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-blue-500 hover:text-blue-700 cursor-pointer"
+                          onClick={() => {
+                            setEditingMethod(method);
+                            setShowEditModal(true);
+                            setEditCost(method.projectCost.toString());
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-500 hover:text-red-700 cursor-pointer"
+                          onClick={() => handleOpenDeleteModal(method)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            {analysisTotalPages > 1 && (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => setAnalysisCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className={`${analysisCurrentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
+                      />
+                    </PaginationItem>
+                    {generateAnalysisPageNumbers().map((page, index) => (
+                      <PaginationItem key={index}>
+                        {page === 'ellipsis' ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            onClick={() => setAnalysisCurrentPage(page)}
+                            isActive={analysisCurrentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => setAnalysisCurrentPage(prev => Math.min(prev + 1, analysisTotalPages))}
+                        className={`${analysisCurrentPage === analysisTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+            </>
+          )}
+        </div>
+      )}
+      {showPointModal && (<CreatePoint 
+        imageInfo={imageInfo} 
+        handleCreatePoint={handleCreatePoint} 
+        mapScale={mapScale} 
+        setMapScale={setMapScale} 
+        previewPoint={previewPoint} 
+        setPreviewPoint={setPreviewPoint} 
+        newPointData={newPointData} 
+        setNewPointData={setNewPointData} 
+        showPointModal={showPointModal} 
+        setShowPointModal={setShowPointModal}/>)}
+
+      {/* Modal para editar costo del método de análisis */}
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="sm:max-w-[425px] bg-white border-gray-200">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900">Editar Costo del Método de Análisis</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="methodName" className="text-gray-700">
+                Método
+              </Label>
+              <div className="bg-gray-50 border border-gray-300 rounded-md px-3 py-2">
+                <span className="text-sm text-gray-900 font-medium">
+                  {editingMethod?.name}
+                </span>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="cost" className="text-gray-700">
+                Costo (UF) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="cost"
+                type="number"
+                step="0.01"
+                min="0"
+                value={editCost}
+                onChange={(e) => setEditCost(e.target.value)}
+                placeholder="Ingrese el nuevo costo"
+                className="bg-white border-gray-300 text-gray-900"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={handleCloseEditModal} className="border-gray-300 text-gray-700">
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleUpdateCost} 
+              disabled={isUpdatingCost || !editCost}
+              className="bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isUpdatingCost ? 'Actualizando...' : 'Actualizar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para confirmar eliminación del método de análisis */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="sm:max-w-[500px] bg-white border-gray-200">
+          <DialogHeader>
+            <DialogTitle className="text-red-600 flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              Confirmar Eliminación
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h4 className="font-semibold text-red-800 mb-2">⚠️ Advertencia Importante</h4>
+              <p className="text-red-700 text-sm mb-3">
+                Eliminar un método de análisis que se esté usando en proyectos puede generar inconsistencias en los datos. 
+                Este botón debe usarse únicamente si se equivocaron en la creación de un método y están seguros de que no provocará ningún cambio indebido.
+              </p>
+              <p className="text-red-700 text-sm font-medium">
+                Método a eliminar: <span className="font-bold">{deletingMethod?.name}</span>
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="deleteConfirmation" className="text-gray-700">
+                Para confirmar la eliminación, escriba exactamente: <span className="font-mono text-red-600">&quot;confirmar eliminar&quot;</span>
+              </Label>
+              <Input
+                id="deleteConfirmation"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                placeholder="confirmar eliminar"
+                className="bg-white border-gray-300 text-gray-900"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleCloseDeleteModal} 
+              className="border-gray-300 text-gray-700"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleDeleteMethod}
+              disabled={deleteConfirmation !== 'confirmar eliminar'}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isDeleting ? 'Eliminando...' : 'Eliminar Método'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal para vincular método de análisis */}
+      <Dialog open={showLinkModal} onOpenChange={setShowLinkModal}>
+        <DialogContent className="sm:max-w-[425px] bg-white border-gray-200">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900">Vincular Método de Análisis</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="linkMethodName" className="text-gray-700">
+                Método
+              </Label>
+              <div className="bg-gray-50 border border-gray-300 rounded-md px-3 py-2">
+                <span className="text-sm text-gray-900 font-medium">
+                  {selectedLinkMethod?.name}
+                </span>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="linkCost" className="text-gray-700">
+                Costo (UF) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="linkCost"
+                type="number"
+                step="0.01"
+                min="0"
+                value={linkCost}
+                onChange={e => setLinkCost(e.target.value)}
+                placeholder="Ingrese el costo"
+                className="bg-white border-gray-300 text-gray-900"
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => { setShowLinkModal(false); setSelectedLinkMethod(null); setLinkCost(''); }} className="border-gray-300 text-gray-700">
+              Cancelar
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!selectedLinkMethod || !linkCost) return;
+                setIsLinking(true);
+                const payload = {
+                  name: selectedLinkMethod.name,
+                  matrixType: selectedLinkMethod.matrixType,
+                  source: selectedLinkMethod.source,
+                  laboratoryName: selectedLinkMethod.laboratory?.name,
+                  projectId: parseInt(id),
+                  cost: parseFloat(linkCost)
+                };
+                try {
+                  console.log('Payload enviado:', payload);
+                  await api.post('/analysisMethods/', payload);
+                  setShowLinkModal(false);
+                  setSelectedLinkMethod(null);
+                  setLinkCost('');
+                  setAlertMessage('Método vinculado correctamente');
+                  setShowAlert(true);
+                  // Refrescar métodos de análisis vinculados
+                  fetchAnalysisMethods();
+                } catch (error) {
+                  console.error('❌ Error al vincular método:', error?.response?.data || error);
+                  setAlertMessage(error.response?.data?.error || 'Error al vincular el método');
+                  setShowAlert(true);
+                } finally {
+                  setIsLinking(false);
+                }
+              }}
+              disabled={isLinking || !linkCost}
+              className="bg-primary hover:bg-green-800 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isLinking ? 'Vinculando...' : 'Vincular'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
     </WithSidebarLayout>
   );

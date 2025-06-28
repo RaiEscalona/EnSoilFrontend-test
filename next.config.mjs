@@ -7,7 +7,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://raimundoserver.lat/:path*',
+        destination: 'https://ensoilapp.site/:path*',
       },
     ];
   },

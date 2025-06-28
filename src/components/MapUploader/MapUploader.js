@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import api from '@/utils/axios';
 import './MapUploader.css';
-import Button from './button';
+import ButtonComponent from '../utils/button';
 
 export default function MapUploader({ onMapDataReady }) {
   const { id } = useParams();
@@ -54,15 +54,15 @@ export default function MapUploader({ onMapDataReady }) {
     if (imageInfo && imageInfo.topLeft.north && imageInfo.topLeft.east && 
         imageInfo.bottomRight.north && imageInfo.bottomRight.east && selectedFile) {
       const formData = new FormData();
-      formData.append('projectId', id);
+      formData.append('projectId', String(id));
       formData.append('map', selectedFile);
       formData.append('name', selectedFile.name);
-      formData.append('topLeftEast', imageInfo.topLeft.east);
-      formData.append('topLeftNorth', imageInfo.topLeft.north);
-      formData.append('bottomRightEast', imageInfo.bottomRight.east);
-      formData.append('bottomRightNorth', imageInfo.bottomRight.north);
-      formData.append('width', imageInfo.width);
-      formData.append('height', imageInfo.height);
+      formData.append('topLeftEast', String(imageInfo.topLeft.east));
+      formData.append('topLeftNorth', String(imageInfo.topLeft.north));
+      formData.append('bottomRightEast', String(imageInfo.bottomRight.east));
+      formData.append('bottomRightNorth', String(imageInfo.bottomRight.north));
+      formData.append('width', String(imageInfo.width));
+      formData.append('height', String(imageInfo.height));
       try {
         console.log('🟢 Subiendo mapa para proyecto:', id);
         console.log('🟢 FormData:', {
@@ -107,7 +107,7 @@ export default function MapUploader({ onMapDataReady }) {
           // >
           //   Elegir Archivo
           // </button>
-          <Button label={'Elegir Archivo'} onClick={() => fileInputRef.current && fileInputRef.current.click()}/>
+          <ButtonComponent label={'Elegir Archivo'} onClick={() => fileInputRef.current && fileInputRef.current.click()}/>
         ) : (
           <div className="selected-file">
             <span className="file-name">{selectedFile.name}</span>
@@ -209,14 +209,8 @@ export default function MapUploader({ onMapDataReady }) {
           </div>
 
           <div className="submit-section">
-            <button
-              onClick={handleSubmit}
-              className="submit-button"
-              disabled={!imageInfo?.topLeft.north || !imageInfo?.topLeft.east || 
-                       !imageInfo?.bottomRight.north || !imageInfo?.bottomRight.east}
-            >
-              Guardar Configuración del Mapa
-            </button>
+            <ButtonComponent label={'Guardar Configuración del Mapa'} onClick={handleSubmit} disable={!imageInfo?.topLeft.north || !imageInfo?.topLeft.east || 
+                       !imageInfo?.bottomRight.north || !imageInfo?.bottomRight.east}/>
           </div>
         </div>
       )}

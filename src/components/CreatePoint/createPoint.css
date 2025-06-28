@@ -1,0 +1,125 @@
+
+/* Modal section */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* bg-black bg-opacity-50 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  /* background-color: white; */
+  /* padding: 1.5rem;
+  border-radius: 0.5rem; 
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  max-width: 28rem; 
+  width: 100%; */
+
+  background-color: var(--background);
+  color: var(--foreground);
+  padding: 1.5rem;
+  border-radius: 0.5rem; 
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  border: 1px solid var(--color-quaternary);
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 1.25rem; /* text-xl */
+  line-height: 1.75rem;
+  font-weight: 600; /* font-semibold */
+  margin-bottom: 1rem; /* mb-4 */
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* space-y-4 */
+  /* max-height: 70vh; */
+  overflow-y: auto;
+}
+
+.modal-input-label {
+  display: block;
+}
+
+.modal-input {
+  margin-top: 0.25rem; /* mt-1 */
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem; /* rounded-md */
+  border-color: #d1d5db; /* border-gray-300 */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+}
+
+.modal-input:focus {
+  border-color: #6366f1; /* focus:border-indigo-500 */
+  --tw-ring-color: #6366f1; /* focus:ring-indigo-500 */
+  box-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+}
+
+.modal-coordinates-text {
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  color: #4b5563; /* text-gray-600 */
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.modal-button {
+  padding-left: 1rem; /* px-4 */
+  padding-right: 1rem; /* px-4 */
+  padding-top: 0.5rem; /* py-2 */
+  padding-bottom: 0.5rem; /* py-2 */
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  font-weight: 500; /* font-medium */
+  border-radius: 0.375rem; /* rounded-md */
+}
+
+.modal-button-cancel {
+  color: #374151; /* text-gray-700 */
+  background-color: #f3f4f6; /* bg-gray-100 */
+}
+
+.modal-button-cancel:hover {
+  background-color: #e5e7eb; /* hover:bg-gray-200 */
+}
+
+.modal-button-confirm {
+  color: white;
+  background-color: #4f46e5; /* bg-indigo-600 */
+}
+
+.modal-button-confirm:hover {
+  background-color: #4338ca; /* hover:bg-indigo-700 */
+}
+
+.modal-map-image-container {
+  /* position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  overflow: hidden; */
+  min-height: 500px; 
+}
+
+.map-main-bg {
+  min-height: 100vh;
+}
+
+@media (max-width: 600px) {
+  .map-main-bg {
+    padding-left: 0;
+  }
+} 

@@ -1,7 +1,9 @@
-import HeaderEnsoil from "@/components/header-ensoil";
-import Carousel from "@/components/carousel";
-import Button from "@/components/button";
-import { Dot, FolderPlus } from "lucide-react";
+import HeaderEnsoil from "@/components/utils/header-ensoil";
+import Carousel from "@/components/utils/carousel";
+import ButtonComponent from "@/components/utils/button";
+import { Button } from "@/ui/button";
+import { Dot, FolderPlus, TestTube } from "lucide-react";
+import Link from "next/link";
 
 const slides = [
   {
@@ -33,7 +35,7 @@ export default function Home() {
       <HeaderEnsoil></HeaderEnsoil>
       <div className="flex flex-col justify-center items-center gap-10 h-100 p-5">
         <Carousel slides={slides}></Carousel>
-        <Button label={"Ingresar a tu cuenta"} route={'/login'} type="link" size={"text-h4"} fullWidth={false}></Button>
+        <ButtonComponent label={"Ingresar a tu cuenta"} route={'/login'} type="link" size={"text-h4"} fullWidth={false}></ButtonComponent>
       </div>
     </div>
   );
