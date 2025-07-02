@@ -69,20 +69,24 @@ export default function ProjectMapPage() {
   const [linkCost, setLinkCost] = useState('');
   const [isLinking, setIsLinking] = useState(false);
 
-  // Utilidad para formatear moneda CLP
+  // Utilidad para formatear moneda UF
   const formatCurrency = (amount) => {
-    if (!amount || isNaN(amount)) return '$0';
-    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount);
+    if (!amount || isNaN(amount)) return '$0.00';
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(amount);
   };
 
   // Utilidad para obtener el costo promedio de un método
   const getAverageCost = (relatedProjects) => {
     if (!Array.isArray(relatedProjects) || relatedProjects.length === 0) return 0;
     const validCosts = relatedProjects
-      .map(p => typeof p.cost === 'number' ? p.cost : (typeof p.analysisCost === 'number' ? p.analysisCost : null))
+      .map(p => {
+        if (typeof p.cost === 'number') return parseFloat(p.cost);
+        if (typeof p.analysisCost === 'number') return parseFloat(p.analysisCost);
+        return null;
+      })
       .filter(c => typeof c === 'number' && !isNaN(c));
     if (!validCosts.length) return 0;
-    return validCosts.reduce((a, b) => a + b, 0) / validCosts.length;
+    return validCosts.reduce((a, b) => a + b, 0.0) / validCosts.length;
   };
 
   useEffect(() => {
@@ -405,19 +409,16 @@ export default function ProjectMapPage() {
     setDeleteConfirmation('');
   };
 
-  // Función para manejar la eliminación del método de análisis
-  const handleDeleteMethod = async () => {
-    if (!deletingMethod || deleteConfirmation !== 'confirmar eliminar') return;
-    
+  // Función para manejar la desasociación de un método de análisis
+  const handleDisassociateProject = async () => {
+    if (!deletingMethod) return;
     setIsDeleting(true);
     try {
-      const response = await api.delete(`/analysisMethods/${deletingMethod.id}`);
-      
+      const response = await api.delete(`/analysisMethods/disassociateProject/${deletingMethod.id}/${parseInt(id)}`);
       // Actualizar la lista de métodos de análisis
       setAnalysisMethods(prevMethods => 
         prevMethods.filter(method => method.id !== deletingMethod.id)
       );
-
       setShowDeleteModal(false);
       setDeletingMethod(null);
       setDeleteConfirmation('');
@@ -548,7 +549,7 @@ export default function ProjectMapPage() {
                   Vincular método
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-md">
+              <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-md z-[9999]">
                 <div className="p-3 border-b">
                   <Input
                     placeholder="Buscar método..."
@@ -574,7 +575,10 @@ export default function ProjectMapPage() {
                       >
                         <div className="font-medium">{method.name}</div>
                         <div className="text-xs text-gray-500">
-                          Costo promedio: {formatCurrency(getAverageCost(method.relatedProjects))}
+                          Laboratorio: {method.laboratory?.name || 'Sin laboratorio'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Costo promedio (UF) : {formatCurrency(getAverageCost(method.relatedProjects))}
                         </div>
                       </button>
                     ))
@@ -748,38 +752,17 @@ export default function ProjectMapPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal para confirmar eliminación del método de análisis */}
+      {/* Modal para confirmar desasociar el método de análisis */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <DialogContent className="sm:max-w-[500px] bg-white border-gray-200">
+        <DialogContent className="sm:max-w-[400px] bg-white border-gray-200">
           <DialogHeader>
             <DialogTitle className="text-red-600 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
-              Confirmar Eliminación
+              Confirmar Desasociar Método de Análisis
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h4 className="font-semibold text-red-800 mb-2">⚠️ Advertencia Importante</h4>
-              <p className="text-red-700 text-sm mb-3">
-                Eliminar un método de análisis que se esté usando en proyectos puede generar inconsistencias en los datos. 
-                Este botón debe usarse únicamente si se equivocaron en la creación de un método y están seguros de que no provocará ningún cambio indebido.
-              </p>
-              <p className="text-red-700 text-sm font-medium">
-                Método a eliminar: <span className="font-bold">{deletingMethod?.name}</span>
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="deleteConfirmation" className="text-gray-700">
-                Para confirmar la eliminación, escriba exactamente: <span className="font-mono text-red-600">&quot;confirmar eliminar&quot;</span>
-              </Label>
-              <Input
-                id="deleteConfirmation"
-                value={deleteConfirmation}
-                onChange={(e) => setDeleteConfirmation(e.target.value)}
-                placeholder="confirmar eliminar"
-                className="bg-white border-gray-300 text-gray-900"
-              />
-            </div>
+          <div className="py-6 text-center text-gray-800 text-lg">
+            ¿Deseas desasociar el método <span className="font-bold">{deletingMethod?.name}</span> de este proyecto?
           </div>
           <div className="flex justify-end gap-2">
             <Button 
@@ -790,11 +773,11 @@ export default function ProjectMapPage() {
               Cancelar
             </Button>
             <Button 
-              onClick={handleDeleteMethod}
-              disabled={deleteConfirmation !== 'confirmar eliminar'}
-              className="bg-red-600 hover:bg-red-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
+              onClick={handleDisassociateProject}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isDeleting ? 'Eliminando...' : 'Eliminar Método'}
+              {isDeleting ? 'Desasociando...' : 'Confirmar desasociar'}
             </Button>
           </div>
         </DialogContent>
@@ -843,16 +826,13 @@ export default function ProjectMapPage() {
                 if (!selectedLinkMethod || !linkCost) return;
                 setIsLinking(true);
                 const payload = {
-                  name: selectedLinkMethod.name,
-                  matrixType: selectedLinkMethod.matrixType,
-                  source: selectedLinkMethod.source,
-                  laboratoryName: selectedLinkMethod.laboratory?.name,
+                  analysisMethodId: selectedLinkMethod.id,
                   projectId: parseInt(id),
                   cost: parseFloat(linkCost)
                 };
                 try {
                   console.log('Payload enviado:', payload);
-                  await api.post('/analysisMethods/', payload);
+                  await api.post('/analysisMethods/assignProjectCost', payload);
                   setShowLinkModal(false);
                   setSelectedLinkMethod(null);
                   setLinkCost('');

@@ -23,6 +23,7 @@ import Link from "next/link";
 import api from '@/utils/axios';
 import WithSidebarLayout from "@/components/layouts/layoutWithSidebar";
 import * as XLSX from 'xlsx';
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function MetodosAnalisis() {
   const [analysisMethods, setAnalysisMethods] = useState([]);
@@ -45,6 +46,10 @@ export default function MetodosAnalisis() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const [shouldLinkProject, setShouldLinkProject] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [projectSearch, setProjectSearch] = useState("");
+  const [selectedProject, setSelectedProject] = useState(null);
 
   // Obtener métodos de análisis desde el backend
   const fetchAnalysisMethods = async () => {
@@ -77,7 +82,13 @@ export default function MetodosAnalisis() {
       setShowAlert(true);
       return;
     }
-
+    if (shouldLinkProject) {
+      if (!selectedProject || !newMethod.cost) {
+        setAlertMessage('Debes seleccionar un proyecto y un costo para vincular.');
+        setShowAlert(true);
+        return;
+      }
+    }
     try {
       const methodData = {
         name: newMethod.name.trim(),
@@ -85,24 +96,18 @@ export default function MetodosAnalisis() {
         source: newMethod.source.trim(),
         laboratoryName: newMethod.laboratoryName
       };
-
-      // Agregar projectId y cost solo si ambos están presentes
-      if (newMethod.projectId && newMethod.cost) {
-        methodData.projectId = parseInt(newMethod.projectId);
+      if (shouldLinkProject && selectedProject && newMethod.cost) {
+        methodData.projectId = selectedProject.id;
         methodData.cost = parseFloat(newMethod.cost);
       }
-
       const response = await api.post('/analysisMethods/', methodData);
-      
-      // Cerrar modal y limpiar formulario
       setIsDialogOpen(false);
       setNewMethod({ name: '', matrixType: '', source: '', laboratoryName: '', projectId: '', cost: '' });
       setCurrentPage(1);
-      
-      // Recargar la lista de métodos
+      setShouldLinkProject(false);
+      setSelectedProject(null);
+      setProjectSearch("");
       fetchAnalysisMethods();
-      
-      // Mostrar mensaje de éxito
       setAlertMessage(`Método "${response.data.data.name}" creado exitosamente`);
       setShowAlert(true);
     } catch (error) {
@@ -138,6 +143,16 @@ export default function MetodosAnalisis() {
   useEffect(() => {
     fetchAnalysisMethods();
     fetchAvailableLaboratories();
+    // Obtener proyectos para el menú
+    const fetchProjects = async () => {
+      try {
+        const response = await api.get('/projects');
+        setProjects(response.data.projects);
+      } catch (error) {
+        // No mostrar alerta, solo dejar vacío
+      }
+    };
+    fetchProjects();
   }, []);
 
   // Utilidades para tabla y paginación
@@ -302,30 +317,65 @@ export default function MetodosAnalisis() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="projectId" className="text-gray-700">ID del Proyecto (opcional)</Label>
-                          <Input
-                            id="projectId"
-                            type="number"
-                            value={newMethod.projectId}
-                            onChange={(e) => setNewMethod(prev => ({ ...prev, projectId: e.target.value }))}
-                            placeholder="Ej: 5"
-                            className="bg-white border-gray-300 text-gray-900"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="cost" className="text-gray-700">Costo (opcional)</Label>
-                          <Input
-                            id="cost"
-                            type="number"
-                            value={newMethod.cost}
-                            onChange={(e) => setNewMethod(prev => ({ ...prev, cost: e.target.value }))}
-                            placeholder="Ej: 777"
-                            className="bg-white border-gray-300 text-gray-900"
-                          />
-                        </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Checkbox id="shouldLinkProject" checked={shouldLinkProject} onCheckedChange={setShouldLinkProject} />
+                        <Label htmlFor="shouldLinkProject" className="text-gray-700 cursor-pointer">Vincular a un proyecto</Label>
                       </div>
+                      {shouldLinkProject && (
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div className="grid gap-2">
+                            <Label className="text-gray-700">Proyecto <span className="text-red-500">*</span></Label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full justify-between border-gray-300 text-gray-900 bg-white">
+                                  {selectedProject ? selectedProject.name : 'Seleccionar proyecto'}
+                                  <ChevronDown className="w-4 h-4 ml-2" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-md z-[9999]">
+                                <div className="p-3 border-b">
+                                  <Input
+                                    placeholder="Buscar proyecto..."
+                                    value={projectSearch}
+                                    onChange={e => setProjectSearch(e.target.value)}
+                                    className="bg-white border-gray-300 text-gray-900"
+                                    autoFocus
+                                  />
+                                </div>
+                                <div className="max-h-64 overflow-y-auto">
+                                  {projects.filter(p => p.name.toLowerCase().includes(projectSearch.toLowerCase())).length === 0 ? (
+                                    <div className="p-4 text-gray-500 text-center text-sm">No hay proyectos disponibles</div>
+                                  ) : (
+                                    projects.filter(p => p.name.toLowerCase().includes(projectSearch.toLowerCase())).map(project => (
+                                      <button
+                                        key={project.id}
+                                        className={`w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-900 border-b last:border-b-0 ${selectedProject && selectedProject.id === project.id ? 'bg-gray-100 font-semibold' : ''}`}
+                                        onClick={() => {
+                                          setSelectedProject(project);
+                                        }}
+                                      >
+                                        <div className="font-medium">{project.name}</div>
+                                        <div className="text-xs text-gray-500">ID: {project.id}</div>
+                                      </button>
+                                    ))
+                                  )}
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="cost" className="text-gray-700">Costo (UF) <span className="text-red-500">*</span></Label>
+                            <Input
+                              id="cost"
+                              type="number"
+                              value={newMethod.cost}
+                              onChange={(e) => setNewMethod(prev => ({ ...prev, cost: e.target.value }))}
+                              placeholder="Ej: 777"
+                              className="bg-white border-gray-300 text-gray-900"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-gray-300 text-gray-700">
