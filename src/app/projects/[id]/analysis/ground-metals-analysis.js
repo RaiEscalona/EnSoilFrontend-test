@@ -1,6 +1,6 @@
 'use client'
 
-export default function GroundMetalsTable({data}) {
+export default function GroundMetalsTable({data, projectId}) {
 
     if (!data) return <p>Datos no disponibles.</p>;
 

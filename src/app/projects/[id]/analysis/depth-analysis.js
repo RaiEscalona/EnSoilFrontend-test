@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export default function DepthAnalysisTable({ data }) {
+export default function DepthAnalysisTable({ data, projectId }) {
   if (!data) return <p>Datos no disponibles.</p>;
 
   const { depths, samplingPoints, analysisData } = data;
