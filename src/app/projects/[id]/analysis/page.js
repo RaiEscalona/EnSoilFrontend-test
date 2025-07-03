@@ -80,13 +80,13 @@ export default function AnalysisPage() {
           analysisData
         });
       } else if (selectedTableType === 'lab_analysis') {
-        const response = await api.get(`/analysisMethods/${projectId}/costsSummary?Suelo`);
+        const response = await api.get(`/analysisMethods/${projectId}/costsSummary?matrixType=Suelo`);
         const data = response.data;
         console.log('[Análisis de Laboratorio - Suelo] Datos recibidos:', data);
         setNoData(false);
         setTableData({});
       } else if (selectedTableType === 'water_analysis') {
-        const response = await api.get(`/analysisMethods/${projectId}/costsSummary?Agua`);
+        const response = await api.get(`/analysisMethods/${projectId}/costsSummary?matrixType=Agua`);
         const data = response.data;
         console.log('[Análisis de Laboratorio - Agua] Datos recibidos:', data);
         setNoData(false);

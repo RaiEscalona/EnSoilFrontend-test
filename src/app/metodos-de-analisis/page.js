@@ -228,7 +228,7 @@ export default function MetodosAnalisis() {
 
   return (
     <WithSidebarLayout>
-      <div className="min-h-screen bg-[#f5f5f5] dark:bg-secondary text-black dark:text-white">
+      <div className="min-h-screen text-black dark:text-white">
         {showAlert && (
           <Alert 
             message={alertMessage} 
@@ -236,7 +236,7 @@ export default function MetodosAnalisis() {
             duration={10000}
           />
         )}
-        <div className="container mx-auto px-4 py-8 text-black dark:text-white bg-[#f5f5f5] dark:bg-secondary">
+        <div className="container mx-auto px-4 py-8 text-black dark:text-white">
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <div>
@@ -309,7 +309,7 @@ export default function MetodosAnalisis() {
                               <SelectItem 
                                 key={laboratory} 
                                 value={laboratory} 
-                                className="text-white hover:bg-[#3e4866]"
+                                className="text-gray-900 hover:bg-[#3e4866]"
                               >
                                 {laboratory}
                               </SelectItem>
@@ -378,7 +378,7 @@ export default function MetodosAnalisis() {
                       )}
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[color:var(--foreground)] text-white">
+                      <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[color:var(--foreground)] border-gray-300">
                         Cancelar
                       </Button>
                       <Button onClick={createAnalysisMethod} className="bg-primary hover:bg-green-800 text-white">
@@ -455,7 +455,7 @@ export default function MetodosAnalisis() {
           </div>
           <div className="bg-[#f5f5f5] dark:bg-[#8f8d8d] rounded-lg shadow-md overflow-hidden text-black dark:text-white border border-[color:var(--foreground)] max-h-[calc(100vh-300px)] overflow-y-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="dark:bg-base">
                 <TableRow>
                   <TableHead className="text-black dark:text-white">Nombre</TableHead>
                   <TableHead className="text-black dark:text-white">Tipo de Matriz</TableHead>
@@ -488,7 +488,7 @@ export default function MetodosAnalisis() {
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="border-[color:var(--foreground)] text-black dark:text-white hover:bg-[#3e4866] cursor-pointer transition-all duration-200 hover:scale-105"
+                            className="border-[color:var(--foreground)] text-black dark:text-white dark:bg-base hover:bg-[#252424] hover:text-white cursor-pointer transition-all duration-200 hover:scale-105"
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             Ver ({method.relatedProjects?.length || 0})
@@ -501,7 +501,7 @@ export default function MetodosAnalisis() {
                               {method.relatedProjects && method.relatedProjects.length > 0 ? (
                                 <div className="space-y-1">
                                   {method.relatedProjects.map((project, index) => (
-                                    <div key={index} className="flex justify-between items-center p-2 bg-[#3e4866] rounded">
+                                    <div key={index} className="flex justify-between items-center p-2 bg-gray-300 dark:bg-secondary rounded">
                                       <div className="flex flex-col">
                                         <span className="text-sm font-medium text-black dark:text-white">
                                           {project.projectName}
@@ -510,7 +510,7 @@ export default function MetodosAnalisis() {
                                           Proyecto ID: {project.projectId}
                                         </span>
                                       </div>
-                                      <span className="font-medium text-green-400">
+                                      <span className="font-medium text-green-500">
                                         {formatUF(project.cost)}
                                       </span>
                                     </div>
@@ -523,7 +523,7 @@ export default function MetodosAnalisis() {
                             <div className="pt-2 border-t border-[color:var(--foreground)]">
                               <div className="flex justify-between items-center">
                                 <span className="text-sm font-medium text-black dark:text-white">Promedio:</span>
-                                <span className="font-semibold text-blue-300">
+                                <span className="font-semibold text-blue-400 dark:text-blue-600">
                                   {formatUF(getAverageCost(method.relatedProjects))}
                                 </span>
                               </div>

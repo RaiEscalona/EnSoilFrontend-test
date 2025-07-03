@@ -19,7 +19,7 @@ export default function WaterAnalysis({ projectId: propProjectId, onDataReady })
       setError(null);
       setNoData(false);
       try {
-        const res = await axios.get(`/analysisMethods/${projectId}/costsSummary?Agua`);
+        const res = await axios.get(`/analysisMethods/${projectId}/costsSummary?matrixType=Agua`);
         if (res.data?.data && res.data?.columns) {
           setData(res.data.data);
           setColumns(res.data.columns);

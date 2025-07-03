@@ -604,15 +604,15 @@ export default function ProjectMapPage() {
           ) : (
             <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-              <span className="text-sm text-gray-600">Mostrar:</span>
+              <span className="text-sm text-gray-600 dark:text-gray-100">Mostrar:</span>
               <select value={analysisItemsPerPage} onChange={e => { setAnalysisItemsPerPage(Number(e.target.value)); setAnalysisCurrentPage(1); }} className="cursor-pointer">
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
               </select>
-              <span className="text-sm text-gray-600">elementos por página</span>
-              <span className="text-sm text-gray-600">Mostrando {analysisStartIndex + 1} a {Math.min(analysisEndIndex, analysisTotalItems)} de {analysisTotalItems} resultados</span>
+              <span className="text-sm text-gray-600 dark:text-gray-100">elementos por página</span>
+              <span className="text-sm text-gray-600 dark:text-gray-100">Mostrando {analysisStartIndex + 1} a {Math.min(analysisEndIndex, analysisTotalItems)} de {analysisTotalItems} resultados</span>
             </div>
             <Table>
               <TableHeader>
@@ -638,7 +638,7 @@ export default function ProjectMapPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-blue-500 hover:text-blue-700 cursor-pointer"
+                          className="text-blue-500 dark:text-blue-700 hover:text-blue-700 dark:hover:text-blue-900 cursor-pointer"
                           onClick={() => {
                             setEditingMethod(method);
                             setShowEditModal(true);
@@ -650,7 +650,7 @@ export default function ProjectMapPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-red-500 hover:text-red-700 cursor-pointer"
+                          className="text-red-500 dark:text-red-700 hover:text-red-700 dark:hover:text-red-900 cursor-pointer"
                           onClick={() => handleOpenDeleteModal(method)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -864,20 +864,43 @@ export default function ProjectMapPage() {
           </div>
         </DialogContent>
       </Dialog>
-      <UnlinkUsers />
+      <UnlinkUsers id={id} />
     </div>
     </WithSidebarLayout>
   );
 } 
 
-function UnlinkUsers() {
+function UnlinkUsers({ id }) {
   const { user } = UserAuth();
   const [admin, setAdmin] = useState(false);
+  const [token, setToken] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleUnlinkUsers = async () => {
+    try {
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const response = await api.delete(`/projects/${id}/removeUser`, { headers });
+      console.log('❕ Respuesta del backend:', response.data);
+
+      if (response.status == 200) {
+        setAlertMessage("Se han desligado los usuarios del proyecto");
+        setShowAlert(true);
+      }
+    } catch (error) {
+      setAlertMessage("Ha ocurrido un error");
+      setShowAlert(true);
+    };
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
         const token = await getIdToken(user);
+        setToken(token);
         const headers = {
           Authorization: `Bearer ${token}`,
         };
@@ -897,6 +920,9 @@ function UnlinkUsers() {
   if (admin) {
     return (
       <div className='flex justify-center'>
+        {showAlert && (
+          <Alert message={alertMessage} onClose={() => setShowAlert(false)}/>
+        )}
         <Dialog>
           <DialogTrigger asChild>
             <ButtonComponent label={'Desligar usuarios del proyecto'} isDelete />
@@ -910,7 +936,7 @@ function UnlinkUsers() {
             </DialogDescription>
             <DialogFooter className="justify-self-center">
                 <DialogClose asChild>
-                    <ButtonComponent label={'Desligar usuarios'} isDelete={true} />
+                    <ButtonComponent label={'Desligar usuarios'} isDelete={true} onClick={handleUnlinkUsers} />
                 </DialogClose>
             </DialogFooter>
           </DialogContent>

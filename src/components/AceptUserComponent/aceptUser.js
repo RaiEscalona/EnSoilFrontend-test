@@ -3,9 +3,12 @@ import { useEffect, useState, useCallback } from "react";
 import UserInfoRow from "../UserInfoRow/userInfoRow";
 import TabsButton from "../utils/tabsButton";
 import { useRouter } from 'next/navigation';
+import Alert from "../Alert/Alert";
 
 export default function AceptUser({user}) {
     const router = useRouter();
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
     const [usersList, setUsers] = useState([]);
     const [filterList, setFilter] = useState([]);
     const [tabOption, setTabOption] = useState(1);
@@ -33,14 +36,13 @@ export default function AceptUser({user}) {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                console.log('🔄 Cargando solicitudes de registro');
                 const response = await api.get('/users');
                 if (response.data.success) {
-                    console.log('✅ Usuarios cargados:', response.data);
                     setUsers(response.data.users.filter((info) => info.email !== user.email));
                 }
             } catch (error) {
-                console.error('❌ Error cargando solicitudes:', error.response?.data || error.message);
+                setAlertMessage('Error', error);
+                setShowAlert(true);
             }
         };
 
@@ -53,6 +55,9 @@ export default function AceptUser({user}) {
 
     return (
         <div className="m-15">
+            {showAlert && (
+                <Alert message={alertMessage} onClose={() => setAlertMessage(false)} />
+            )}
             <div className="text-h3 text-black dark:text-white pb-2">Administración de usuarios</div>
             <div className="flex gap-3 pb-1">
                 <TabsButton label={'Administrar rol'} onUse={tabOption == 1} onClick={handleOption1} />

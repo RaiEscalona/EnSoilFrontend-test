@@ -18,6 +18,7 @@ import UpdatePassword from "../UpdateProfileComponents/updatePassword";
 
 export default function UserInfo({ user }) {
     const [isAdmin, setAdmin] = useState(false);
+    const [userInfo, setUserInfo] = useState('');
     const [hierarchy, setHierarchy] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [profileForm, setProfileForm] = useState({ name: '', lastName: '' });
@@ -44,12 +45,10 @@ export default function UserInfo({ user }) {
             })
             
             if (response.data.success) {
-                console.log('✅ Datos actualizados exitosamente', response.data);
                 setAlertMessage('Datos actualizados correctamente');
                 setShowAlert(true);
             }
         } catch (error) {
-            console.log('Error al actualizar datos:', error);
             setAlertMessage('El correo ingresado ya está siendo utilizado');
             setShowAlert(true);
         }
@@ -86,10 +85,8 @@ export default function UserInfo({ user }) {
                 const credential = EmailAuthProvider.credential(user.email, passwordForm.password);
                 await reauthenticateWithCredential(user, credential);
                 await updatePassword(user, passwordForm.newPassword);
-                console.log('✅ Constraseña cambiada exitosamente');
             }
         } catch (error) {
-            console.log(error);
             setShowAlert(true);
             setAlertMessage('Contraseña incorrecta');
         }
@@ -118,15 +115,14 @@ export default function UserInfo({ user }) {
                 };
                 const response = await api.get('/users/verify-admin', { headers });
                 const userResponse = await api.get('/users/me', { headers });
-                console.log('❕ Respuesta del backend:', response.data);
                 if (response.data.success) {
                     setAdmin(true);
                 }
                 if (userResponse.data.success) {
+                    setUserInfo(userResponse.data.user);
                     handleHierarchyInfo(userResponse.data.user)
                 }
             } catch (error) {
-                console.log('❌ Error en validación del token:', error);
                 setAdmin(false);
             } finally {
                 setIsLoading(false)
@@ -150,18 +146,9 @@ export default function UserInfo({ user }) {
                                     size={55}
                                     strokeWidth={1}/>
                             </div>
-                            {user.displayName ? (
-                                <>
-                                    <div className="row-start-1 col-start-2 justify-self-start">{user.displayName}</div>
-                                    <div className="row-start-2 col-start-2 justify-self-start">{user.email}</div>
-                                    <div className="row-start-3 col-start-2 justify-self-start">{hierarchy}</div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="row-start-1 col-start-2 justify-self-start">{user.email}</div>
-                                    <div className="row-start-2 col-start-2 justify-self-start">Rol {hierarchy}</div>
-                                </>
-                            )}
+                            <div className="row-start-1 col-start-2 justify-self-start">{userInfo.name} {userInfo.lastName}</div>
+                            <div className="row-start-2 col-start-2 justify-self-start">{userInfo.email}</div>
+                            <div className="row-start-3 col-start-2 justify-self-start">{hierarchy}</div>
                             <div className="row-start-1 col-start-4 justify-self-stretch">
                                 <UpdateProfile handleUpdateProfile={handleUpdateProfile} form={profileForm} setForm={setProfileForm} />
                             </div>

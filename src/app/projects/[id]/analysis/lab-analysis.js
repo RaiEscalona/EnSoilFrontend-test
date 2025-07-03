@@ -42,7 +42,7 @@ export default function LabAnalysisTable({ onDataReady, projectId }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`/analysisMethods/${currentProjectId}/costsSummary?Suelo`);
+        const res = await axios.get(`/analysisMethods/${currentProjectId}/costsSummary?matrixType=Suelo`);
         if (res.data?.data && res.data?.columns) {
           setData(res.data.data);
           setMethodTotals(res.data.methodTotals || {});

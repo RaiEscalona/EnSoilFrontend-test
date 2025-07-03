@@ -13,8 +13,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog"
+import Alert from "../Alert/Alert";
 
 export default function UserInfoRow({ user, requestedUser, option, setUpdate }) {
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
     const [deleteUserOption, setDeleteUser] = useState(null);
     const [userRole, setRole] = useState("");
     const [registerAnswer, setAnswer] = useState("");
@@ -38,17 +41,15 @@ export default function UserInfoRow({ user, requestedUser, option, setUpdate }) 
             const auth = {
                 Authorization: `Bearer ${token}`
             }
-            // console.log(token)
 
             if (option == 'admin') {
-                console.log(`🔄 Actualizando permiso del usuario ${requestedUser.email}`);
-
                 const response = await api.delete(`/users/${requestedUser.uid}`, {
                     headers: auth
                 })
                 
                 if (response.data.success) {
-                    console.log('✅ Permiso actualizado correctamente:', response.data);
+                    setAlertMessage('Usuario eliminado correctamente');
+                    setShowAlert(true);
                 }
             } else if (option == 'role') {
                 if (userRole == 5) {
@@ -58,28 +59,40 @@ export default function UserInfoRow({ user, requestedUser, option, setUpdate }) 
                     })
 
                     if (responseAdmin.data.success) {
-                        console.log(responseAdmin.data.message)
+                        setAlertMessage('Usuario promivido a admin');
+                        setShowAlert(true);
                     }
                 } else {
+                    if ((requestedUser.role == 'admin') && (userRole < 5)) {
+                        const response = await api.post(`/users/remove-admin`, { 
+                            email: requestedUser.email,
+                            password: 'Contras3na_ultr4_s3cr3t4_4dm1n'}
+                        )
+                    
+                        if (response.data.success) {
+                            setAlertMessage('Admin despromovido correctamente');
+                            setShowAlert(true);
+                        }
+                    }
                     const response = await api.patch(`/users/${requestedUser.uid}/hierarchy`, 
                         { hierarchy: userRole }, 
                         { headers: auth }
                     )
                     
                     if (response.data.success) {
-                        console.log('✅ Rol actualizado correctamente', response.data.success)
+                        setAlertMessage('Rol actualizado correctamente');
+                        setShowAlert(true);
                     }
                 }
             } else {
-
-                console.log(`🔄 Actualizando permiso del usuario ${requestedUser.email}`);
                 if (registerAnswer == true) {
                     const response = await api.patch(`/users/${requestedUser.uid}/permission`,
                         { permission: registerAnswer },
                         { headers: auth }
                     )
                     if (response.data.success) {
-                        console.log('✅ Permiso actualizado correctamente:', response.data);
+                        setAlertMessage('Permiso de usuario actualizado');
+                        setShowAlert(true);
                     }
                 } else if (registerAnswer == false) {
                     const response = await api.delete(`/users/${requestedUser.uid}`, {
@@ -87,14 +100,16 @@ export default function UserInfoRow({ user, requestedUser, option, setUpdate }) 
                     })
                     
                     if (response.data.success) {
-                        console.log('✅ Permiso actualizado correctamente:', response.data);
+                        setAlertMessage('Permiso de usuario actualizado');
+                        setShowAlert(true);
                     }
                 }
             }
 
             setUpdate(prev => !prev);
         } catch (error) {
-            console.log('Error al enviar la respuesta:', error)
+            setAlertMessage('Error', error);
+            setShowAlert(true);
         }
     }
 
@@ -108,6 +123,9 @@ export default function UserInfoRow({ user, requestedUser, option, setUpdate }) 
 
     return (
         <Form onSubmit={handleSubmit}>
+            {showAlert && (
+                <Alert message={alertMessage} onClose={() => setShowAlert(false)} />
+            )}
             <div className="grid grid-cols-6 justify-items items-center bg-quaternary dark:bg-base text-h5 text-black dark:text-white rounded-2xl p-3 gap-2">
                 <div className="col-start-1">
                     {requestedUser.name} {requestedUser.lastName}
