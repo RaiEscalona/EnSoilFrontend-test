@@ -1,0 +1,119 @@
+@import "@fontsource/montserrat";
+@import "tailwindcss";
+
+/*.projects-bg {
+  background: var(--color-white);
+  min-height: 100vh;
+}*/
+
+.projects-container {
+  /* max-width: 900px; */
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  color: var(--foreground);
+}
+
+.create-project-form,
+.project-card {
+  background: var(--background);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-quaternary);
+}
+
+.create-project-form label {
+  color: var(--foreground);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.create-project-form input,
+.create-project-form textarea {
+  font-family: 'Montserrat', sans-serif;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-quaternary);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.create-project-form input:focus,
+.create-project-form textarea:focus {
+  outline: none;
+  border: 1.5px solid var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(54,123,93,0.3);
+}
+
+.create-project-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-fields > div {
+  margin-bottom: 1.25rem;
+}
+
+.form-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.project-create-btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.project-map-btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.project-map-btn:hover {
+  background: #2e6b4f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.project-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.project-card-desc {
+  /* color: var(--color-secondary); */
+  margin-top: 0.25rem;
+}
+
+.project-card-dates {
+  font-size: 0.875rem;
+  color: var(--color-tertiary);
+  margin-top: 0.25rem;
+}
+
+.projects-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+.project-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}

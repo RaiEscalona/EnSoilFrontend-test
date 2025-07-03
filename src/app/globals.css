@@ -1,0 +1,80 @@
+@import "@fontsource/montserrat";
+@import "tailwindcss";
+
+
+:root {
+  --background: #FDFDFD;
+  --foreground: #242424;
+  
+  --card: 0 0% 100%;
+  --card-foreground: #242424;
+  --popover: #FDFDFD;
+  --popover-foreground: #242424;
+  --primary: #367B5D;
+  --primary-foreground: #FDFDFD;
+  --secondary: #7A7A7A;
+  --secondary-foreground: #FDFDFD;
+  --muted: #AFAFAF;
+  --muted-foreground: #242424;
+  --accent: #CECECE;
+  --accent-foreground: #242424;
+  --destructive: #dc2626;
+  --destructive-foreground: #FDFDFD;
+  --border: #AFAFAF;
+  --input: #FDFDFD;
+  --ring: #367B5D;
+  --radius: 0.5rem;
+}
+
+@theme {
+  --color-primary: #367B5D;
+  --color-secondary: #7A7A7A;
+  --color-tertiary: #AFAFAF;
+  --color-quaternary: #CECECE;
+  --color-black: #242424;
+  --color-white: #FDFDFD;
+  --color-base: #393737;
+
+  --text-h1: 58px;
+  --text-h1--font-weight: 800;
+  --text-h2: 42px;
+  --text-h2--font-weight: 600;
+  --text-h3: 21px;
+  --text-h3--font-weight: 600;
+  --text-h4: 20px;
+  --text-h5: 14px;
+  --text-p: 10px;
+  --text-p-medium: 12px;
+  --text-p-medium--font-weight: 600;
+  --text-s: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #393737;
+    --foreground: #FDFDFD;
+    
+    --card: #393737;
+    --card-foreground: #FDFDFD;
+    --popover: #393737;
+    --popover-foreground: #FDFDFD;
+    --primary: #367B5D;
+    --primary-foreground: #FDFDFD;
+    --secondary: #7A7A7A;
+    --secondary-foreground: #FDFDFD;
+    --muted: #AFAFAF;
+    --muted-foreground: #242424;
+    --accent: #CECECE;
+    --accent-foreground: #242424;
+    --destructive: #dc2626;
+    --destructive-foreground: #FDFDFD;
+    --border: #AFAFAF;
+    --input: #393737;
+    --ring: #367B5D;
+  }
+}
+
+body {
+  color: var(--foreground);
+  font-family: 'Montserrat', sans-serif;
+}

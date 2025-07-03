@@ -1,0 +1,69 @@
+.analysis-table-container {
+  overflow-x: auto; /* Handle wide tables */
+  margin-top: 1.5rem; /* Add some space above the table */
+  max-height: 70vh; /* Limit table height and enable vertical scroll */
+  overflow-y: auto;
+}
+
+.analysis-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem; /* Smaller font for table */
+  min-width: 1400px; /* Ensure table is wide enough based on columns */
+  border-spacing: 0;
+  background-color: var(--color-white);
+}
+
+.analysis-table th,
+.analysis-table td {
+  border: 1px solid #e2e8f0; /* gray-200 */
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  white-space: nowrap; /* Prevent text wrapping */
+  color: #242424;
+}
+
+.analysis-table thead th {
+  background-color: #f1f5f9; /* slate-100 */
+  font-weight: 600; /* semibold */
+  position: sticky;
+  top: 0; /* Stick header */
+  z-index: 10;
+  color: #242424;
+}
+
+:root.dark .analysis-table thead th {
+  background-color: #1e293b; /* slate-800, por ejemplo */
+}
+
+/* Styling for the top-left empty cell */
+.analysis-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 11; /* Above other header cells */
+}
+
+/* Styling for the depth header column cells in the body */
+.analysis-table tbody th {
+  position: sticky;
+  left: 0;
+  background-color: #f8fafc; /* slate-50 */
+  font-weight: 600; /* semibold */
+  z-index: 5; /* Below header, above row cells */
+  border-right-width: 2px; /* Add emphasis */
+  border-color: #cbd5e1; /* slate-300 */
+}
+
+.analysis-table td.highlight {
+  /* background-color: #fce7f3; pink-100 */
+  background-color: oklch(97% 0.001 106.424);
+}
+
+/* Optional: Alternate row colors for readability */
+.analysis-table tbody tr:nth-child(even) td {
+  background-color: #f8fafc; /* slate-50 */
+}
+.analysis-table tbody tr:nth-child(even) td.highlight {
+  /* background-color: #fbcfe8; pink-200 adjusted for even rows */
+  background-color: oklch(92.3% 0.003 48.717);
+} 
