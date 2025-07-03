@@ -43,20 +43,28 @@ export default function LabAnalysisTable({ onDataReady, projectId }) {
     const fetchData = async () => {
       try {
         const res = await axios.get(`/analysisMethods/${currentProjectId}/costsSummary?Suelo`);
-
-        if (res.data?.data) {
+        if (res.data?.data && res.data?.columns) {
           setData(res.data.data);
           setMethodTotals(res.data.methodTotals || {});
-
-          const claves = Object.keys(res.data.data[0] || {});
-          const columnasOrdenadas = claves.filter(k => k !== 'drillingPoint' && k !== 'sampleLog' && k !== 'totalCost');
-          const finalColumns = ["Punto", "Muestra", ...columnasOrdenadas, "Costo Total"];
-          setColumns(finalColumns);
-
+          setColumns(res.data.columns);
           if (onDataReady) {
             onDataReady({
               data: res.data.data,
-              columns: finalColumns,
+              columns: res.data.columns,
+              methodTotals: res.data.methodTotals || {},
+              tipoMatriz: 'Suelo'
+            });
+          }
+        } else if (res.data?.data) {
+          // Fallback legacy: columnas dinámicas
+          const claves = Object.keys(res.data.data[0] || {});
+          setColumns(claves);
+          setData(res.data.data);
+          setMethodTotals(res.data.methodTotals || {});
+          if (onDataReady) {
+            onDataReady({
+              data: res.data.data,
+              columns: claves,
               methodTotals: res.data.methodTotals || {},
               tipoMatriz: 'Suelo'
             });
@@ -69,6 +77,13 @@ export default function LabAnalysisTable({ onDataReady, projectId }) {
     fetchData();
   }, [currentProjectId, onDataReady]);
 
+  // Alias para headers
+  const columnAliases = {
+    drillingPoint: 'Punto',
+    sampleLog: 'Muestra',
+    totalCost: 'Costo Total',
+  };
+
   return (
     <div className="analysis-table-container w-full flex flex-col max-h-[50vh] overflow-auto">
       <div className="w-full flex-1 overflow-auto">
@@ -76,63 +91,42 @@ export default function LabAnalysisTable({ onDataReady, projectId }) {
             <thead>
               <tr className="text-left border-b border-gray-600">
                 {columns.map((col, idx) => (
-                  <th key={idx} className="truncate" style={{ width: `${100 / columns.length}%` }}>{col}</th>
+                  <th key={idx} className="truncate" style={{ width: `${100 / columns.length}%` }}>{columnAliases[col] || col}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {(() => {
-                const conteoPorColumna = {};
-                const precioPorColumna = {};
-                let totalCostoTotal = 0;
-
-                const filas = data.map((row, rowIdx) => (
-                  <tr key={rowIdx} className="border-b border-gray-700">
-                    {columns.map((col, colIdx) => {
-                      if (col === "Punto") {
-                        return <td key={colIdx} className="truncate">{row.drillingPoint ?? ''}</td>;
-                      } else if (col === "Muestra") {
-                        return <td key={colIdx} className="truncate">{row.sampleLog ?? ''}</td>;
-                      } else if (col === "Costo Total") {
-                        const totalFila = parseFloat(row.totalCost?.replace('$','')) || 0;
-                        totalCostoTotal += totalFila;
-                        return <td key={colIdx} className="truncate">{row.totalCost ?? ''}</td>;
-                      } else {
-                        const valor = row[col] ?? '';
-                        const costoMatch = valor.match(/\$\s*([\d.]+)/);
-                        if (valor.includes('X')) {
-                          conteoPorColumna[col] = (conteoPorColumna[col] || 0) + 1;
+              {data.length === 0 ? (
+                <tr><td colSpan={columns.length} className="text-center py-4 text-gray-500">No hay datos disponibles</td></tr>
+              ) : (
+                <>
+                  {data.map((row, rowIdx) => (
+                    <tr key={rowIdx} className="border-b border-gray-700">
+                      {columns.map((col, colIdx) => (
+                        <td key={colIdx} className="truncate">
+                          {row[col] ?? ''}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  {/* Totales si corresponde */}
+                  {methodTotals && Object.keys(methodTotals).length > 0 && (
+                    <tr key="totales" className="font-semibold">
+                      {columns.map((col, idx) => {
+                        if (col === "drillingPoint") {
+                          return <td key={idx} className="truncate">TOTAL COSTOS</td>;
+                        } else if (col === "sampleLog") {
+                          return <td key={idx} className="truncate"></td>;
+                        } else if (col === "totalCost") {
+                          return <td key={idx} className="truncate">{methodTotals[col] ?? ''}</td>;
+                        } else {
+                          return <td key={idx} className="truncate">{methodTotals[col] ?? ''}</td>;
                         }
-                        if (costoMatch) {
-                          precioPorColumna[col] = parseFloat(costoMatch[1]);
-                        }
-                        return <td key={colIdx} className={`truncate ${valor.includes('$') ? 'text-green-400' : ''}`}>
-                          {valor}
-                        </td>;
-                      }
-                    })}
-                  </tr>
-                ));
-
-                return filas.concat(
-                  <tr key="totales" className="font-semibold">
-                    {columns.map((col, idx) => {
-                      if (col === "Punto") {
-                        return <td key={idx} className="truncate">TOTAL COSTOS</td>;
-                      } else if (col === "Muestra") {
-                        return <td key={idx} className="truncate"></td>;
-                      } else if (col === "Costo Total") {
-                        return <td key={idx} className="truncate">${totalCostoTotal.toFixed(2)}</td>;
-                      } else {
-                        const cantidad = conteoPorColumna[col] || 0;
-                        const precioUnitario = precioPorColumna[col] || 0;
-                        const total = cantidad * precioUnitario;
-                        return <td key={idx} className="truncate">{total > 0 ? `$${total.toFixed(2)}` : ''}</td>;
-                      }
-                    })}
-                  </tr>
-                );
-              })()}
+                      })}
+                    </tr>
+                  )}
+                </>
+              )}
             </tbody>
         </table>
       </div>

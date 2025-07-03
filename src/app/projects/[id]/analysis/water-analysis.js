@@ -20,14 +20,20 @@ export default function WaterAnalysis({ projectId: propProjectId, onDataReady })
       setNoData(false);
       try {
         const res = await axios.get(`/analysisMethods/${projectId}/costsSummary?Agua`);
-        setData(res.data || []);
-        if (res.data?.length) {
-          const claves = Object.keys(res.data[0]);
-          const columnasOrdenadas = claves.filter(k => k !== 'sampleLog' && k !== 'totalCost');
-          const cols = ["Muestra", ...columnasOrdenadas, "Costo Total"];
-          setColumns(cols);
+        if (res.data?.data && res.data?.columns) {
+          setData(res.data.data);
+          setColumns(res.data.columns);
           if (onDataReady) {
-            onDataReady({ data: res.data, columns: cols });
+            onDataReady({ data: res.data.data, columns: res.data.columns });
+          }
+          if (!res.data.data.length) setNoData(true);
+        } else if (res.data?.length) {
+          // Fallback legacy: columnas dinámicas
+          const claves = Object.keys(res.data[0]);
+          setColumns(claves);
+          setData(res.data);
+          if (onDataReady) {
+            onDataReady({ data: res.data, columns: claves });
           }
         } else {
           setNoData(true);
@@ -51,41 +57,15 @@ export default function WaterAnalysis({ projectId: propProjectId, onDataReady })
     }
   }, [projectId, onDataReady]);
 
+  // Alias para headers
+  const columnAliases = {
+    sampleLog: 'Muestra',
+    totalCost: 'Costo Total',
+  };
+
   if (loading) return <div className="text-center py-4 text-gray-500">No hay datos disponibles</div>;
   if (noData) return <div className="text-center py-4 text-gray-500">No hay datos disponibles</div>;
   if (error) return <div className="text-center py-4 text-red-600">{error}</div>;
-
-  // Calculate totals for numeric columns that include costs (assumed to be columns with $)
-  const totals = {};
-  if (data.length > 0) {
-    columns.forEach(col => {
-      if (col === "Muestra") {
-        totals[col] = "Total";
-      } else if (col === "Costo Total") {
-        const sum = data.reduce((acc, row) => {
-          const val = row.totalCost;
-          if (typeof val === "number") return acc + val;
-          if (typeof val === "string") {
-            const num = parseFloat(val.replace(/[^0-9.-]+/g,""));
-            return acc + (isNaN(num) ? 0 : num);
-          }
-          return acc;
-        }, 0);
-        totals[col] = `$${sum.toFixed(2)}`;
-      } else {
-        const sum = data.reduce((acc, row) => {
-          const val = row[col];
-          if (typeof val === "number") return acc + val;
-          if (typeof val === "string") {
-            const num = parseFloat(val.replace(/[^0-9.-]+/g,""));
-            return acc + (isNaN(num) ? 0 : num);
-          }
-          return acc;
-        }, 0);
-        totals[col] = sum !== 0 ? sum : '';
-      }
-    });
-  }
 
   return (
     <div className="p-4 bg-white rounded shadow">
@@ -99,7 +79,7 @@ export default function WaterAnalysis({ projectId: propProjectId, onDataReady })
                   scope="col"
                   className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  {col}
+                  {columnAliases[col] || col}
                 </th>
               ))}
             </tr>
@@ -116,22 +96,14 @@ export default function WaterAnalysis({ projectId: propProjectId, onDataReady })
                 {data.map((row, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                     {columns.map((col, colIdx) => {
-                      const valor = col === "Muestra" ? row.sampleLog ?? '' : col === "Costo Total" ? row.totalCost ?? '' : row[col] ?? '';
                       return (
-                        <td key={colIdx} className={`px-4 py-2 whitespace-nowrap text-sm text-gray-700 truncate ${typeof valor === 'string' && valor.includes('$') ? 'text-green-500' : ''}`}>
-                          {valor}
+                        <td key={colIdx} className={`px-4 py-2 whitespace-nowrap text-sm text-gray-700 truncate`}>
+                          {row[col] ?? ''}
                         </td>
                       );
                     })}
                   </tr>
                 ))}
-                <tr className="bg-gray-100 font-semibold">
-                  {columns.map((col, colIdx) => (
-                    <td key={colIdx} className={`px-4 py-2 whitespace-nowrap text-sm text-gray-800 truncate ${typeof totals[col] === 'string' && totals[col].includes('$') ? 'text-green-600' : ''}`}>
-                      {totals[col]}
-                    </td>
-                  ))}
-                </tr>
               </>
             )}
           </tbody>

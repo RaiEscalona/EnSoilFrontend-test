@@ -12,6 +12,7 @@ import ButtonComponent from '@/components/utils/button';
 import api from '@/utils/axios';
 import GroundMetalsTable from './ground-metals-analysis';
 import { getLabAnalysisExcel } from './lab-analysis';
+import LabGeneralAnalysisTable from './lab-general-analysis';
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -22,11 +23,13 @@ export default function AnalysisPage() {
   const [labTableData, setLabTableData] = useState(null); // { data, columns, methodTotals, tipoMatriz }
   const [waterTableData, setWaterTableData] = useState(null); // { data, columns }
   const [noData, setNoData] = useState(false);
+  const [labGeneralTableData, setLabGeneralTableData] = useState(null); // { data, columns }
 
   const tableTypes = [
     { value: 'depth_analysis', label: 'Análisis de Profundidad' },
     { value: 'lab_analysis', label: 'Análisis de Laboratorio - Suelo'},
     { value: 'water_analysis', label: 'Análisis de Laboratorio - Agua'},
+    { value: 'lab_general_analysis', label: 'Análisis de Laboratorio' },
     { value: 'ground_metals_analysis', label: 'Análisis de Metales en el suelo'},
     // Add more table types here in the future
   ];
@@ -105,6 +108,16 @@ export default function AnalysisPage() {
 
         // const dataModule = await import('@/data/simulatedGroundMetalData.json');
         // setTableData(dataModule.default);
+      } else if (selectedTableType === 'lab_general_analysis') {
+        const response = await api.get(`/analysisMethods/${projectId}/costsSummary`);
+        const data = response.data;
+        console.log('[Análisis de Laboratorio General] Datos recibidos:', data);
+        if (!data || !data.data || !data.columns || data.data.length === 0) {
+          setNoData(true);
+          return;
+        }
+        setLabGeneralTableData({ data: data.data, columns: data.columns });
+        setTableData({});
       } else {
         throw new Error(`Tipo de tabla no soportado: ${selectedTableType}`);
       }
@@ -200,6 +213,21 @@ export default function AnalysisPage() {
           XLSX.utils.book_append_sheet(wb, ws, "Análisis de Agua");
           XLSX.writeFile(wb, `analisis_agua_proyecto_${projectId}.xlsx`);
         }
+      } else if (selectedTableType === 'lab_general_analysis') {
+        if (labGeneralTableData && labGeneralTableData.data && labGeneralTableData.columns) {
+          // Exportar a Excel usando XLSX
+          const exportData = labGeneralTableData.data.map(row => {
+            const exportRow = {};
+            labGeneralTableData.columns.forEach(col => {
+              exportRow[col] = row[col] ?? '';
+            });
+            return exportRow;
+          });
+          const ws = XLSX.utils.json_to_sheet(exportData, { header: labGeneralTableData.columns });
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Análisis de Laboratorio');
+          XLSX.writeFile(wb, `analisis_laboratorio_proyecto_${projectId}.xlsx`);
+        }
       }
     } catch (error) {
       console.error('Error al exportar a Excel:', error);
@@ -225,6 +253,7 @@ export default function AnalysisPage() {
                   setTableData(null); // Limpiar tabla generada al cambiar selección
                   setLabTableData(null);
                   setWaterTableData(null);
+                  setLabGeneralTableData(null);
                 }}
                 className="block w-full bg-quaternary dark:bg-base p-2 rounded-md border-secondary shadow-sm sm:text-h5"
                 disabled={isLoading}
@@ -241,7 +270,8 @@ export default function AnalysisPage() {
             <ButtonComponent label={'Exportar a Excel'} onClick={handleExportExcel} disable={
               !tableData || isLoading ||
               (selectedTableType === 'lab_analysis' && !labTableData) ||
-              (selectedTableType === 'water_analysis' && !waterTableData)
+              (selectedTableType === 'water_analysis' && !waterTableData) ||
+              (selectedTableType === 'lab_general_analysis' && !labGeneralTableData)
             }/>
           </div>
         </div>
@@ -264,6 +294,7 @@ export default function AnalysisPage() {
             {selectedTableType === 'lab_analysis' && <div className="h-full overflow-auto"><LabAnalysisTable projectId={projectId} onDataReady={setLabTableData} /></div>}
             {selectedTableType === 'water_analysis' && <div className="h-full overflow-auto"><WaterAnalysisTable projectId={projectId} onDataReady={setWaterTableData} /></div>}
             {selectedTableType === 'ground_metals_analysis' && <div className="h-full overflow-auto"><GroundMetalsTable data={tableData} projectId={projectId} /></div>}
+            {selectedTableType === 'lab_general_analysis' && <div className="h-full overflow-auto"><LabGeneralAnalysisTable projectId={projectId} data={labGeneralTableData?.data} columns={labGeneralTableData?.columns} /></div>}
           </div>
         )}
       </div>
