@@ -11,6 +11,7 @@ import WaterAnalysisTable from './water-analysis';
 import ButtonComponent from '@/components/utils/button';
 import api from '@/utils/axios';
 import GroundMetalsTable from './ground-metals-analysis';
+import { getLabAnalysisExcel } from './lab-analysis';
 
 export default function AnalysisPage() {
   const { id: projectId } = useParams(); // Rename id to avoid conflict
@@ -18,6 +19,9 @@ export default function AnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState(null);
   const [error, setError] = useState(null);
+  const [labTableData, setLabTableData] = useState(null); // { data, columns, methodTotals, tipoMatriz }
+  const [waterTableData, setWaterTableData] = useState(null); // { data, columns }
+  const [noData, setNoData] = useState(false);
 
   const tableTypes = [
     { value: 'depth_analysis', label: 'Análisis de Profundidad' },
@@ -33,14 +37,15 @@ export default function AnalysisPage() {
     setIsLoading(true);
     setTableData(null);
     setError(null);
+    setNoData(false);
 
     try {
       if (selectedTableType === 'depth_analysis') {
         const response = await api.get(`/projects/${projectId}/depthAnalysis`);
         const data = response.data;
-
+        console.log('[Análisis de Profundidad] Datos recibidos:', data);
         if (!data || data.length === 0) {
-          setError('No hay información suficiente para generar la tabla de análisis de profundidad.');
+          setNoData(true);
           return;
         }
 
@@ -72,16 +77,23 @@ export default function AnalysisPage() {
           analysisData
         });
       } else if (selectedTableType === 'lab_analysis') {
-        setTableData({}); 
+        const response = await api.get(`/analysisMethods/${projectId}/costsSummary?Suelo`);
+        const data = response.data;
+        console.log('[Análisis de Laboratorio - Suelo] Datos recibidos:', data);
+        setNoData(false);
+        setTableData({});
       } else if (selectedTableType === 'water_analysis') {
+        const response = await api.get(`/analysisMethods/${projectId}/costsSummary?Agua`);
+        const data = response.data;
+        console.log('[Análisis de Laboratorio - Agua] Datos recibidos:', data);
+        setNoData(false);
         setTableData({});
       } else if (selectedTableType === 'ground_metals_analysis') {
         const response = await api.get(`/projects/${projectId}/groundMetals`);
-        console.log(`✅ Datos de la tabla metales suelo del proyecto ${projectId} cargado:`);
         const data = response.data;
-
+        console.log('[Análisis de Metales en el Suelo] Datos recibidos:', data);
         if (!data || data.length === 0) {
-          setError('No hay información suficiente para generar la tabla de análisis de metales en el suelo.');
+          setNoData(true);
           return;
         }
 
@@ -105,29 +117,93 @@ export default function AnalysisPage() {
   };
 
   const handleExportExcel = () => {
-    if (!tableData || selectedTableType !== 'depth_analysis') return;
+    if (!tableData) return;
 
-    const { depths, samplingPoints, analysisData } = tableData;
-    const header = ['Profundidad (cm)', ...samplingPoints];
-    const dataRows = depths.map(depth => {
-      const row = [depth];
-      samplingPoints.forEach(point => {
-        row.push(analysisData[depth]?.[point] || '');
-      });
-      return row;
-    });
+    try {
+      if (selectedTableType === 'depth_analysis') {
+        const { depths, samplingPoints, analysisData } = tableData;
+        const header = ['Profundidad (cm)', ...samplingPoints];
+        const dataRows = depths.map(depth => {
+          const row = [depth];
+          samplingPoints.forEach(point => {
+            row.push(analysisData[depth]?.[point] || '');
+          });
+          return row;
+        });
 
-    const excelData = [header, ...dataRows];
-    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'AnálisisProfundidad');
+        const excelData = [header, ...dataRows];
+        const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'AnálisisProfundidad');
 
-    worksheet['!cols'] = header.map((_, i) => ({
-      wch: i === 0 ? 15 : Math.max(15, ...dataRows.map(r => r[i]?.toString().length || 0), header[i].length)
-    }));
+        worksheet['!cols'] = header.map((_, i) => ({
+          wch: i === 0 ? 15 : Math.max(15, ...dataRows.map(r => r[i]?.toString().length || 0), header[i].length)
+        }));
 
-    const fileName = `analisis_profundidad_proyecto_${projectId}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
+        const fileName = `analisis_profundidad_proyecto_${projectId}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+      } else if (selectedTableType === 'ground_metals_analysis') {
+        const { info, analytes } = tableData;
+        const exportData = [];
+        
+        info.forEach((point) => {
+          point.sampleLogs.forEach((sample) => {
+            const row = {
+              'Punto de muestreo': point.drillingPointTag,
+              'Muestra': sample.sampleLogTag
+            };
+            
+            analytes.forEach((analyte) => {
+              const match = sample.analytes.find((a) => a.analyte === analyte);
+              row[analyte] = match ? match.result : '';
+            });
+            
+            exportData.push(row);
+          });
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'MetalesSuelo');
+
+        const maxWidth = Math.max(...analytes.map(a => a.length), 20);
+        worksheet['!cols'] = [
+          { wch: 20 }, // Punto de muestreo
+          { wch: 15 }, // Muestra
+          ...analytes.map(() => ({ wch: maxWidth }))
+        ];
+
+        const fileName = `analisis_metales_suelo_proyecto_${projectId}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+      } else if (selectedTableType === 'lab_analysis') {
+        if (labTableData && labTableData.data && labTableData.columns) {
+          getLabAnalysisExcel(labTableData.data, labTableData.columns, labTableData.methodTotals, labTableData.tipoMatriz);
+        }
+      } else if (selectedTableType === 'water_analysis') {
+        if (waterTableData && waterTableData.data && waterTableData.columns) {
+          // Exportar a Excel usando XLSX
+          const exportData = waterTableData.data.map(row => {
+            const exportRow = {};
+            waterTableData.columns.forEach(col => {
+              if (col === "Muestra") {
+                exportRow[col] = row.sampleLog ?? "";
+              } else if (col === "Costo Total") {
+                exportRow[col] = row.totalCost ?? "";
+              } else {
+                exportRow[col] = row[col] ?? "";
+              }
+            });
+            return exportRow;
+          });
+          const ws = XLSX.utils.json_to_sheet(exportData, { header: waterTableData.columns });
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Análisis de Agua");
+          XLSX.writeFile(wb, `analisis_agua_proyecto_${projectId}.xlsx`);
+        }
+      }
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+    }
   };
 
   return (
@@ -147,6 +223,8 @@ export default function AnalysisPage() {
                 onChange={(e) => {
                   setSelectedTableType(e.target.value);
                   setTableData(null); // Limpiar tabla generada al cambiar selección
+                  setLabTableData(null);
+                  setWaterTableData(null);
                 }}
                 className="block w-full bg-quaternary dark:bg-base p-2 rounded-md border-secondary shadow-sm sm:text-h5"
                 disabled={isLoading}
@@ -160,14 +238,19 @@ export default function AnalysisPage() {
               </select>
             </div>
             <ButtonComponent label={isLoading ? 'Generando...' : 'Generar Tabla'} onClick={handleGenerateTable} disable={!selectedTableType || isLoading}/>
-            <ButtonComponent label={'Exportar a Excel'} onClick={handleExportExcel} disable={!tableData || isLoading || selectedTableType !== 'depth_analysis'}/>
+            <ButtonComponent label={'Exportar a Excel'} onClick={handleExportExcel} disable={
+              !tableData || isLoading ||
+              (selectedTableType === 'lab_analysis' && !labTableData) ||
+              (selectedTableType === 'water_analysis' && !waterTableData)
+            }/>
           </div>
         </div>
 
         {/* Tabla de resultados */}
         {isLoading && <p className="text-center my-4">Cargando datos de la tabla...</p>}
-        {error && <p className="text-center my-4 text-red-600">{error}</p>}
-        {tableData && (
+        {noData && <p className="text-center my-4 text-gray-500">No hay datos disponibles</p>}
+        {error && !noData && <p className="text-center my-4 text-red-600">{error}</p>}
+        {tableData && !noData && (
           <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md flex flex-col overflow-hidden max-h-[calc(100vh-250px)]">
             {/* Selector Suelo/Agua flotante y título */}
             {selectedTableType === 'lab_analysis' ? (
@@ -177,10 +260,10 @@ export default function AnalysisPage() {
                 Tabla: {tableTypes.find(t => t.value === selectedTableType)?.label}
               </h3>
             )}
-            {selectedTableType === 'depth_analysis' && <div className="h-full overflow-auto"><DepthAnalysisTable data={tableData} /></div>}
-            {selectedTableType === 'lab_analysis' && <div className="h-full overflow-auto"><LabAnalysisTable showHeaderControls={false} /></div>}
-            {selectedTableType === 'water_analysis' && <div className="h-full overflow-auto"><WaterAnalysisTable /></div>}
-            {selectedTableType === 'ground_metals_analysis' && <div className="h-full overflow-auto"><GroundMetalsTable data={tableData} /></div>}
+            {selectedTableType === 'depth_analysis' && <div className="h-full overflow-auto"><DepthAnalysisTable data={tableData} projectId={projectId} /></div>}
+            {selectedTableType === 'lab_analysis' && <div className="h-full overflow-auto"><LabAnalysisTable projectId={projectId} onDataReady={setLabTableData} /></div>}
+            {selectedTableType === 'water_analysis' && <div className="h-full overflow-auto"><WaterAnalysisTable projectId={projectId} onDataReady={setWaterTableData} /></div>}
+            {selectedTableType === 'ground_metals_analysis' && <div className="h-full overflow-auto"><GroundMetalsTable data={tableData} projectId={projectId} /></div>}
           </div>
         )}
       </div>

@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import * as XLSX from 'xlsx';
 
 export function getLabAnalysisExcel(data, columns, methodTotals, tipoMatriz) {
-  const columnasFijas = columnasSuelo;
+  const columnasFijas = columns;
   const exportData = data.map(row => {
     const formatted = {};
     columnasFijas.forEach(col => {
@@ -28,13 +28,13 @@ export function getLabAnalysisExcel(data, columns, methodTotals, tipoMatriz) {
 
   const ws = XLSX.utils.json_to_sheet(exportData);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, `Resumen Suelo`);
-  XLSX.writeFile(wb, `Resumen_Laboratorio_Suelo.xlsx`);
+  XLSX.utils.book_append_sheet(wb, ws, `Resumen ${tipoMatriz}`);
+  XLSX.writeFile(wb, `Resumen_Laboratorio_${tipoMatriz}.xlsx`);
 }
 
-export default function LabAnalysisTable({ onDataReady }) {
+export default function LabAnalysisTable({ onDataReady, projectId }) {
   const params = useParams();
-  const projectId = params.id;
+  const currentProjectId = projectId || params.id;
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [methodTotals, setMethodTotals] = useState({});
@@ -42,7 +42,7 @@ export default function LabAnalysisTable({ onDataReady }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`/analysisMethods/${projectId}/costsSummary?Suelo`);
+        const res = await axios.get(`/analysisMethods/${currentProjectId}/costsSummary?Suelo`);
 
         if (res.data?.data) {
           setData(res.data.data);
@@ -50,12 +50,13 @@ export default function LabAnalysisTable({ onDataReady }) {
 
           const claves = Object.keys(res.data.data[0] || {});
           const columnasOrdenadas = claves.filter(k => k !== 'drillingPoint' && k !== 'sampleLog' && k !== 'totalCost');
-          setColumns(["Punto", "Muestra", ...columnasOrdenadas, "Costo Total"]);
+          const finalColumns = ["Punto", "Muestra", ...columnasOrdenadas, "Costo Total"];
+          setColumns(finalColumns);
 
           if (onDataReady) {
             onDataReady({
               data: res.data.data,
-              columns,
+              columns: finalColumns,
               methodTotals: res.data.methodTotals || {},
               tipoMatriz: 'Suelo'
             });
@@ -66,7 +67,7 @@ export default function LabAnalysisTable({ onDataReady }) {
       }
     };
     fetchData();
-  }, [projectId, onDataReady, columns]);
+  }, [currentProjectId, onDataReady]);
 
   return (
     <div className="analysis-table-container w-full flex flex-col max-h-[50vh] overflow-auto">

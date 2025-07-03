@@ -45,7 +45,7 @@ export default function DrillingPointView() {
                 setDrillingPointPhotos(response.data.drillingPointPhotos || []);
                 setLayerLogs(response.data.layerLogs || []);
                 if (response.data.sampleLogs && response.data.sampleLogs.length > 0) {
-                    setTabOption(response.data.sampleLogs[0].tag);
+                setTabOption(response.data.sampleLogs[0].tag);
                 }
             } catch (error) {
                 console.error(`❌ Error cargando punto de perforación ${drillingPointId} proyecto ${id}:`, error.response?.data || error.message);
@@ -91,119 +91,119 @@ export default function DrillingPointView() {
                 <div className="m-4">
                     <div className="grid grid-row justify-center text-h4 gap-3">
                         {drillingPoint.coordinates && drillingPoint.coordinates.coordinates && drillingPoint.coordinates.coordinates.length >= 2 && (
-                            <div className="border-1 rounded-full py-3 px-4">
-                                <MapPinned 
-                                    size={30}
-                                    strokeWidth={1}
-                                    className="inline"/> {drillingPoint.coordinates.coordinates[0]}, {drillingPoint.coordinates.coordinates[1]}
-                            </div>
+                        <div className="border-1 rounded-full py-3 px-4">
+                            <MapPinned 
+                                size={30}
+                                strokeWidth={1}
+                                className="inline"/> {drillingPoint.coordinates.coordinates[0]}, {drillingPoint.coordinates.coordinates[1]}
+                        </div>
                         )}
                         {drillingPoint.method && (
-                            <div className="border-1 rounded-full py-3 px-4">
-                                <Pickaxe 
-                                    size={30}
-                                    strokeWidth={1}
-                                    className="inline"/> {drillingPoint.method}
-                            </div>
+                        <div className="border-1 rounded-full py-3 px-4">
+                            <Pickaxe 
+                                size={30}
+                                strokeWidth={1}
+                                className="inline"/> {drillingPoint.method}
+                        </div>
                         )}
                         {drillingPoint.matrixType && (
-                            <div className="border-1 rounded-full py-3 px-4">
-                                <Sprout 
-                                    size={30}
-                                    strokeWidth={1}
-                                    className="inline"/> {drillingPoint.matrixType}
-                            </div>
+                        <div className="border-1 rounded-full py-3 px-4">
+                            <Sprout 
+                                size={30}
+                                strokeWidth={1}
+                                className="inline"/> {drillingPoint.matrixType}
+                        </div>
                         )}
                     </div>
                     
                     {layerLogs && layerLogs.length > 0 && (
                         <>
                             <div className="flex justify-between text-h3 mt-4 pb-2">
-                                <div>Información de la capa</div>
+                        <div>Información de la capa</div>
                                 <ButtonComponent label={'Exportar a excel'} onClick={() => exportToExcel(layerLogs[0])} disable />
-                            </div>
-                            {layerLogs.map((layerLog) => (
-                                <div key={layerLog.id}>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
+                    </div>
+                    {layerLogs.map((layerLog) => (
+                        <div key={layerLog.id}>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
                                                 {layerLog.initialDepth !== null && layerLog.initialDepth !== undefined && (
-                                                    <TableHead>Profundidad inicial</TableHead>
+                                        <TableHead>Profundidad inicial</TableHead>
                                                 )}
                                                 {layerLog.finalDepth !== null && layerLog.finalDepth !== undefined && (
-                                                    <TableHead>Profundidad final</TableHead>
+                                        <TableHead>Profundidad final</TableHead>
                                                 )}
                                                 {layerLog.subMatrix && (
-                                                    <TableHead>Sub matriz</TableHead>
+                                        <TableHead>Sub matriz</TableHead>
                                                 )}
                                                 {layerLog.texture && (
-                                                    <TableHead>Textura</TableHead>
+                                        <TableHead>Textura</TableHead>
                                                 )}
-                                                {layerLog.seccondaryTexture && (
-                                                    <TableHead>Sub textura</TableHead>
-                                                )}
+                                        {layerLog.seccondaryTexture && (
+                                            <TableHead>Sub textura</TableHead>
+                                        )}
                                                 {layerLog.color && (
-                                                    <TableHead>Color</TableHead>
+                                        <TableHead>Color</TableHead>
                                                 )}
                                                 {layerLog.humidity && (
-                                                    <TableHead>Humedad</TableHead>
+                                        <TableHead>Humedad</TableHead>
                                                 )}
                                                 {layerLog.smell && (
-                                                    <TableHead>Olor</TableHead>
+                                        <TableHead>Olor</TableHead>
                                                 )}
                                                 {layerLog.pidLog !== null && layerLog.pidLog !== undefined && (
-                                                    <TableHead>PID</TableHead>
+                                        <TableHead>PID</TableHead>
                                                 )}
                                                 {layerLog.waterPresence !== null && layerLog.waterPresence !== undefined && (
-                                                    <TableHead>Presencia de agua</TableHead>
+                                        <TableHead>Presencia de agua</TableHead>
                                                 )}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            <TableRow>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow>
                                                 {layerLog.initialDepth !== null && layerLog.initialDepth !== undefined && (
-                                                    <TableHead>{(layerLog.initialDepth).toFixed(5)}</TableHead>
+                                        <TableHead>{(layerLog.initialDepth).toFixed(5)}</TableHead>
                                                 )}
                                                 {layerLog.finalDepth !== null && layerLog.finalDepth !== undefined && (
-                                                    <TableHead>{(layerLog.finalDepth).toFixed(5)}</TableHead>
+                                        <TableHead>{(layerLog.finalDepth).toFixed(5)}</TableHead>
                                                 )}
                                                 {layerLog.subMatrix && (
-                                                    <TableHead>{layerLog.subMatrix}</TableHead>
+                                        <TableHead>{layerLog.subMatrix}</TableHead>
                                                 )}
                                                 {layerLog.texture && (
-                                                    <TableHead>{layerLog.texture}</TableHead>
+                                        <TableHead>{layerLog.texture}</TableHead>
                                                 )}
-                                                {layerLog.seccondaryTexture && (
-                                                    <TableHead>{layerLog.seccondaryTexture}</TableHead>
-                                                )}
+                                        {layerLog.seccondaryTexture && (
+                                            <TableHead>{layerLog.seccondaryTexture}</TableHead>
+                                        )}
                                                 {layerLog.color && (
-                                                    <TableHead>{layerLog.color}</TableHead>
+                                        <TableHead>{layerLog.color}</TableHead>
                                                 )}
                                                 {layerLog.humidity && (
-                                                    <TableHead>{layerLog.humidity}</TableHead>
+                                        <TableHead>{layerLog.humidity}</TableHead>
                                                 )}
                                                 {layerLog.smell && (
-                                                    <TableHead>{layerLog.smell}</TableHead>
+                                        <TableHead>{layerLog.smell}</TableHead>
                                                 )}
                                                 {layerLog.pidLog !== null && layerLog.pidLog !== undefined && (
-                                                    <TableHead>{(layerLog.pidLog).toFixed(5)}</TableHead>
+                                        <TableHead>{(layerLog.pidLog).toFixed(5)}</TableHead>
                                                 )}
                                                 {layerLog.waterPresence !== null && layerLog.waterPresence !== undefined && (
                                                     <TableHead>
                                                         {layerLog.waterPresence ? 'Positivo' : 'Negativo'}
                                                     </TableHead>
-                                                )}
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                                        )}
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
                                     {layerLog.observations && (
                                         <>
                                             <div className="text-h4 px-2">Comentarios de la capa</div>
                                             <div className="text-h5 px-2">{layerLog.observations}</div>
                                         </>
                                     )}
-                                </div>
-                            ))}
+                        </div>
+                    ))}
                         </>
                     )}
                     
@@ -211,14 +211,14 @@ export default function DrillingPointView() {
                         <div className="flex flex-wrap justify-center gap-x-2 mt-4">
                             {drillingPointPhotos.map((photo) => (
                                 photo && photo.url && (
-                                    <Image
-                                        key={photo.id}
-                                        src={photo.url}
+                                <Image
+                                    key={photo.id}
+                                    src={photo.url}
                                         alt={`Foto del punto de perforación ${drillingPoint.tag || 'sin etiqueta'}`}
-                                        height={300}
-                                        width={300}
-                                        className="object-cover"
-                                    />
+                                    height={300}
+                                    width={300}
+                                    className="object-cover"
+                                />
                                 )
                             ))}
                         </div>
