@@ -47,9 +47,9 @@ export default function ExcelsPage() {
       </div>
 
       <div className="mt-8">
-        <div className="grid grid-cols-11 justify-items-center items-center text-black dark:text-white bg-quaternary dark:bg-base p-2 text-h5">
-          <div className="col-start-1 col-span-9 text-center">Nombre</div>
-          <div className="col-start-10 col-span-2 text-center">Última apertura</div>
+        <div className="grid grid-cols-11 items-center text-black dark:text-white bg-quaternary dark:bg-base p-2 text-h5">
+          <div className="col-start-1 col-span-9 pl-28">Nombre</div>
+          <div className="col-start-10 col-span-3 text-center">Fecha Creación</div>
         </div>
 
         <Table>

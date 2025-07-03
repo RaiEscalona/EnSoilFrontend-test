@@ -18,6 +18,7 @@ import UpdatePassword from "../UpdateProfileComponents/updatePassword";
 
 export default function UserInfo({ user }) {
     const [isAdmin, setAdmin] = useState(false);
+    const [hierarchy, setHierarchy] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [profileForm, setProfileForm] = useState({ name: '', lastName: '' });
     const [passwordForm, setPasswordForm] = useState({ password: '', newPassword: '' });
@@ -92,7 +93,21 @@ export default function UserInfo({ user }) {
             setShowAlert(true);
             setAlertMessage('Contraseña incorrecta');
         }
-    }
+    };
+
+    const handleHierarchyInfo = (data) => {
+        if (data.hierarchy === 1) {
+            setHierarchy('Baja');
+        } else if (data.hierarchy === 2) {
+            setHierarchy('Media Baja');
+        } else if (data.hierarchy === 3) {
+            setHierarchy('Media Baja');
+        } else if (data.hierarchy === 4) {
+            setHierarchy('Media Alta');
+        } else if (data.hierarchy === 5) {
+            setHierarchy('Admin');
+        }
+    };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -102,9 +117,13 @@ export default function UserInfo({ user }) {
                     Authorization: `Bearer ${token}`,
                 };
                 const response = await api.get('/users/verify-admin', { headers });
+                const userResponse = await api.get('/users/me', { headers });
                 console.log('❕ Respuesta del backend:', response.data);
                 if (response.data.success) {
                     setAdmin(true);
+                }
+                if (userResponse.data.success) {
+                    handleHierarchyInfo(userResponse.data.user)
                 }
             } catch (error) {
                 console.log('❌ Error en validación del token:', error);
@@ -125,7 +144,7 @@ export default function UserInfo({ user }) {
                 <div className="info-container">
                     <div className="text-h2 pb-2">Perfil</div>
                     <div className="flex justify-center">
-                        <div className="grid grid-flow-col grid-cols-4 grid-rows-2 justify-items-center items-center gap-2">
+                        <div className="grid grid-flow-col grid-cols-4 grid-rows-3 justify-items-center items-center gap-2">
                             <div className="row-span-2 col-start-1">
                                 <CircleUserRound 
                                     size={55}
@@ -135,9 +154,13 @@ export default function UserInfo({ user }) {
                                 <>
                                     <div className="row-start-1 col-start-2 justify-self-start">{user.displayName}</div>
                                     <div className="row-start-2 col-start-2 justify-self-start">{user.email}</div>
+                                    <div className="row-start-3 col-start-2 justify-self-start">{hierarchy}</div>
                                 </>
                             ) : (
-                                <div className="row-span-2 col-start-2">{user.email}</div>
+                                <>
+                                    <div className="row-start-1 col-start-2 justify-self-start">{user.email}</div>
+                                    <div className="row-start-2 col-start-2 justify-self-start">Rol {hierarchy}</div>
+                                </>
                             )}
                             <div className="row-start-1 col-start-4 justify-self-stretch">
                                 <UpdateProfile handleUpdateProfile={handleUpdateProfile} form={profileForm} setForm={setProfileForm} />

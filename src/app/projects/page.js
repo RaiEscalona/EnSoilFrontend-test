@@ -96,7 +96,7 @@ export default function ProjectsPage() {
         {/* Controles de paginación y barra de búsqueda */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Mostrar:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-200">Mostrar:</span>
             <select
               value={itemsPerPage}
               onChange={e => {
@@ -110,7 +110,7 @@ export default function ProjectsPage() {
               <option value={12}>12</option>
               <option value={20}>20</option>
             </select>
-            <span className="text-sm text-gray-600">elementos por página</span>
+            <span className="text-sm text-gray-600 dark:text-gray-200">elementos por página</span>
           </div>
           <div className="flex-1 flex justify-center">
             <input
@@ -124,7 +124,7 @@ export default function ProjectsPage() {
               className="max-w-xs w-full border border-gray-300 rounded px-2 py-1"
             />
           </div>
-          <div className="text-sm text-gray-600 text-center sm:text-right">
+          <div className="text-sm text-gray-600 dark:text-gray-200 text-center sm:text-right">
             Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems} resultados
           </div>
         </div>

@@ -72,14 +72,12 @@ export default function AnalysisPage() {
           analysisData
         });
       } else if (selectedTableType === 'lab_analysis') {
-        // Simulación de datos para análisis de laboratorio
-        setTableData({}); // Puedes reemplazarlo con una carga real
+        setTableData({}); 
       } else if (selectedTableType === 'water_analysis') {
         setTableData({});
       } else if (selectedTableType === 'ground_metals_analysis') {
-        console.log(`🔄 Cargando datos de la tabla metales suelo del proyecto ${projectId}`);
         const response = await api.get(`/projects/${projectId}/groundMetals`);
-        console.log(`✅ Datos de la tabla metales suelo del proyecto ${projectId} cargado:`, response.data);
+        console.log(`✅ Datos de la tabla metales suelo del proyecto ${projectId} cargado:`);
         const data = response.data;
 
         if (!data || data.length === 0) {
@@ -134,7 +132,7 @@ export default function AnalysisPage() {
 
   return (
     <WithSidebarLayout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col">
         <h1 className="text-h2 font-bold mb-6">Análisis del Proyecto {projectId}</h1>
         <div className="p-4 rounded-lg border mb-5" style={{ borderColor: 'var(--color-quaternary)' }}>
           <h2 className="text-h3 mb-4 text-center">Generar Tabla de Análisis</h2>
@@ -170,7 +168,7 @@ export default function AnalysisPage() {
         {isLoading && <p className="text-center my-4">Cargando datos de la tabla...</p>}
         {error && <p className="text-center my-4 text-red-600">{error}</p>}
         {tableData && (
-          <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md h-full w- flex flex-col">
+          <div className="bg-white dark:bg-quaternary border border-quaternary p-6 rounded-lg shadow-md flex flex-col overflow-hidden max-h-[calc(100vh-250px)]">
             {/* Selector Suelo/Agua flotante y título */}
             {selectedTableType === 'lab_analysis' ? (
               <h3 className="text-black text-h3 mb-4">Tabla: Análisis de Laboratorio</h3>

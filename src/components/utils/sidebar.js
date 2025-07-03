@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link";
-import { Home, FolderPlus, ArrowLeftToLine, CircleUserRound, ClipboardList, FolderOpen, PlusSquare } from "lucide-react";
+import { Home, FolderPlus, ArrowLeftToLine, CircleUserRound, ClipboardList, FolderOpen, PlusSquare, Folder } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { UserAuth } from "../Authentication/AuthContext";
 
@@ -56,7 +56,7 @@ export default function Sidebar() {
             className="text-black flex flex-col items-center gap-1 pt-4 dark:text-white group focus:outline-none"
             style={{ cursor: 'pointer' }}
           >
-            <FolderPlus
+            <Folder
               size={35}
               strokeWidth={1}
               className="group-hover:text-primary transition-colors duration-200"
@@ -65,16 +65,16 @@ export default function Sidebar() {
           </button>
           {showProjectsDropdown && (
             <div
-              className="absolute left-full top-0 ml-2 bg-white border rounded shadow-lg flex flex-col z-50 min-w-[180px]"
+              className="absolute left-full top-0 ml-3 border rounded-lg border-gray-300 dark:border-black bg-quaternary dark:bg-base shadow-xl flex flex-col z-50 w-[220px] min-w-[180px]"
               onMouseEnter={handleProjectsEnter}
               onMouseLeave={handleProjectsLeave}
             >
-              <Link href="/projects" className="flex items-center gap-2 px-4 py-2 text-black hover:text-primary hover:bg-gray-100 cursor-pointer">
+              <Link href="/projects" className="flex items-center gap-2 px-4 py-2 text-black dark:text-white rounded-lg hover:text-primary hover:bg-gray-200 dark:hover:bg-neutral-800 cursor-pointer">
                 <FolderOpen size={22} className="transition-colors duration-200 group-hover:text-primary" />
                 <span>Ver Proyectos</span>
               </Link>
-              <Link href="/projects/create" className="flex items-center gap-2 px-4 py-2 text-black hover:text-primary hover:bg-gray-100 cursor-pointer">
-                <PlusSquare size={22} className="transition-colors duration-200 group-hover:text-primary" />
+              <Link href="/projects/create" className="flex items-center gap-2 px-4 py-2 text-black dark:text-white rounded-lg hover:text-primary hover:bg-gray-200 dark:hover:bg-neutral-800 cursor-pointer">
+                <FolderPlus size={22} className="transition-colors duration-200 group-hover:text-primary" />
                 <span>Crear Proyecto Nuevo</span>
               </Link>
             </div>

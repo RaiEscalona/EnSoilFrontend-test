@@ -42,7 +42,7 @@ export function formatCoordinates(coordinates) {
   // Handle GeoJSON Point format
   if (coordinates.type === 'Point' && Array.isArray(coordinates.coordinates)) {
     const [east, north] = coordinates.coordinates;
-    return `N: ${north.toFixed(6)}, E: ${east.toFixed(6)}`;
+    return `N: ${north?.toFixed(6)}, E: ${east?.toFixed(6)}`;
   }
   
   // Handle simple object format

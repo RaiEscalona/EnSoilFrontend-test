@@ -5,19 +5,9 @@ import axios from "axios";
 import { useParams } from 'next/navigation';
 import * as XLSX from "xlsx";
 
-const columnasAgua = [
-  "Muestra",
-  "Metales",
-  "pH/CE",
-  "PB",
-  "Iones",
-  "Coliformes fecales",
-  "Alcalinidad",
-  "Amoníaco y amonio"
-];
-
 export default function WaterAnalysis({ projectId }) {
   const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -28,6 +18,11 @@ export default function WaterAnalysis({ projectId }) {
       try {
         const res = await axios.get(`/analysisMethods/${projectId}/costsSummary?Agua`);
         setData(res.data || []);
+        if (res.data?.length) {
+          const claves = Object.keys(res.data[0]);
+          const columnasOrdenadas = claves.filter(k => k !== 'sampleLog' && k !== 'totalCost');
+          setColumns(["Muestra", ...columnasOrdenadas, "Costo Total"]);
+        }
       } catch (err) {
         setError("Error al cargar los datos");
       }
@@ -39,17 +34,20 @@ export default function WaterAnalysis({ projectId }) {
   }, [projectId]);
 
   const exportToExcel = () => {
-    const exportData = data.map(row => ({
-      "Muestra": row.sampleLog ?? "",
-      "Metales": row.metales ?? "",
-      "pH/CE": row.phce ?? "",
-      "PB": row.pb ?? "",
-      "Iones": row.iones ?? "",
-      "Coliformes fecales": row.coliformesFecales ?? "",
-      "Alcalinidad": row.alcalinidad ?? "",
-      "Amoníaco y amonio": row.amoniaco ?? ""
-    }));
-    const ws = XLSX.utils.json_to_sheet(exportData, { header: columnasAgua });
+    const exportData = data.map(row => {
+      const exportRow = {};
+      columns.forEach(col => {
+        if (col === "Muestra") {
+          exportRow[col] = row.sampleLog ?? "";
+        } else if (col === "Costo Total") {
+          exportRow[col] = row.totalCost ?? "";
+        } else {
+          exportRow[col] = row[col] ?? "";
+        }
+      });
+      return exportRow;
+    });
+    const ws = XLSX.utils.json_to_sheet(exportData, { header: columns });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Análisis de Agua");
     XLSX.writeFile(wb, "analisis_agua.xlsx");
@@ -57,6 +55,38 @@ export default function WaterAnalysis({ projectId }) {
 
   if (loading) return <div className="text-center py-4 text-gray-500">No hay datos disponibles</div>;
   if (error) return <div className="text-center py-4 text-red-600">{error}</div>;
+
+  // Calculate totals for numeric columns that include costs (assumed to be columns with $)
+  const totals = {};
+  if (data.length > 0) {
+    columns.forEach(col => {
+      if (col === "Muestra") {
+        totals[col] = "Total";
+      } else if (col === "Costo Total") {
+        const sum = data.reduce((acc, row) => {
+          const val = row.totalCost;
+          if (typeof val === "number") return acc + val;
+          if (typeof val === "string") {
+            const num = parseFloat(val.replace(/[^0-9.-]+/g,""));
+            return acc + (isNaN(num) ? 0 : num);
+          }
+          return acc;
+        }, 0);
+        totals[col] = `$${sum.toFixed(2)}`;
+      } else {
+        const sum = data.reduce((acc, row) => {
+          const val = row[col];
+          if (typeof val === "number") return acc + val;
+          if (typeof val === "string") {
+            const num = parseFloat(val.replace(/[^0-9.-]+/g,""));
+            return acc + (isNaN(num) ? 0 : num);
+          }
+          return acc;
+        }, 0);
+        totals[col] = sum !== 0 ? sum : '';
+      }
+    });
+  }
 
   return (
     <div className="p-4 bg-white rounded shadow">
@@ -73,7 +103,7 @@ export default function WaterAnalysis({ projectId }) {
         <table className="min-w-full border border-gray-300 divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {columnasAgua.map((col) => (
+              {columns.map((col) => (
                 <th
                   key={col}
                   scope="col"
@@ -87,31 +117,32 @@ export default function WaterAnalysis({ projectId }) {
           <tbody className="bg-white divide-y divide-gray-200">
             {data.length === 0 ? (
               <tr>
-                <td colSpan={columnasAgua.length} className="text-center py-6 text-gray-400">
+                <td colSpan={columns.length} className="text-center py-6 text-gray-400">
                   No hay datos.
                 </td>
               </tr>
             ) : (
-              data.map((row, idx) => (
-                <tr key={idx} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                  {columnasAgua.map((col, colIdx) => {
-                    let cellValue = '';
-                    if (col === "Muestra") cellValue = row.sampleLog ?? '';
-                    else if (col === "Metales") cellValue = row.metales ?? '';
-                    else if (col === "pH/CE") cellValue = row.phce ?? '';
-                    else if (col === "PB") cellValue = row.pb ?? '';
-                    else if (col === "Iones") cellValue = row.iones ?? '';
-                    else if (col === "Coliformes fecales") cellValue = row.coliformesFecales ?? '';
-                    else if (col === "Alcalinidad") cellValue = row.alcalinidad ?? '';
-                    else if (col === "Amoníaco y amonio") cellValue = row.amoniaco ?? '';
-                    return (
-                      <td key={colIdx} className="px-4 py-2 whitespace-nowrap text-sm text-gray-700 truncate">
-                        {cellValue}
-                      </td>
-                    );
-                  })}
+              <>
+                {data.map((row, idx) => (
+                  <tr key={idx} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    {columns.map((col, colIdx) => {
+                      const valor = col === "Muestra" ? row.sampleLog ?? '' : col === "Costo Total" ? row.totalCost ?? '' : row[col] ?? '';
+                      return (
+                        <td key={colIdx} className={`px-4 py-2 whitespace-nowrap text-sm text-gray-700 truncate ${typeof valor === 'string' && valor.includes('$') ? 'text-green-500' : ''}`}>
+                          {valor}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+                <tr className="bg-gray-100 font-semibold">
+                  {columns.map((col, colIdx) => (
+                    <td key={colIdx} className={`px-4 py-2 whitespace-nowrap text-sm text-gray-800 truncate ${typeof totals[col] === 'string' && totals[col].includes('$') ? 'text-green-600' : ''}`}>
+                      {totals[col]}
+                    </td>
+                  ))}
                 </tr>
-              ))
+              </>
             )}
           </tbody>
         </table>

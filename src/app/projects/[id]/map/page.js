@@ -20,6 +20,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/ui/pagination';
+import TabsButton from '@/components/utils/tabsButton';
+import { DialogDescription, DialogFooter } from '@/ui/dialog';
+import { DialogClose } from '@radix-ui/react-dialog';
+import { UserAuth } from '@/components/Authentication/AuthContext';
+import { getIdToken, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/firebase';
 
 export default function ProjectMapPage() {
   const { id } = useParams();
@@ -497,8 +503,8 @@ export default function ProjectMapPage() {
           showPointModal={showPointModal} />
 
       {/* Botones para cambiar la vista debajo del mapa */}
-      <div style={{ display: 'flex', gap: 16, margin: '32px auto 16px auto', maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%' }}>
-        <Button
+      <div className='m-5 pt-3 flex gap-4'>
+        {/* <Button
           onClick={() => setViewMode('points')}
           className={`px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
             viewMode === 'points' 
@@ -507,8 +513,8 @@ export default function ProjectMapPage() {
           }`}
         >
           Ver puntos de perforación
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           onClick={() => setViewMode('analysisMethods')}
           className={`px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
             viewMode === 'analysisMethods' 
@@ -517,12 +523,14 @@ export default function ProjectMapPage() {
           }`}
         >
           Ver métodos de análisis
-        </Button>
-      </div>
+        </Button> */}
+        <TabsButton label={'Ver puntos de perforación'} onUse={viewMode == 'points'} onClick={() => setViewMode('points')} />
+        <TabsButton label={'Ver métodos de análisis'} onUse={viewMode == 'analysisMethods'} onClick={() => setViewMode('analysisMethods')} />
 
+      </div>
       {/* Vista condicional debajo del mapa */}
       {viewMode === 'points' && (
-        <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '0 auto' }}>
+        <div className='m-5'>
           <div className="text-h3" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
             Lista de Puntos de Perforación
             <ButtonComponent label={'Exportar puntos'} onClick={() => {
@@ -535,7 +543,7 @@ export default function ProjectMapPage() {
         </div>
       )}
       {viewMode === 'analysisMethods' && (
-        <div style={{ maxWidth: imageInfo ? `${Math.min(imageInfo.width, 1000)}px` : '100%', margin: '0 auto' }}>
+        <div className='m-5'>
           <div className="flex justify-between items-center mb-4">
             <div className="text-h3" style={{ marginBottom: 0, display: 'flex', alignItems: 'center', gap: 16 }}>
               Métodos de Análisis del Proyecto
@@ -590,7 +598,7 @@ export default function ProjectMapPage() {
           {loadingAnalysis ? (
             <div>Cargando métodos de análisis...</div>
           ) : analysisMethods.length === 0 ? (
-            <div className="text-center text-gray-500 text-lg py-12">
+            <div className="text-center text-h4 py-12">
               No hay métodos de análisis vinculados a este proyecto actualmente
             </div>
           ) : (
@@ -856,7 +864,58 @@ export default function ProjectMapPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <UnlinkUsers />
     </div>
     </WithSidebarLayout>
   );
 } 
+
+function UnlinkUsers() {
+  const { user } = UserAuth();
+  const [admin, setAdmin] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      try {
+        const token = await getIdToken(user);
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await api.get('/users/verify-admin', { headers });
+        console.log('❕ Respuesta del backend:', response.data);
+        if (response.data.success) {
+          setAdmin(true);
+        }
+      } catch (error) {
+        console.log('❌ Error en validación del token:', error);
+        setAdmin(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [user])
+
+  if (admin) {
+    return (
+      <div className='flex justify-center'>
+        <Dialog>
+          <DialogTrigger asChild>
+            <ButtonComponent label={'Desligar usuarios del proyecto'} isDelete />
+          </DialogTrigger>
+          <DialogContent className={'bg-base border-red-600'}>
+            <DialogHeader>
+              <DialogTitle>Desligar todos los usuarios del proyecto</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              Se desligarán todos los permisos de jerarquía asociados al proyecto, es decir, ningún usuario estará asignado a un recurso. Esto no borrará los datos asociados a los recursos, solo libera a los usuarios del recurso asignado.
+            </DialogDescription>
+            <DialogFooter className="justify-self-center">
+                <DialogClose asChild>
+                    <ButtonComponent label={'Desligar usuarios'} isDelete={true} />
+                </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+}

@@ -215,8 +215,8 @@ export default function MetodosAnalisis() {
   if (loading) {
     return (
       <WithSidebarLayout>
-        <div className="min-h-screen bg-gray-50">
-          <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen bg-[#f5f5f5] dark:bg-secondary text-black dark:text-white">
+          <div className="container mx-auto px-4 py-8 text-black dark:text-white bg-[#f5f5f5] dark:bg-secondary">
             <div className="flex justify-center items-center h-64">
               <div className="text-lg">Cargando métodos de análisis...</div>
             </div>
@@ -228,7 +228,7 @@ export default function MetodosAnalisis() {
 
   return (
     <WithSidebarLayout>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#f5f5f5] dark:bg-secondary text-black dark:text-white">
         {showAlert && (
           <Alert 
             message={alertMessage} 
@@ -236,14 +236,14 @@ export default function MetodosAnalisis() {
             duration={10000}
           />
         )}
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 text-black dark:text-white bg-[#f5f5f5] dark:bg-secondary">
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                <h1 className="text-4xl font-bold text-black dark:text-white mb-2">
                   Métodos de Análisis
                 </h1>
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-black dark:text-white">
                   Gestión y visualización de métodos de análisis disponibles
                 </p>
               </div>
@@ -255,13 +255,13 @@ export default function MetodosAnalisis() {
                       Agregar Método
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px] bg-white border-gray-200">
+                  <DialogContent className="sm:max-w-[425px] bg-[#f5f5f5] dark:bg-[#8f8d8d] text-black dark:text-white border border-[color:var(--foreground)]">
                     <DialogHeader>
-                      <DialogTitle className="text-gray-900">Agregar Nuevo Método de Análisis</DialogTitle>
+                      <DialogTitle className="text-black dark:text-white">Agregar Nuevo Método de Análisis</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="name" className="text-gray-700">
+                        <Label htmlFor="name" className="text-black dark:text-white">
                           Nombre del Método <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -269,11 +269,11 @@ export default function MetodosAnalisis() {
                           value={newMethod.name}
                           onChange={(e) => setNewMethod(prev => ({ ...prev, name: e.target.value }))}
                           placeholder="Ej: Metales, pH/CE, etc."
-                          className="bg-white border-gray-300 text-gray-900"
+                          className="bg-quaternary border-[color:var(--foreground)] text-white"
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="matrixType" className="text-gray-700">
+                        <Label htmlFor="matrixType" className="text-black dark:text-white">
                           Tipo de Matriz <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -281,11 +281,11 @@ export default function MetodosAnalisis() {
                           value={newMethod.matrixType}
                           onChange={(e) => setNewMethod(prev => ({ ...prev, matrixType: e.target.value }))}
                           placeholder="Ej: Suelo, Agua, Aire, Sedimento, etc."
-                          className="bg-white border-gray-300 text-gray-900"
+                          className="bg-quaternary border-[color:var(--foreground)] text-white"
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="source" className="text-gray-700">
+                        <Label htmlFor="source" className="text-black dark:text-white">
                           Fuente <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -293,23 +293,23 @@ export default function MetodosAnalisis() {
                           value={newMethod.source}
                           onChange={(e) => setNewMethod(prev => ({ ...prev, source: e.target.value }))}
                           placeholder="Ej: Método ALS 8270D"
-                          className="bg-white border-gray-300 text-gray-900"
+                          className="bg-quaternary border-[color:var(--foreground)] text-white"
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="laboratoryName" className="text-gray-700">
+                        <Label htmlFor="laboratoryName" className="text-black dark:text-white">
                           Nombre del Laboratorio <span className="text-red-500">*</span>
                         </Label>
                         <Select value={newMethod.laboratoryName} onValueChange={(value) => setNewMethod(prev => ({ ...prev, laboratoryName: value }))}>
-                          <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                          <SelectTrigger className="bg-[#f5f5f5] dark:bg-[#8f8d8d] border-[color:var(--foreground)] text-black dark:text-white">
                             <SelectValue placeholder="Seleccionar laboratorio" />
                           </SelectTrigger>
-                          <SelectContent className="bg-white border-gray-200">
+                          <SelectContent className="bg-[#f5f5f5] dark:bg-[#8f8d8d] text-black dark:text-white border border-[color:var(--foreground)]">
                             {availableLaboratories.map((laboratory) => (
                               <SelectItem 
                                 key={laboratory} 
                                 value={laboratory} 
-                                className="text-gray-900 hover:bg-gray-100"
+                                className="text-white hover:bg-[#3e4866]"
                               >
                                 {laboratory}
                               </SelectItem>
@@ -378,7 +378,7 @@ export default function MetodosAnalisis() {
                       )}
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-gray-300 text-gray-700">
+                      <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[color:var(--foreground)] text-white">
                         Cancelar
                       </Button>
                       <Button onClick={createAnalysisMethod} className="bg-primary hover:bg-green-800 text-white">
@@ -420,22 +420,22 @@ export default function MetodosAnalisis() {
           </div>
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Mostrar:</span>
+              <span className="text-sm text-black dark:text-white">Mostrar:</span>
               <Select value={itemsPerPage.toString()} onValueChange={(value) => {
                 setItemsPerPage(parseInt(value));
                 setCurrentPage(1);
               }}>
-                <SelectTrigger className="w-20 bg-white border-gray-300 text-gray-900 cursor-pointer">
+                <SelectTrigger className="w-20 bg-[#f5f5f5] dark:bg-[#8f8d8d] border-[color:var(--foreground)] text-black dark:text-white cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200">
-                  <SelectItem value="5" className="text-gray-900 hover:bg-gray-100">5</SelectItem>
-                  <SelectItem value="10" className="text-gray-900 hover:bg-gray-100">10</SelectItem>
-                  <SelectItem value="20" className="text-gray-900 hover:bg-gray-100">20</SelectItem>
-                  <SelectItem value="50" className="text-gray-900 hover:bg-gray-100">50</SelectItem>
+                <SelectContent className="bg-[#f5f5f5] dark:bg-[#8f8d8d] text-black dark:text-white border border-[color:var(--foreground)]">
+                  <SelectItem value="5" className="text-white hover:bg-[#3e4866]">5</SelectItem>
+                  <SelectItem value="10" className="text-white hover:bg-[#3e4866]">10</SelectItem>
+                  <SelectItem value="20" className="text-white hover:bg-[#3e4866]">20</SelectItem>
+                  <SelectItem value="50" className="text-white hover:bg-[#3e4866]">50</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-gray-600">elementos por página</span>
+              <span className="text-sm text-black dark:text-white">elementos por página</span>
             </div>
             <div className="flex-1 flex justify-center">
               <Input
@@ -446,40 +446,40 @@ export default function MetodosAnalisis() {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="max-w-xs w-full border-gray-300"
+                className="max-w-xs w-full border-[color:var(--foreground)] text-black dark:text-white bg-[#f5f5f5] dark:bg-[#8f8d8d] placeholder:text-black dark:placeholder:text-white"
               />
             </div>
-            <div className="text-sm text-gray-600 text-center sm:text-right">
+            <div className="text-sm text-black dark:text-white text-center sm:text-right">
               Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems} resultados
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-[#f5f5f5] dark:bg-[#8f8d8d] rounded-lg shadow-md overflow-hidden text-black dark:text-white border border-[color:var(--foreground)] max-h-[calc(100vh-300px)] overflow-y-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Tipo de Matriz</TableHead>
-                  <TableHead>Fuente</TableHead>
-                  <TableHead>Laboratorio</TableHead>
-                  <TableHead>Costo Actual (UF)</TableHead>
-                  <TableHead>Costo Promedio (UF)</TableHead>
-                  <TableHead>Historial de Costos</TableHead>
-                  <TableHead>Acciones</TableHead>
+                  <TableHead className="text-black dark:text-white">Nombre</TableHead>
+                  <TableHead className="text-black dark:text-white">Tipo de Matriz</TableHead>
+                  <TableHead className="text-black dark:text-white">Fuente</TableHead>
+                  <TableHead className="text-black dark:text-white">Laboratorio</TableHead>
+                  <TableHead className="text-black dark:text-white">Costo Actual (UF)</TableHead>
+                  <TableHead className="text-black dark:text-white">Costo Promedio (UF)</TableHead>
+                  <TableHead className="text-black dark:text-white">Historial de Costos</TableHead>
+                  <TableHead className="text-black dark:text-white">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.map((method) => (
                   <TableRow key={method.id}>
-                    <TableCell className="font-medium">{method.name}</TableCell>
-                    <TableCell>{method.matrixType}</TableCell>
-                    <TableCell className="max-w-xs truncate" title={method.source}>
+                    <TableCell className="font-medium text-black dark:text-white">{method.name}</TableCell>
+                    <TableCell className="text-black dark:text-white">{method.matrixType}</TableCell>
+                    <TableCell className="max-w-xs truncate text-black dark:text-white" title={method.source}>
                       {method.source}
                     </TableCell>
-                    <TableCell>{getLaboratoryName(method.laboratory)}</TableCell>
-                    <TableCell className="font-semibold text-green-600">
+                    <TableCell className="text-black dark:text-white">{getLaboratoryName(method.laboratory)}</TableCell>
+                    <TableCell className="font-semibold text-green-400">
                       {formatUF(getCurrentCost(method.relatedProjects))}
                     </TableCell>
-                    <TableCell className="text-blue-600">
+                    <TableCell className="text-blue-300">
                       {formatUF(getAverageCost(method.relatedProjects))}
                     </TableCell>
                     <TableCell>
@@ -488,42 +488,42 @@ export default function MetodosAnalisis() {
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer transition-all duration-200 hover:scale-105"
+                            className="border-[color:var(--foreground)] text-black dark:text-white hover:bg-[#3e4866] cursor-pointer transition-all duration-200 hover:scale-105"
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             Ver ({method.relatedProjects?.length || 0})
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80 bg-white border-gray-200">
+                        <PopoverContent className="w-80 bg-[#f5f5f5] dark:bg-[#8f8d8d] text-black dark:text-white border border-[color:var(--foreground)]">
                           <div className="space-y-2">
-                            <h4 className="font-medium text-gray-900">Historial de Costos - {method.name}</h4>
+                            <h4 className="font-medium text-black dark:text-white">Historial de Costos - {method.name}</h4>
                             <div className="max-h-60 overflow-y-auto">
                               {method.relatedProjects && method.relatedProjects.length > 0 ? (
                                 <div className="space-y-1">
                                   {method.relatedProjects.map((project, index) => (
-                                    <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                    <div key={index} className="flex justify-between items-center p-2 bg-[#3e4866] rounded">
                                       <div className="flex flex-col">
-                                        <span className="text-sm font-medium text-gray-900">
+                                        <span className="text-sm font-medium text-black dark:text-white">
                                           {project.projectName}
                                         </span>
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-black dark:text-white">
                                           Proyecto ID: {project.projectId}
                                         </span>
                                       </div>
-                                      <span className="font-medium text-green-600">
+                                      <span className="font-medium text-green-400">
                                         {formatUF(project.cost)}
                                       </span>
                                     </div>
                                   ))}
                                 </div>
                               ) : (
-                                <p className="text-gray-500 text-sm">No hay historial de costos disponible</p>
+                                <p className="text-black dark:text-white text-sm">No hay historial de costos disponible</p>
                               )}
                             </div>
-                            <div className="pt-2 border-t border-gray-200">
+                            <div className="pt-2 border-t border-[color:var(--foreground)]">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-700">Promedio:</span>
-                                <span className="font-semibold text-blue-600">
+                                <span className="text-sm font-medium text-black dark:text-white">Promedio:</span>
+                                <span className="font-semibold text-blue-300">
                                   {formatUF(getAverageCost(method.relatedProjects))}
                                 </span>
                               </div>
@@ -535,7 +535,7 @@ export default function MetodosAnalisis() {
                     <TableCell>
                       <button
                         onClick={() => openDeleteDialog(method)}
-                        className="delete-btn p-2 rounded-md text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all duration-300 ease-in-out cursor-pointer"
+                        className="delete-btn p-2 rounded-md text-black dark:text-white hover:text-red-400 hover:bg-red-900 transition-all duration-300 ease-in-out cursor-pointer"
                         title="Eliminar método"
                         style={{
                           transform: 'rotate(0deg) scale(1)',
@@ -544,11 +544,14 @@ export default function MetodosAnalisis() {
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = 'rotate(12deg) scale(1.1)';
                           e.currentTarget.style.color = '#dc2626';
-                          e.currentTarget.style.backgroundColor = '#fef2f2';
+                          e.currentTarget.style.backgroundColor = '#991b1b';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = 'rotate(0deg) scale(1)';
-                          e.currentTarget.style.color = '#6b7280';
+                          e.currentTarget.style.color = '#000';
+                          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                            e.currentTarget.style.color = '#fff';
+                          }
                           e.currentTarget.style.backgroundColor = 'transparent';
                         }}
                       >
@@ -561,30 +564,30 @@ export default function MetodosAnalisis() {
             </Table>
           </div>
           <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-            <DialogContent className="sm:max-w-[500px] bg-white border-gray-200">
+            <DialogContent className="sm:max-w-[500px] bg-[#f5f5f5] dark:bg-[#8f8d8d] text-black dark:text-white border border-[color:var(--foreground)]">
               <DialogHeader>
-                <DialogTitle className="text-red-600 flex items-center gap-2">
+                <DialogTitle className="text-red-400 flex items-center gap-2">
                   <Trash2 className="w-5 h-5" />
                   Confirmar Eliminación
                 </DialogTitle>
-                <DialogDescription className="text-gray-600">
+                <DialogDescription className="text-black dark:text-white">
                   Esta acción no se puede deshacer. Por favor, confirme que desea eliminar este método de análisis.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-red-800 mb-2">⚠️ Advertencia Importante</h4>
-                  <p className="text-red-700 text-sm mb-3">
+                <div className="bg-red-900 border border-red-400 rounded-lg p-4">
+                  <h4 className="font-semibold text-red-200 mb-2">⚠️ Advertencia Importante</h4>
+                  <p className="text-red-300 text-sm mb-3">
                     Eliminar un método de análisis que se esté usando en proyectos puede generar inconsistencias en los datos. 
                     Este botón debe usarse únicamente si se equivocaron en la creación de un método y están seguros de que no provocará ningún cambio indebido.
                   </p>
-                  <p className="text-red-700 text-sm font-medium">
+                  <p className="text-red-200 text-sm font-medium">
                     Método a eliminar: <span className="font-bold">{methodToDelete?.name}</span>
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="deleteConfirmation" className="text-gray-700">
-                    Para confirmar la eliminación, escriba exactamente: <span className="font-mono text-red-600">&quot;confirmar eliminar&quot;</span>
+                  <Label htmlFor="deleteConfirmation" className="text-black dark:text-white">
+                    Para confirmar la eliminación, escriba exactamente: <span className="font-mono text-red-400">&quot;confirmar eliminar&quot;</span>
                   </Label>
                   <br />
                   <br />
@@ -593,7 +596,7 @@ export default function MetodosAnalisis() {
                     value={deleteConfirmation}
                     onChange={(e) => setDeleteConfirmation(e.target.value)}
                     placeholder="confirmar eliminar"
-                    className="bg-white border-gray-300 text-gray-900"
+                    className="bg-quaternary border-[color:var(--foreground)] text-white placeholder:text-white"
                   />
                 </div>
               </div>
@@ -605,7 +608,7 @@ export default function MetodosAnalisis() {
                     setMethodToDelete(null);
                     setDeleteConfirmation('');
                   }} 
-                  className="border-gray-300 text-gray-700"
+                  className="border-[color:var(--foreground)] text-white"
                 >
                   Cancelar
                 </Button>
